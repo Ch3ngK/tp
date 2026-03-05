@@ -488,11 +488,11 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 ### Non-Functional Requirements
 
 1. The app shall run on Windows, macOS, and Linux, with Java 17 without requiring external dependencies not bundled in the packaged app.
-2. The app shall run fully offline without network connection.
-3. The app shall handle up to 1000 contacts without noticeable sluggishness in performance (respond in under 1 second) for typical usage (listing, finding, modifying contacts).
-4. The app shall be save contact data automatically to persistent storage after any data mutations, and shall alert the user if it detects problems saving data.
+2. The app shall be able to run fully offline without network connection.
+3. The app shall handle up to 1000 contacts without noticeable sluggishness in performance (respond in under 1 second) for typical usage (listing, finding, modifying contacts) on a modern computer.
+4. The app shall save contact data automatically to persistent storage after any data mutations, and shall alert the user if it detects problems saving data.
 5. The app shall provide a descriptive error message for invalid commands and shall not crash on malformed user input.
-6. Users with above-average typing speed for regular English text (not code, not terminal commands) shall be able to accomplish typical tasks quicker by typing commands than using the mouse.
+6. Users with above-average typing speed for regular English text (not code, not terminal commands) should be able to complete typical tasks faster using keyboard commands than with a mouse.
 7. The codebase shall largely follow Object Oriented Programming principles.
 
 ### Glossary
