@@ -27,19 +27,25 @@ public class MatricNumberTest {
         // invalid addresses
         assertFalse(MatricNumber.isValidMatricNumber("")); // empty string
         assertFalse(MatricNumber.isValidMatricNumber(" ")); // spaces only
+        assertFalse(MatricNumber.isValidMatricNumber("B1234567N")); //starts with `B`
+        assertFalse(MatricNumber.isValidMatricNumber("1234567")); //only numbers
+        assertFalse(MatricNumber.isValidMatricNumber("A12345678Z")); //has 8 digits
+        assertFalse(MatricNumber.isValidMatricNumber("A123456Z")); //has 6 digits
+        assertFalse(MatricNumber.isValidMatricNumber("A0N")); // 1 digit
+        assertFalse(MatricNumber.isValidMatricNumber("AZ")); //no digits
 
         // valid addresses
-        assertTrue(MatricNumber.isValidMatricNumber("Blk 456, Den Road, #01-355"));
-        assertTrue(MatricNumber.isValidMatricNumber("-")); // one character
-        assertTrue(MatricNumber.isValidMatricNumber("Leng Inc; 1234 Market St; San Francisco CA 2349879; USA")); // long address
+        assertTrue(MatricNumber.isValidMatricNumber("A4433221B"));
+        assertTrue(MatricNumber.isValidMatricNumber("A0000000A")); // all same digits
+        assertTrue(MatricNumber.isValidMatricNumber("A4455667A")); // ends with `A`
     }
 
     @Test
     public void equals() {
-        MatricNumber matricNumber = new MatricNumber("Valid Address");
+        MatricNumber matricNumber = new MatricNumber("A1111111Z");
 
         // same values -> returns true
-        assertTrue(matricNumber.equals(new MatricNumber("Valid Address")));
+        assertTrue(matricNumber.equals(new MatricNumber("A1111111Z")));
 
         // same object -> returns true
         assertTrue(matricNumber.equals(matricNumber));
@@ -51,6 +57,6 @@ public class MatricNumberTest {
         assertFalse(matricNumber.equals(5.0f));
 
         // different values -> returns false
-        assertFalse(matricNumber.equals(new MatricNumber("Other Valid Address")));
+        assertFalse(matricNumber.equals(new MatricNumber("A1111111X")));
     }
 }

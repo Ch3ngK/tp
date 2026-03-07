@@ -14,8 +14,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Email;
+import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
@@ -29,7 +29,7 @@ public class ParserUtilTest {
 
     private static final String VALID_NAME = "Rachel Walker";
     private static final String VALID_PHONE = "123456";
-    private static final String VALID_ADDRESS = "123 Main Street #0505";
+    private static final String VALID_MATRIC_NUMBER = "A1234567K";
     private static final String VALID_EMAIL = "rachel@example.com";
     private static final String VALID_TAG_1 = "friend";
     private static final String VALID_TAG_2 = "neighbour";
@@ -114,14 +114,14 @@ public class ParserUtilTest {
 
     @Test
     public void parseAddress_validValueWithoutWhitespace_returnsAddress() throws Exception {
-        MatricNumber expectedMatricNumber = new MatricNumber(VALID_ADDRESS);
-        assertEquals(expectedMatricNumber, ParserUtil.parseAddress(VALID_ADDRESS));
+        MatricNumber expectedMatricNumber = new MatricNumber(VALID_MATRIC_NUMBER);
+        assertEquals(expectedMatricNumber, ParserUtil.parseAddress(VALID_MATRIC_NUMBER));
     }
 
     @Test
     public void parseAddress_validValueWithWhitespace_returnsTrimmedAddress() throws Exception {
-        String addressWithWhitespace = WHITESPACE + VALID_ADDRESS + WHITESPACE;
-        MatricNumber expectedMatricNumber = new MatricNumber(VALID_ADDRESS);
+        String addressWithWhitespace = WHITESPACE + VALID_MATRIC_NUMBER + WHITESPACE;
+        MatricNumber expectedMatricNumber = new MatricNumber(VALID_MATRIC_NUMBER);
         assertEquals(expectedMatricNumber, ParserUtil.parseAddress(addressWithWhitespace));
     }
 

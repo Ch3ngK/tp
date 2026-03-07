@@ -10,7 +10,7 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 public class MatricNumber {
 
     public static final String MESSAGE_CONSTRAINTS = "Matriculation numbers should start with `A`,"
-            + "followed by 7 digits and end with a capital letter.";
+            + " followed by 7 digits and end with a capital letter.";
 
     /*
      * The first character of the address must not be a whitespace,
