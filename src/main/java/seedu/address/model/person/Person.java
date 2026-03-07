@@ -49,7 +49,7 @@ public class Person {
         return email;
     }
 
-    public MatricNumber getAddress() {
+    public MatricNumber getMatricNumber() {
         return matricNumber;
     }
 

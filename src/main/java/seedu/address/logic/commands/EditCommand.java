@@ -98,7 +98,7 @@ public class EditCommand extends Command {
         Name updatedName = editPersonDescriptor.getName().orElse(personToEdit.getName());
         Phone updatedPhone = editPersonDescriptor.getPhone().orElse(personToEdit.getPhone());
         Email updatedEmail = editPersonDescriptor.getEmail().orElse(personToEdit.getEmail());
-        MatricNumber updatedMatricNumber = editPersonDescriptor.getAddress().orElse(personToEdit.getAddress());
+        MatricNumber updatedMatricNumber = editPersonDescriptor.getMatricNumber().orElse(personToEdit.getMatricNumber());
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
         return new Person(updatedName, updatedPhone, updatedEmail, updatedMatricNumber, updatedTags);
@@ -188,7 +188,7 @@ public class EditCommand extends Command {
             this.matricNumber = matricNumber;
         }
 
-        public Optional<MatricNumber> getAddress() {
+        public Optional<MatricNumber> getMatricNumber() {
             return Optional.ofNullable(matricNumber);
         }
 
