@@ -103,26 +103,26 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseAddress_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parseAddress((String) null));
+    public void parseMatricNumber_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseMatricNumber((String) null));
     }
 
     @Test
     public void parseAddress_invalidValue_throwsParseException() {
-        assertThrows(ParseException.class, () -> ParserUtil.parseAddress(INVALID_ADDRESS));
+        assertThrows(ParseException.class, () -> ParserUtil.parseMatricNumber(INVALID_ADDRESS));
     }
 
     @Test
-    public void parseAddress_validValueWithoutWhitespace_returnsAddress() throws Exception {
+    public void parseMatricNumber_validValueWithoutWhitespace_returnsMatricNumber() throws Exception {
         MatricNumber expectedMatricNumber = new MatricNumber(VALID_MATRIC_NUMBER);
-        assertEquals(expectedMatricNumber, ParserUtil.parseAddress(VALID_MATRIC_NUMBER));
+        assertEquals(expectedMatricNumber, ParserUtil.parseMatricNumber(VALID_MATRIC_NUMBER));
     }
 
     @Test
-    public void parseAddress_validValueWithWhitespace_returnsTrimmedAddress() throws Exception {
+    public void parseAddress_validValueWithWhitespace_returnsTrimmedMatricNumber() throws Exception {
         String addressWithWhitespace = WHITESPACE + VALID_MATRIC_NUMBER + WHITESPACE;
         MatricNumber expectedMatricNumber = new MatricNumber(VALID_MATRIC_NUMBER);
-        assertEquals(expectedMatricNumber, ParserUtil.parseAddress(addressWithWhitespace));
+        assertEquals(expectedMatricNumber, ParserUtil.parseMatricNumber(addressWithWhitespace));
     }
 
     @Test

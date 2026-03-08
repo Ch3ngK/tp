@@ -13,10 +13,9 @@ public class MatricNumber {
             + " followed by 7 digits and end with a capital letter.";
 
     /*
-     * The first character of the address must not be a whitespace,
-     * otherwise " " (a blank string) becomes a valid input.
+     * The first character of the matriculation number must be the alphabet 'A'.
      */
-    public static final String VALIDATION_REGEX = "^A\\d{7}[A-Z]$";
+    public static final String VALIDATION_REGEX = "^[aA]\\d{7}[a-zA-Z]$";
 
     public final String value;
 

@@ -66,18 +66,18 @@ public class ParserUtil {
     }
 
     /**
-     * Parses a {@code String address} into an {@code Address}.
+     * Parses a {@code String matriculation number} into an {@code MatricNumber}.
      * Leading and trailing whitespaces will be trimmed.
      *
-     * @throws ParseException if the given {@code address} is invalid.
+     * @throws ParseException if the given {@code matriculation number} is invalid.
      */
-    public static MatricNumber parseAddress(String address) throws ParseException {
-        requireNonNull(address);
-        String trimmedAddress = address.trim();
-        if (!MatricNumber.isValidMatricNumber(trimmedAddress)) {
+    public static MatricNumber parseMatricNumber(String matricNumber) throws ParseException {
+        requireNonNull(matricNumber);
+        String trimmedMatricNumber = matricNumber.trim();
+        if (!MatricNumber.isValidMatricNumber(trimmedMatricNumber)) {
             throw new ParseException(MatricNumber.MESSAGE_CONSTRAINTS);
         }
-        return new MatricNumber(trimmedAddress);
+        return new MatricNumber(trimmedMatricNumber);
     }
 
     /**

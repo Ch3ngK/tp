@@ -35,7 +35,7 @@ public class EditPersonDescriptorBuilder {
         descriptor.setName(person.getName());
         descriptor.setPhone(person.getPhone());
         descriptor.setEmail(person.getEmail());
-        descriptor.setAddress(person.getMatricNumber());
+        descriptor.setMatricNumber(person.getMatricNumber());
         descriptor.setTags(person.getTags());
     }
 
@@ -67,7 +67,7 @@ public class EditPersonDescriptorBuilder {
      * Sets the {@code MatricNumber} of the {@code EditPersonDescriptor} that we are building.
      */
     public EditPersonDescriptorBuilder withMatricNumber(String matricNumber) {
-        descriptor.setAddress(new MatricNumber(matricNumber));
+        descriptor.setMatricNumber(new MatricNumber(matricNumber));
         return this;
     }
 

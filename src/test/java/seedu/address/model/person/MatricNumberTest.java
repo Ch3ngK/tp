@@ -38,6 +38,9 @@ public class MatricNumberTest {
         assertTrue(MatricNumber.isValidMatricNumber("A4433221B"));
         assertTrue(MatricNumber.isValidMatricNumber("A0000000A")); // all same digits
         assertTrue(MatricNumber.isValidMatricNumber("A4455667A")); // ends with `A`
+        assertTrue(MatricNumber.isValidMatricNumber("a4455667Z")); // starts with lower capital `a`
+        assertTrue(MatricNumber.isValidMatricNumber("A4455667z")); // ends with lower capital
+        assertTrue(MatricNumber.isValidMatricNumber("a4455667z")); // characters are both in lower capital
     }
 
     @Test
@@ -46,6 +49,8 @@ public class MatricNumberTest {
 
         // same values -> returns true
         assertTrue(matricNumber.equals(new MatricNumber("A1111111Z")));
+
+        //TODO: add case-insensitive test case
 
         // same object -> returns true
         assertTrue(matricNumber.equals(matricNumber));

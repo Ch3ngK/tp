@@ -151,7 +151,7 @@ public class EditCommand extends Command {
             setName(toCopy.name);
             setPhone(toCopy.phone);
             setEmail(toCopy.email);
-            setAddress(toCopy.matricNumber);
+            setMatricNumber(toCopy.matricNumber);
             setTags(toCopy.tags);
         }
 
@@ -186,7 +186,7 @@ public class EditCommand extends Command {
             return Optional.ofNullable(email);
         }
 
-        public void setAddress(MatricNumber matricNumber) {
+        public void setMatricNumber(MatricNumber matricNumber) {
             this.matricNumber = matricNumber;
         }
 
