@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -63,5 +64,13 @@ public class MatricNumberTest {
 
         // different values -> returns false
         assertFalse(matricNumber.equals(new MatricNumber("A1111111X")));
+    }
+
+    @Test
+    public void hashCode_test() {
+        String validMatricNumber = "A1234567X";
+        MatricNumber matricNumber1 = new MatricNumber(validMatricNumber);
+        MatricNumber matricNumber2 = new MatricNumber(validMatricNumber);
+        assertEquals(matricNumber1, matricNumber2);
     }
 }

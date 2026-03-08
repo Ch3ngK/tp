@@ -2,6 +2,7 @@ package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_EMAIL_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_MATRIC_NUMBER_BOB;
@@ -96,5 +97,14 @@ public class PersonTest {
                 + ", email=" + ALICE.getEmail() + ", matricNumber=" + ALICE.getMatricNumber() + ", tags="
                 + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
+    }
+
+    @Test
+    public void hashCode_test() {
+        //same person, same hashcode.
+        assertEquals(ALICE.hashCode(), ALICE.hashCode());
+
+        //different person, different hashcode.
+        assertNotEquals(ALICE.hashCode(), BOB.hashCode());
     }
 }
