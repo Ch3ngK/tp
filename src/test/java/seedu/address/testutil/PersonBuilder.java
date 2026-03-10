@@ -111,9 +111,9 @@ public class PersonBuilder {
      * @return a new {@code Person} instance
      */
     public Person build() {
-        //return new Person(name, phone, email, matricNumber, classSpaces, tags);
+        return new Person(name, phone, email, matricNumber, classSpaces, tags);
         // TODO: Might need this ^ when implementing /tg into AddCommand
-        return new Person(name, phone, email, matricNumber, tags);
+        //return new Person(name, phone, email, matricNumber, tags);
     }
 
 }

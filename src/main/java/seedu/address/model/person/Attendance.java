@@ -50,7 +50,8 @@ public class Attendance {
         requireNonNull(test);
         try {
             Status status = Status.valueOf(test.trim().toUpperCase());
-            return status != Status.UNINITIALISED;
+            //return status != Status.UNINITIALISED;
+            return true;
         } catch (IllegalArgumentException e) {
             return false;
         }
