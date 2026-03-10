@@ -343,7 +343,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * **Attendance Status**: The recorded presence or absence of a student for a tutorial session.
 * **Participation Score**: A qualitative or quantitative measure of a student's engagement during tutorials.
 * **Submission Status**: The state of a student’s assignment (e.g., Submitted, Late, Missing, Graded).
-* **Command**: A user-issued instruction in TAA to perform a specific action (e.g., add, edit, delete, mark).
+* **Command**: A user-issued instruction in TAA to perform a specific action (e.g., add, edit, delete, mark, attview).
 
 --------------------------------------------------------------------------------------------------------------------
 
