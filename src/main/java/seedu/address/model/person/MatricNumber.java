@@ -54,7 +54,7 @@ public class MatricNumber {
         }
 
         MatricNumber otherMatricNumber = (MatricNumber) other;
-        return value.equals(otherMatricNumber.value);
+        return value.equalsIgnoreCase(otherMatricNumber.value);
     }
 
     @Override

@@ -23,7 +23,7 @@ import seedu.address.model.tag.Tag;
 public class ParserUtilTest {
     private static final String INVALID_NAME = "R@chel";
     private static final String INVALID_PHONE = "+651234";
-    private static final String INVALID_ADDRESS = " ";
+    private static final String INVALID_MATRIC_NUMBER = "A12345678N";
     private static final String INVALID_EMAIL = "example.com";
     private static final String INVALID_TAG = "#friend";
 
@@ -108,8 +108,8 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseAddress_invalidValue_throwsParseException() {
-        assertThrows(ParseException.class, () -> ParserUtil.parseMatricNumber(INVALID_ADDRESS));
+    public void parseMatricNumber_invalidValue_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseMatricNumber(INVALID_MATRIC_NUMBER));
     }
 
     @Test
@@ -119,10 +119,10 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseAddress_validValueWithWhitespace_returnsTrimmedMatricNumber() throws Exception {
-        String addressWithWhitespace = WHITESPACE + VALID_MATRIC_NUMBER + WHITESPACE;
+    public void parseMatricNumber_validValueWithWhitespace_returnsTrimmedMatricNumber() throws Exception {
+        String matricNumberWithWhitespace = WHITESPACE + VALID_MATRIC_NUMBER + WHITESPACE;
         MatricNumber expectedMatricNumber = new MatricNumber(VALID_MATRIC_NUMBER);
-        assertEquals(expectedMatricNumber, ParserUtil.parseMatricNumber(addressWithWhitespace));
+        assertEquals(expectedMatricNumber, ParserUtil.parseMatricNumber(matricNumberWithWhitespace));
     }
 
     @Test

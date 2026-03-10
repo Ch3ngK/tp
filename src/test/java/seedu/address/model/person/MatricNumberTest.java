@@ -15,17 +15,17 @@ public class MatricNumberTest {
     }
 
     @Test
-    public void constructor_invalidAddress_throwsIllegalArgumentException() {
-        String invalidAddress = "";
-        assertThrows(IllegalArgumentException.class, () -> new MatricNumber(invalidAddress));
+    public void constructor_invalidMatricNumber_throwsIllegalArgumentException() {
+        String invalidMatricNumber = "";
+        assertThrows(IllegalArgumentException.class, () -> new MatricNumber(invalidMatricNumber));
     }
 
     @Test
     public void isValidMatricNumber() {
-        // null address
+        // null matriculation number
         assertThrows(NullPointerException.class, () -> MatricNumber.isValidMatricNumber(null));
 
-        // invalid addresses
+        // invalid matriculation numbers
         assertFalse(MatricNumber.isValidMatricNumber("")); // empty string
         assertFalse(MatricNumber.isValidMatricNumber(" ")); // spaces only
         assertFalse(MatricNumber.isValidMatricNumber("B1234567N")); //starts with `B`
@@ -34,8 +34,11 @@ public class MatricNumberTest {
         assertFalse(MatricNumber.isValidMatricNumber("A123456Z")); //has 6 digits
         assertFalse(MatricNumber.isValidMatricNumber("A0N")); // 1 digit
         assertFalse(MatricNumber.isValidMatricNumber("AZ")); //no digits
+        assertFalse(MatricNumber.isValidMatricNumber("A1234567N ")); // trailing space
+        assertFalse(MatricNumber.isValidMatricNumber(" A1234567N")); // leading space
+        assertFalse(MatricNumber.isValidMatricNumber("A1234 567N")); // space in the middle
 
-        // valid addresses
+        // valid matriculation numbers
         assertTrue(MatricNumber.isValidMatricNumber("A4433221B"));
         assertTrue(MatricNumber.isValidMatricNumber("A0000000A")); // all same digits
         assertTrue(MatricNumber.isValidMatricNumber("A4455667A")); // ends with `A`
@@ -51,7 +54,8 @@ public class MatricNumberTest {
         // same values -> returns true
         assertTrue(matricNumber.equals(new MatricNumber("A1111111Z")));
 
-        //TODO: add case-insensitive test case
+        //different case -> returns true
+        assertTrue(matricNumber.equals(new MatricNumber("a1111111z")));
 
         // same object -> returns true
         assertTrue(matricNumber.equals(matricNumber));
