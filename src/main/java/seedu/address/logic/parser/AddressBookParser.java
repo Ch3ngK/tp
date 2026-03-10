@@ -83,7 +83,8 @@ public class AddressBookParser {
 
         case ListGroupsCommand.COMMAND_WORD:
             if (!arguments.trim().isEmpty()) {
-                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, ListGroupsCommand.MESSAGE_USAGE));
+                throw new ParseException(
+                        String.format(MESSAGE_INVALID_COMMAND_FORMAT, ListGroupsCommand.MESSAGE_USAGE));
             }
             return new ListGroupsCommand();
 

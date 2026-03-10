@@ -21,7 +21,8 @@ public class RemoveFromGroupCommandParser implements Parser<RemoveFromGroupComma
 
     @Override
     public RemoveFromGroupCommand parse(String args) throws ParseException {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_GROUP, PREFIX_MATRIC_NUMBER, PREFIX_INDEXES);
+        ArgumentMultimap argMultimap =
+                ArgumentTokenizer.tokenize(args, PREFIX_GROUP, PREFIX_MATRIC_NUMBER, PREFIX_INDEXES);
         if (!arePrefixesPresent(argMultimap, PREFIX_GROUP) || !argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
                     RemoveFromGroupCommand.MESSAGE_USAGE));

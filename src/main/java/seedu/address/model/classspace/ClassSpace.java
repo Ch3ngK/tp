@@ -10,6 +10,11 @@ import seedu.address.commons.util.ToStringBuilder;
 public class ClassSpace {
     private final ClassSpaceName classSpaceName;
 
+    /**
+     * Creates a {@code ClassSpace} with the given name.
+     *
+     * @param classSpaceName Name of the class space.
+     */
     public ClassSpace(ClassSpaceName classSpaceName) {
         requireNonNull(classSpaceName);
         this.classSpaceName = classSpaceName;

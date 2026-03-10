@@ -29,6 +29,12 @@ public class RenameGroupCommand extends Command {
     private final ClassSpaceName targetName;
     private final ClassSpaceName newName;
 
+    /**
+     * Creates a RenameGroupCommand to rename the specified class space.
+     *
+     * @param targetName The existing class space name.
+     * @param newName The new class space name.
+     */
     public RenameGroupCommand(ClassSpaceName targetName, ClassSpaceName newName) {
         this.targetName = targetName;
         this.newName = newName;

@@ -22,7 +22,8 @@ public class AddToGroupCommandParser implements Parser<AddToGroupCommand> {
 
     @Override
     public AddToGroupCommand parse(String args) throws ParseException {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_GROUP, PREFIX_MATRIC_NUMBER, PREFIX_INDEXES);
+        ArgumentMultimap argMultimap =
+                ArgumentTokenizer.tokenize(args, PREFIX_GROUP, PREFIX_MATRIC_NUMBER, PREFIX_INDEXES);
         if (!arePrefixesPresent(argMultimap, PREFIX_GROUP) || !argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddToGroupCommand.MESSAGE_USAGE));
         }
