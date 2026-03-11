@@ -37,17 +37,31 @@ public class AttViewCommand extends Command {
     private final Optional<Attendance> attendance;
     private final Optional<ClassSpaceName> classSpaceName;
 
+    /**
+     * Creates an attendance view command for the current view without filtering by attendance status.
+     */
     public AttViewCommand() {
         this.attendance = Optional.empty();
         this.classSpaceName = Optional.empty();
     }
 
+    /**
+     * Creates an attendance view command filtered by the specified attendance status.
+     *
+     * @param attendance Attendance status to filter by.
+     */
     public AttViewCommand(Attendance attendance) {
         requireNonNull(attendance);
         this.attendance = Optional.of(attendance);
         this.classSpaceName = Optional.empty();
     }
 
+    /**
+     * Creates an attendance view command filtered by attendance status within the specified class space.
+     *
+     * @param attendance Attendance status to filter by.
+     * @param classSpaceName Name of the class space to switch to before filtering.
+     */
     public AttViewCommand(Attendance attendance, ClassSpaceName classSpaceName) {
         requireNonNull(attendance);
         requireNonNull(classSpaceName);
@@ -55,6 +69,11 @@ public class AttViewCommand extends Command {
         this.classSpaceName = Optional.of(classSpaceName);
     }
 
+    /**
+     * Creates an attendance view command for the specified class space without attendance filtering.
+     *
+     * @param classSpaceName Name of the class space to switch to.
+     */
     public AttViewCommand(ClassSpaceName classSpaceName) {
         requireNonNull(classSpaceName);
         this.attendance = Optional.empty();
