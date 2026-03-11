@@ -6,9 +6,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
+import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
@@ -30,6 +32,8 @@ public class PersonBuilder {
     private MatricNumber matricNumber;
     private Set<Tag> tags;
     private Set<ClassSpaceName> classSpaces;
+    private Attendance attendance;
+    private Participation participation;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -41,6 +45,8 @@ public class PersonBuilder {
         matricNumber = new MatricNumber(DEFAULT_MATRIC_NUMBER);
         tags = new HashSet<>();
         classSpaces = new HashSet<>();
+        attendance = new Attendance(Attendance.Status.UNINITIALISED);
+        participation = new Participation(0);
     }
 
     /**
@@ -53,6 +59,8 @@ public class PersonBuilder {
         matricNumber = personToCopy.getMatricNumber();
         tags = new HashSet<>(personToCopy.getTags());
         classSpaces = new HashSet<>(personToCopy.getClassSpaces());
+        attendance = personToCopy.getAttendance();
+        participation = personToCopy.getParticipation();
     }
 
     /**
@@ -90,6 +98,22 @@ public class PersonBuilder {
     }
 
     /**
+     * Sets the {@code Attendance} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withAttendance(String attendance) {
+        this.attendance = new Attendance(attendance);
+        return this;
+    }
+
+    /**
+     * Sets the {@code Participation} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withParticipation(int participation) {
+        this.participation = new Participation(participation);
+        return this;
+    }
+
+    /**
      * Sets the {@code Phone} of the {@code Person} that we are building.
      */
     public PersonBuilder withPhone(String phone) {
@@ -111,9 +135,10 @@ public class PersonBuilder {
      * @return a new {@code Person} instance
      */
     public Person build() {
-        return new Person(name, phone, email, matricNumber, classSpaces, tags);
-        // TODO: Might need this ^ when implementing /tg into AddCommand
-        //return new Person(name, phone, email, matricNumber, tags);
+        Person person = new Person(name, phone, email, matricNumber, classSpaces, tags);
+        person = new Person(person, attendance);
+        person = new Person(person, participation);
+        return person;
     }
 
 }

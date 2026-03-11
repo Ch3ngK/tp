@@ -18,6 +18,9 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.classspace.ClassSpace;
+import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.testutil.PersonBuilder;
 
 public class JsonAddressBookStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonAddressBookStorageTest");
@@ -83,7 +86,28 @@ public class JsonAddressBookStorageTest {
         jsonAddressBookStorage.saveAddressBook(original); // file path not specified
         readBack = jsonAddressBookStorage.readAddressBook().get(); // file path not specified
         assertEquals(original, new AddressBook(readBack));
+    }
 
+    @Test
+    public void readAndSaveAddressBook_personSessionFieldsPreserved_success() throws Exception {
+        Path filePath = testFolder.resolve("TempAddressBookWithSessionFields.json");
+        AddressBook original = new AddressBook();
+        original.addClassSpace(new ClassSpace(new ClassSpaceName("CS2103T-T01")));
+        original.addPerson(new PersonBuilder()
+                .withName("Session Student")
+                .withMatricNumber("A1234567B")
+                .withPhone("91234567")
+                .withEmail("session@example.com")
+                .withClassSpaces("CS2103T-T01")
+                .withAttendance("PRESENT")
+                .withParticipation(5)
+                .build());
+
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+        jsonAddressBookStorage.saveAddressBook(original, filePath);
+
+        ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook(filePath).get();
+        assertEquals(original, new AddressBook(readBack));
     }
 
     @Test
