@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -29,6 +31,7 @@ public class ModelManager implements Model {
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
     private final SimpleStringProperty currentView;
+    private final SimpleBooleanProperty attendanceViewActive;
 
     private Predicate<Person> currentAdditionalPredicate;
     private ClassSpaceName activeClassSpaceName;
@@ -45,6 +48,7 @@ public class ModelManager implements Model {
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         currentView = new SimpleStringProperty(ALL_STUDENTS_VIEW_NAME);
+        attendanceViewActive = new SimpleBooleanProperty(false);
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
         refreshFilteredPersonList();
     }
@@ -226,6 +230,21 @@ public class ModelManager implements Model {
         return currentView;
     }
 
+    @Override
+    public void setAttendanceViewActive(boolean isActive) {
+        attendanceViewActive.set(isActive);
+    }
+
+    @Override
+    public boolean isAttendanceViewActive() {
+        return attendanceViewActive.get();
+    }
+
+    @Override
+    public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
+        return attendanceViewActive;
+    }
+
     private void updateCurrentViewLabel() {
         currentView.set(activeClassSpaceName == null
                 ? ALL_STUDENTS_VIEW_NAME
@@ -254,6 +273,7 @@ public class ModelManager implements Model {
                 && userPrefs.equals(otherModelManager.userPrefs)
                 && filteredPersons.equals(otherModelManager.filteredPersons)
                 && currentView.get().equals(otherModelManager.currentView.get())
+                && attendanceViewActive.get() == otherModelManager.attendanceViewActive.get()
                 && Optional.ofNullable(activeClassSpaceName).equals(
                         Optional.ofNullable(otherModelManager.activeClassSpaceName));
     }

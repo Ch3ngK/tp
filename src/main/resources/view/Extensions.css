@@ -18,3 +18,15 @@
 .tooltip-text {
     -fx-text-fill: white;
 }
+
+.attendance_label {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.participation_label {
+    -fx-text-fill: #d7c36a;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}

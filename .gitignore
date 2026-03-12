@@ -1,5 +1,7 @@
 # Gradle build files
 /.gradle/
+/.gradle-user-home/
+/.gradle-user-home-attview/
 /build/
 src/main/resources/docs/
 

@@ -128,5 +128,10 @@ public class ModelManagerTest {
         UserPrefs differentUserPrefs = new UserPrefs();
         differentUserPrefs.setAddressBookFilePath(Paths.get("differentFilePath"));
         assertFalse(modelManager.equals(new ModelManager(addressBook, differentUserPrefs)));
+
+        // different attendance view mode -> returns false
+        ModelManager attendanceViewModel = new ModelManager(addressBook, userPrefs);
+        attendanceViewModel.setAttendanceViewActive(true);
+        assertFalse(modelManager.equals(attendanceViewModel));
     }
 }

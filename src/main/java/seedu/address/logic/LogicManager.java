@@ -5,6 +5,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -75,6 +76,11 @@ public class LogicManager implements Logic {
     @Override
     public ReadOnlyStringProperty currentViewProperty() {
         return model.currentViewProperty();
+    }
+
+    @Override
+    public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
+        return model.attendanceViewActiveProperty();
     }
 
     @Override

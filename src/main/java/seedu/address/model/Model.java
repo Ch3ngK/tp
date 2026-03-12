@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -139,4 +140,13 @@ public interface Model {
 
     /** Returns the current view label property. */
     ReadOnlyStringProperty currentViewProperty();
+
+    /** Sets whether attendance view mode is active. */
+    void setAttendanceViewActive(boolean isActive);
+
+    /** Returns whether attendance view mode is active. */
+    boolean isAttendanceViewActive();
+
+    /** Returns the attendance view mode property. */
+    ReadOnlyBooleanProperty attendanceViewActiveProperty();
 }

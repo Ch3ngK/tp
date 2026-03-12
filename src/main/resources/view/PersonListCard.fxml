@@ -28,6 +28,8 @@
       </HBox>
       <FlowPane fx:id="tags" />
       <FlowPane fx:id="groups" />
+      <Label fx:id="attendance" styleClass="attendance_label" text="$attendance" />
+      <Label fx:id="participation" styleClass="participation_label" text="$participation" />
       <Label fx:id="phone" styleClass="cell_small_label" text="$phone" />
       <Label fx:id="matricNumber" styleClass="cell_small_label" text="$matricNumber" />
       <Label fx:id="email" styleClass="cell_small_label" text="$email" />

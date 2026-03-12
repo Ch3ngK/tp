@@ -39,6 +39,10 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label email;
     @FXML
+    private Label attendance;
+    @FXML
+    private Label participation;
+    @FXML
     private FlowPane tags;
     @FXML
     private FlowPane groups;
@@ -46,7 +50,7 @@ public class PersonCard extends UiPart<Region> {
     /**
      * Creates a {@code PersonCode} with the given {@code Person} and index to display.
      */
-    public PersonCard(Person person, int displayedIndex) {
+    public PersonCard(Person person, int displayedIndex, boolean showSessionDetails) {
         super(FXML);
         this.person = person;
         id.setText(displayedIndex + ". ");
@@ -54,11 +58,25 @@ public class PersonCard extends UiPart<Region> {
         phone.setText(person.getPhone().value);
         matricNumber.setText(person.getMatricNumber().value);
         email.setText(person.getEmail().value);
+        attendance.setText(formatAttendance(person));
+        participation.setText("Participation: " + person.getParticipation());
+        attendance.setManaged(showSessionDetails);
+        attendance.setVisible(showSessionDetails);
+        participation.setManaged(showSessionDetails);
+        participation.setVisible(showSessionDetails);
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
         person.getClassSpaces().stream()
                 .sorted(Comparator.comparing(classSpaceName -> classSpaceName.value, String.CASE_INSENSITIVE_ORDER))
                 .forEach(classSpaceName -> groups.getChildren().add(new Label(classSpaceName.value)));
+    }
+
+    private String formatAttendance(Person person) {
+        return switch (person.getAttendance().value) {
+        case PRESENT -> "Attendance: [X] Present";
+        case ABSENT -> "Attendance: [ ] Absent";
+        case UNINITIALISED -> "Attendance: [-] Uninitialised";
+        };
     }
 }

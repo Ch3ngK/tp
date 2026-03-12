@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -215,6 +216,21 @@ public class AddCommandTest {
 
         @Override
         public ReadOnlyStringProperty currentViewProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setAttendanceViewActive(boolean isActive) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public boolean isAttendanceViewActive() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
             throw new AssertionError("This method should not be called.");
         }
     }

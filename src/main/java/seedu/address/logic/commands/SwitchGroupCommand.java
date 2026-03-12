@@ -39,6 +39,7 @@ public class SwitchGroupCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+        model.setAttendanceViewActive(false);
         if (classSpaceName.isEmpty()) {
             model.switchToAllStudentsView();
             return new CommandResult(MESSAGE_SWITCHED_TO_ALL);
