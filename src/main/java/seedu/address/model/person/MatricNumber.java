@@ -3,6 +3,10 @@ package seedu.address.model.person;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
+import java.util.logging.Logger;
+
+import seedu.address.commons.core.LogsCenter;
+
 /**
  * Represents a Person's matriculation number in the address book.
  * Guarantees: immutable; is valid as declared in {@link #isValidFormat(String)}
@@ -22,6 +26,8 @@ public class MatricNumber {
      */
     public static final String VALIDATION_REGEX = "^[aA]\\d{7}[a-zA-Z]$";
 
+    private static final Logger logger = LogsCenter.getLogger(MatricNumber.class);
+
     public final String value;
 
     /**
@@ -34,6 +40,7 @@ public class MatricNumber {
         String upperCaseMatricNumber = matricNumber.toUpperCase();
         validateMatricNumber(upperCaseMatricNumber);
         value = upperCaseMatricNumber;
+        logCreationSuccess();
     }
 
     /**
@@ -57,9 +64,11 @@ public class MatricNumber {
     }
 
     private static boolean hasCorrectChecksum(String matricNumber) {
-        char expectedSum = calculateChecksum(matricNumber);
-        char actualSum = extractProvidedChecksum(matricNumber);
-        return expectedSum == actualSum;
+        return isChecksumValid(matricNumber);
+    }
+
+    private static boolean isChecksumValid(String matricNumber) {
+        return calculateChecksum(matricNumber) == extractProvidedChecksum(matricNumber);
     }
 
     private static char extractProvidedChecksum(String matricNumber) {
@@ -71,10 +80,15 @@ public class MatricNumber {
     }
 
     private static void validateMatricNumber(String matricNumber) {
-        checkArgument(isValidFormat(matricNumber), MESSAGE_CONSTRAINTS);
-        checkArgument(hasCorrectChecksum(matricNumber), getChecksumErrorMessage(matricNumber));
+        if (!isValidFormat(matricNumber)) {
+            logFormatError(matricNumber);
+            throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
+        }
+        if (!hasCorrectChecksum(matricNumber)) {
+            logChecksumError(matricNumber);
+            throw new IllegalArgumentException(getChecksumErrorMessage(matricNumber));
+        }
     }
-
     /**
      * Calculates the checksum character for NUS matriculation numbers.
      *
@@ -98,6 +112,18 @@ public class MatricNumber {
         }
 
         return checksumLetters.charAt(remainder);
+    }
+
+    private void logCreationSuccess() {
+        logger.fine("Successfully created MatricNumber: " + value);
+    }
+
+    private static void logFormatError(String matricNumber) {
+        logger.warning("Failed creation: Invalid format for MatricNumber: '" + matricNumber + "'");
+    }
+
+    private static void logChecksumError(String matricNumber) {
+        logger.warning("Failed creation: Checksum mismatch for MatricNumber: '" + matricNumber + "'");
     }
 
     @Override
