@@ -22,7 +22,6 @@ public class MatricNumber {
      * The first character of the matriculation number must be the alphabet 'A'.
      */
     public static final String VALIDATION_REGEX = "^[aA]\\d{7}[a-zA-Z]$";
-    private static final int EXPECTED_LENGTH = 9;
     private static final int CHECKSUM_POSITION = 8;
     private static final int DIGITS_START_INDEX = 2;
     private static final int DIGITS_END_INDEX = 8;
@@ -69,22 +68,13 @@ public class MatricNumber {
     }
 
     private static boolean hasCorrectChecksum(String matricNumber) {
-        // Method should only be called after it has passed format validation and null checks.
-        assert hasValidLength(matricNumber)
-                : "Matriculation number length should be correct before checksum validation.";
         return hasValidChecksum(matricNumber);
     }
-
-    private static boolean hasValidLength(String matricNumber) {
-        return matricNumber.length() == EXPECTED_LENGTH;
-    }
-
     private static boolean hasValidChecksum(String matricNumber) {
         return calculateChecksum(matricNumber) == extractProvidedChecksum(matricNumber);
     }
 
     private static char extractProvidedChecksum(String matricNumber) {
-        assert hasValidLength(matricNumber) : "Matriculation number length should be 9";
         return matricNumber.charAt(CHECKSUM_POSITION);
     }
 
@@ -109,8 +99,6 @@ public class MatricNumber {
      * @return Checksum character for matriculation number.
      */
     private static char calculateChecksum(String matricNumber) {
-        assert hasValidLength(matricNumber) : "Matriculation number length should be 9";
-        assert hasCorrectFirstCharacter(matricNumber) : "First character must be an 'A'";
         String digits = matricNumber.substring(DIGITS_START_INDEX, DIGITS_END_INDEX);
         int length = CHECKSUM_LETTERS.length();
         int sum = 0;
@@ -125,10 +113,6 @@ public class MatricNumber {
         }
 
         return CHECKSUM_LETTERS.charAt(remainder);
-    }
-
-    private static boolean hasCorrectFirstCharacter(String matricNumber) {
-        return Character.toUpperCase(matricNumber.charAt(0)) == 'A';
     }
 
     private void logCreationSuccess() {

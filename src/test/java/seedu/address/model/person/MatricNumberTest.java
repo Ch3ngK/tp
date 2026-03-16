@@ -47,11 +47,12 @@ public class MatricNumberTest {
     public void hasValidMatricNumber() {
         // null matriculation number
         assertThrows(NullPointerException.class, () -> MatricNumber.hasValidFormat(null));
-
+        assertFalse(MatricNumber.hasValidMatricNumber(null));
         // invalid matriculation numbers
         assertFalse(MatricNumber.hasValidFormat("")); // empty string
         assertFalse(MatricNumber.hasValidFormat(" ")); // spaces only
         assertFalse(MatricNumber.hasValidFormat(INVALID_MATRIC_NUMBER_WRONG_FORMAT_START)); //starts with `B`
+        assertFalse(MatricNumber.hasValidMatricNumber(INVALID_MATRIC_NUMBER_WRONG_FORMAT_START));
         assertFalse(MatricNumber.hasValidFormat("1234567")); //only numbers
         assertFalse(MatricNumber.hasValidFormat("A12345678M")); //has 8 digits
         assertFalse(MatricNumber.hasValidFormat("A123456Z")); //has 6 digits
@@ -61,12 +62,16 @@ public class MatricNumberTest {
         assertFalse(MatricNumber.hasValidFormat(" " + VALID_MATRIC_NUMBER_1)); // leading space
         assertFalse(MatricNumber.hasValidFormat("A1234 567N")); // space in the middle
 
+
         // wrong checksums
         assertFalse(MatricNumber.hasValidMatricNumber("A1111111A")); // wrong checksum, should be 'M'
         assertFalse(MatricNumber.hasValidMatricNumber("A0388420K")); // wrong checksum, should be 'B'
         assertFalse(MatricNumber.hasValidMatricNumber("A2222222A")); // wrong checksum, should be 'B'
 
         // valid matriculation numbers
+        assertTrue(MatricNumber.hasValidMatricNumber(VALID_MATRIC_NUMBER_1_LOWERCASE));
+        assertTrue(MatricNumber.hasValidMatricNumber(VALID_MATRIC_NUMBER_1));
+        assertTrue(MatricNumber.hasValidMatricNumber(VALID_MATRIC_NUMBER_2));
         assertTrue(MatricNumber.hasValidFormat("A4433221B"));
         assertTrue(MatricNumber.hasValidFormat("A0000000A")); // all same digits
         assertTrue(MatricNumber.hasValidFormat("a4455667L")); // starts with lower capital `a`
