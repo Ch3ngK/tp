@@ -1,16 +1,21 @@
 package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
+import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Session;
 
 /**
  * Marks a person as present using the displayed index.
@@ -21,28 +26,62 @@ public class MarkCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Marks the person identified by the index number used in the displayed person list as PRESENT.\n"
-            + "Parameters: INDEX\n"
-            + "Example: " + COMMAND_WORD + " 1";
+            + "Parameters: i/INDEX d/YYYY-MM-DD [g/CLASSSPACE]\n"
+            + "Example: " + COMMAND_WORD + " i/1 d/2026-03-16 g/T02";
 
     public static final String MESSAGE_MARK_SUCCESS =
             "Marked Person as PRESENT: %1$s";
 
+    public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
+            "No class space selected. Enter a class space first or provide g/CLASS_SPACE.";
+
+    public static final String MESSAGE_GROUP_NOT_FOUND =
+            "This class space does not exist.";
+
     private final Index targetIndex;
+    private final LocalDate date;
+    private final Optional<ClassSpaceName> classSpaceName;
 
     /**
      * Creates a MarkCommand to mark the person identified by the given {@code Index}
      * as present.
      *
      * @param targetIndex Index of the person in the filtered person list to be marked as present.
+     * @param date Date of the session to mark attendance for.
+     * @param classSpaceName Class Space containing this session.
      */
-    public MarkCommand(Index targetIndex) {
-        requireNonNull(targetIndex);
+    public MarkCommand(Index targetIndex, LocalDate date, Optional<ClassSpaceName> classSpaceName) {
+        requireAllNonNull(targetIndex, date, classSpaceName);
         this.targetIndex = targetIndex;
+        this.date = date;
+        this.classSpaceName = classSpaceName;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
+
+        // Step 1: switch classspace if g/ provided
+        if (classSpaceName.isPresent()) {
+            ClassSpaceName targetName = classSpaceName.get();
+
+            if (model.findClassSpaceByName(targetName).isEmpty()) {
+                throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
+            }
+
+            model.switchToClassSpaceView(targetName);
+        }
+
+        // Step 2: resolve active classspace
+        Optional<ClassSpaceName> activeClassSpace = model.getActiveClassSpaceName();
+
+        if (activeClassSpace.isEmpty()) {
+            throw new CommandException(MESSAGE_NO_ACTIVE_CLASS_SPACE);
+        }
+
+        ClassSpaceName classSpace = activeClassSpace.get();
+
+        // Step 3: get person
         List<Person> lastShownList = model.getFilteredPersonList();
 
         if (targetIndex.getZeroBased() >= lastShownList.size()) {
@@ -50,12 +89,26 @@ public class MarkCommand extends Command {
         }
 
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
-        Attendance attendance = new Attendance(Attendance.Status.PRESENT);
 
-        Person updatedPerson = new Person(personToUpdate, attendance);
+        // Step 4: get session
+        Session currentSession = personToUpdate.getOrCreateSession(classSpace, date);
 
+        // Step 5: update attendance
+        Session updatedSession = new Session(
+                date,
+                new Attendance(Attendance.Status.PRESENT),
+                currentSession.getParticipation()
+        );
+
+        // Step 6: update person
+        Person updatedPerson = personToUpdate.withUpdatedSession(classSpace, updatedSession);
+
+        // Step 7: update model
         model.setPerson(personToUpdate, updatedPerson);
-        return new CommandResult(String.format(MESSAGE_MARK_SUCCESS, Messages.format(updatedPerson)));
+
+        return new CommandResult(
+                String.format(MESSAGE_MARK_SUCCESS, Messages.format(updatedPerson, classSpace, date))
+        );
     }
 
     @Override
@@ -68,13 +121,17 @@ public class MarkCommand extends Command {
             return false;
         }
 
-        return targetIndex.equals(otherMarkCommand.targetIndex);
+        return targetIndex.equals(otherMarkCommand.targetIndex)
+                && date.equals(otherMarkCommand.date)
+                && classSpaceName.equals(otherMarkCommand.classSpaceName);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .add("targetIndex", targetIndex)
+                .add("date", date)
+                .add("classSpaceName", classSpaceName)
                 .toString();
     }
 }

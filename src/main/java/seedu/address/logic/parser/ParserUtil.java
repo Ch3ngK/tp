@@ -2,6 +2,8 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,6 +19,7 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Session;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -185,5 +188,20 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a date string in yyyy-MM-dd format.
+     */
+    public static LocalDate parseSessionDate(String date)
+            throws ParseException {
+        requireNonNull(date);
+        String trimmedDate = date.trim();
+
+        try {
+            return LocalDate.parse(trimmedDate, Session.DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            throw new ParseException(Session.MESSAGE_CONSTRAINTS);
+        }
     }
 }

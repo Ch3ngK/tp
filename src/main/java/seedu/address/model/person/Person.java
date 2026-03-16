@@ -84,10 +84,17 @@ public class Person {
      * Used for ClassSpace commands. Every field must be present and not null.
      */
     public Person(Person person, Set<ClassSpaceName> classSpaces) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags,
-                classSpaces,
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, classSpaces,
                 person.attendance, person.participation, person.classSpaceSessions
         );
+    }
+
+    /**
+     * Used for Session commands. Every field must be present and not null.
+     */
+    public Person(Person person, Map<ClassSpaceName, SessionList> updatedSessionMap) {
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.classSpaces,
+                person.attendance, person.participation, updatedSessionMap);
     }
 
     private Person(Name name,
@@ -121,20 +128,20 @@ public class Person {
      */
     public Person withUpdatedSession(ClassSpaceName classSpaceName, Session newSession) {
         // Copy the existing map.
-        Map<ClassSpaceName, SessionList> updatedMap = new HashMap<>(this.classSpaceSessions);
+        Map<ClassSpaceName, SessionList> updatedSessionMap = new HashMap<>(this.classSpaceSessions);
 
         // Get the existing list of sessions for this class space or create a new one.
-        SessionList currentSessionList = updatedMap.getOrDefault(classSpaceName, new SessionList());
+        SessionList currentSessionList = updatedSessionMap.getOrDefault(classSpaceName, new SessionList());
 
         // Create a copy of the SessionList and add or overwrite the session.
         SessionList newSessionList = new SessionList(currentSessionList.getSessions());
         newSessionList.addSession(newSession);
 
         // Update the map.
-        updatedMap.put(classSpaceName, newSessionList);
+        updatedSessionMap.put(classSpaceName, newSessionList);
 
         // Return a new Person with the updated map.
-        return new Person(name, phone, email, matricNumber, tags, classSpaces, attendance, participation, updatedMap);
+        return new Person(this, updatedSessionMap);
     }
     /**
      * Returns a {@code Map<ClassSpaceName, SessionList>}.
@@ -177,10 +184,38 @@ public class Person {
         return matricNumber;
     }
 
+    /**
+     * Returns the attendance for the specified class space and session date.
+     * If the session does not exist, returns UNINITIALISED attendance.
+     *
+     * @param classSpaceName Class space name.
+     * @param date Date of session.
+     * @return Attendance for the specified session.
+     */
+    public Attendance getAttendance(ClassSpaceName classSpaceName, LocalDate date) {
+        requireAllNonNull(classSpaceName, date);
+        return getOrCreateSession(classSpaceName, date).getAttendance();
+    }
+
+    // TODO: Remove. This is legacy from pre-Session class.
     public Attendance getAttendance() {
         return attendance;
     }
 
+    /**
+     * Returns the participation for the specified class space and session date.
+     * If the session does not exist, returns 0 participation.
+     *
+     * @param classSpaceName Class space name.
+     * @param date Date of session.
+     * @return Participation for the specified session.
+     */
+    public Participation getParticipation(ClassSpaceName classSpaceName, LocalDate date) {
+        requireAllNonNull(classSpaceName, date);
+        return getOrCreateSession(classSpaceName, date).getParticipation();
+    }
+
+    // TODO: Remove. This is legacy from pre-Session class.
     public Participation getParticipation() {
         return participation;
     }
@@ -241,8 +276,8 @@ public class Person {
                 && phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
                 && matricNumber.equals(otherPerson.matricNumber)
-                && attendance.equals(otherPerson.attendance)
-                && participation.equals(otherPerson.participation)
+                && attendance.equals(otherPerson.attendance) // TODO: Remove. This is legacy from pre-Session class.
+                && participation.equals(otherPerson.participation) // TODO: Remove. This is legacy pre-Session class.
                 && tags.equals(otherPerson.tags)
                 && classSpaces.equals(otherPerson.classSpaces)
                 && classSpaceSessions.equals(otherPerson.classSpaceSessions);
@@ -251,8 +286,9 @@ public class Person {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, matricNumber, attendance, participation, tags, classSpaces,
-                classSpaceSessions);
+        return Objects.hash(name, phone, email, matricNumber,
+                attendance, participation, // TODO: Remove. This is legacy from pre-Session class.
+                tags, classSpaces, classSpaceSessions);
     }
 
     @Override
