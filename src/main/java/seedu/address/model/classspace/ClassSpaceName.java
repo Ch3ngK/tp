@@ -9,7 +9,7 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
  */
 public class ClassSpaceName {
 
-    public static final String MESSAGE_CONSTRAINTS = "Class space names should only contain letters, numbers, "
+    public static final String MESSAGE_CONSTRAINTS = "Group names should only contain letters, numbers, "
             + "spaces, hyphens, and underscores, and it should not be blank.";
     private static final String VALIDATION_REGEX = "[\\p{Alnum}][\\p{Alnum} _-]*";
 

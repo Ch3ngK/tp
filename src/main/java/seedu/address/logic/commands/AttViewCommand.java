@@ -33,7 +33,7 @@ public class AttViewCommand extends Command {
     public static final String MESSAGE_NO_MATCHES =
             "No students with attendance %1$s were found in the current view";
     public static final String MESSAGE_GROUP_NOT_FOUND =
-            "This class space does not exist.";
+            "This group does not exist.";
 
     private final Optional<Attendance> attendance;
     private final Optional<ClassSpaceName> classSpaceName;

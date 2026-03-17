@@ -23,8 +23,8 @@ public class SwitchGroupCommand extends Command {
             + "          " + COMMAND_WORD + " g/T01";
 
     public static final String MESSAGE_SWITCHED_TO_ALL = "Switched to all students view.";
-    public static final String MESSAGE_SWITCHED_TO_GROUP = "Switched to class space: %1$s";
-    public static final String MESSAGE_GROUP_NOT_FOUND = "This class space does not exist.";
+    public static final String MESSAGE_SWITCHED_TO_GROUP = "Switched to group: %1$s";
+    public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
 
     private final Optional<ClassSpaceName> classSpaceName;
 

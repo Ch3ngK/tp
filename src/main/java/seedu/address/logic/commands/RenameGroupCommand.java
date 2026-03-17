@@ -18,13 +18,13 @@ public class RenameGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "renamegroup";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Renames a class space.\n"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Renames a group.\n"
             + "Parameters: g/OLD_GROUP_NAME new/NEW_GROUP_NAME\n"
             + "Example: " + COMMAND_WORD + " g/T01 new/Tutorial-01";
 
-    public static final String MESSAGE_GROUP_NOT_FOUND = "This class space does not exist.";
-    public static final String MESSAGE_DUPLICATE_GROUP = "Another class space with that name already exists.";
-    public static final String MESSAGE_SUCCESS = "Renamed class space %1$s to %2$s";
+    public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
+    public static final String MESSAGE_DUPLICATE_GROUP = "Another group with that name already exists.";
+    public static final String MESSAGE_SUCCESS = "Renamed group %1$s to %2$s";
 
     private final ClassSpaceName targetName;
     private final ClassSpaceName newName;

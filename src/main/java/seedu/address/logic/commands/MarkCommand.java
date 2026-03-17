@@ -26,17 +26,17 @@ public class MarkCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Marks the person identified by the index number used in the displayed person list as PRESENT.\n"
-            + "Parameters: i/INDEX d/YYYY-MM-DD [g/CLASSSPACE]\n"
+            + "Parameters: i/INDEX d/YYYY-MM-DD [g/GROUP_NAME]\n"
             + "Example: " + COMMAND_WORD + " i/1 d/2026-03-16 g/T02";
 
     public static final String MESSAGE_MARK_SUCCESS =
             "Marked Person as PRESENT: %1$s";
 
     public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
-            "No class space selected. Enter a class space first or provide g/CLASS_SPACE.";
+            "No group selected. Enter a group first or provide g/GROUP_NAME.";
 
     public static final String MESSAGE_GROUP_NOT_FOUND =
-            "This class space does not exist.";
+            "This group does not exist.";
 
     private final Index targetIndex;
     private final LocalDate date;

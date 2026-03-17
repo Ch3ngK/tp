@@ -5,6 +5,6 @@ package seedu.address.model.classspace.exceptions;
  */
 public class DuplicateClassSpaceException extends RuntimeException {
     public DuplicateClassSpaceException() {
-        super("Operation would result in duplicate class spaces");
+        super("Operation would result in duplicate class spaces"); // This String is not user-facing.
     }
 }

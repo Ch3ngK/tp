@@ -21,7 +21,7 @@ import seedu.address.model.person.Person;
 class JsonSerializableAddressBook {
 
     public static final String MESSAGE_DUPLICATE_PERSON = "Persons list contains duplicate person(s).";
-    public static final String MESSAGE_DUPLICATE_CLASS_SPACE = "Class space list contains duplicate class space(s).";
+    public static final String MESSAGE_DUPLICATE_CLASS_SPACE = "Group list contains duplicate group(s).";
     public static final String MESSAGE_INVALID_MATRICULATION_NUMBER = "Invalid matriculation number.";
 
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();

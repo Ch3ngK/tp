@@ -5,7 +5,9 @@ import static java.util.Objects.requireNonNull;
 import seedu.address.commons.util.ToStringBuilder;
 
 /**
- * Represents a class space in the address book.
+ * Class Space represents a real-world Group, such as Tutorial Group, Lab Group, and similar.
+ * This concept is purely internal to the codebase, and all user-facing strings should use the term
+ * "{@code GROUP_NAME}".
  */
 public class ClassSpace {
     private final ClassSpaceName classSpaceName;

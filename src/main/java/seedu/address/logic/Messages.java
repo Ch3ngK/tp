@@ -79,7 +79,7 @@ public class Messages {
 
     private static String getString(Person person, StringBuilder builder) {
         person.getTags().forEach(builder::append);
-        builder.append("; Class Spaces: ");
+        builder.append("; Groups: ");
         builder.append(person.getClassSpaces().stream()
                 .sorted(Comparator.comparing(classSpaceName -> classSpaceName.value, String.CASE_INSENSITIVE_ORDER))
                 .map(classSpaceName -> classSpaceName.value)

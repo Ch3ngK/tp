@@ -12,7 +12,8 @@ import seedu.address.model.classspace.ClassSpaceName;
  */
 class JsonAdaptedClassSpace {
 
-    public static final String MISSING_FIELD_MESSAGE_FORMAT = "Class space's %s field is missing!";
+    // This String is not user-facing, so Class Space was not renamed to Group
+    public static final String MISSING_FIELD_MESSAGE_FORMAT = "Class Space's %s field is missing!";
 
     private final String name;
 

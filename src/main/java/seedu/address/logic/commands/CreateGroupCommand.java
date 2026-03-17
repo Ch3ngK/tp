@@ -13,12 +13,12 @@ public class CreateGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "creategroup";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Creates a class space.\n"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Creates a group.\n"
             + "Parameters: g/GROUP_NAME\n"
             + "Example: " + COMMAND_WORD + " g/T01";
 
-    public static final String MESSAGE_SUCCESS = "Created class space: %1$s";
-    public static final String MESSAGE_DUPLICATE_GROUP = "This class space already exists.";
+    public static final String MESSAGE_SUCCESS = "Created group: %1$s";
+    public static final String MESSAGE_DUPLICATE_GROUP = "This group already exists.";
 
     private final ClassSpace classSpace;
 

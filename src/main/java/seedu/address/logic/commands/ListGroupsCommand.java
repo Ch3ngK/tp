@@ -16,8 +16,8 @@ public class ListGroupsCommand extends Command {
 
     public static final String COMMAND_WORD = "listgroups";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Lists all class spaces.";
-    public static final String MESSAGE_NO_GROUPS = "There are no class spaces yet.";
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Lists all groups.";
+    public static final String MESSAGE_NO_GROUPS = "There are no groups yet.";
 
     @Override
     public CommandResult execute(Model model) {
@@ -31,7 +31,7 @@ public class ListGroupsCommand extends Command {
             return new CommandResult(MESSAGE_NO_GROUPS);
         }
 
-        StringBuilder builder = new StringBuilder("Class spaces:\n");
+        StringBuilder builder = new StringBuilder("Groups:\n");
         for (int i = 0; i < classSpaces.size(); i++) {
             builder.append(i + 1)
                     .append(". ")

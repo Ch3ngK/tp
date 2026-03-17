@@ -18,12 +18,12 @@ public class DeleteGroupCommand extends Command {
 
     public static final String COMMAND_WORD = "deletegroup";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Deletes a class space.\n"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Deletes a group.\n"
             + "Parameters: g/GROUP_NAME\n"
             + "Example: " + COMMAND_WORD + " g/T01";
 
-    public static final String MESSAGE_SUCCESS = "Deleted class space: %1$s";
-    public static final String MESSAGE_GROUP_NOT_FOUND = "This class space does not exist.";
+    public static final String MESSAGE_SUCCESS = "Deleted group: %1$s";
+    public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
 
     private final ClassSpaceName classSpaceName;
 
