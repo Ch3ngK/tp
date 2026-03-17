@@ -26,7 +26,7 @@ public class MarkCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Marks the person identified by the index number used in the displayed person list as PRESENT.\n"
-            + "Parameters: i/INDEX d/YYYY-MM-DD [g/CLASSSPACE]\n"
+            + "Parameters: i/INDEX [d/YYYY-MM-DD] [g/CLASSSPACE]\n"
             + "Example: " + COMMAND_WORD + " i/1 d/2026-03-16 g/T02";
 
     public static final String MESSAGE_MARK_SUCCESS =
@@ -34,12 +34,14 @@ public class MarkCommand extends Command {
 
     public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
             "No class space selected. Enter a class space first or provide g/CLASS_SPACE.";
+    public static final String MESSAGE_NO_ACTIVE_SESSION_DATE =
+            "No active session date selected. Run attview d/DATE g/CLASS_SPACE first or provide d/DATE.";
 
     public static final String MESSAGE_GROUP_NOT_FOUND =
             "This class space does not exist.";
 
     private final Index targetIndex;
-    private final LocalDate date;
+    private final Optional<LocalDate> date;
     private final Optional<ClassSpaceName> classSpaceName;
 
     /**
@@ -50,7 +52,7 @@ public class MarkCommand extends Command {
      * @param date Date of the session to mark attendance for.
      * @param classSpaceName Class Space containing this session.
      */
-    public MarkCommand(Index targetIndex, LocalDate date, Optional<ClassSpaceName> classSpaceName) {
+    public MarkCommand(Index targetIndex, Optional<LocalDate> date, Optional<ClassSpaceName> classSpaceName) {
         requireAllNonNull(targetIndex, date, classSpaceName);
         this.targetIndex = targetIndex;
         this.date = date;
@@ -80,6 +82,7 @@ public class MarkCommand extends Command {
         }
 
         ClassSpaceName classSpace = activeClassSpace.get();
+        LocalDate resolvedDate = resolveDate(model);
 
         // Step 3: get person
         List<Person> lastShownList = model.getFilteredPersonList();
@@ -91,11 +94,11 @@ public class MarkCommand extends Command {
         Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
 
         // Step 4: get session
-        Session currentSession = personToUpdate.getOrCreateSession(classSpace, date);
+        Session currentSession = personToUpdate.getOrCreateSession(classSpace, resolvedDate);
 
         // Step 5: update attendance
         Session updatedSession = new Session(
-                date,
+                resolvedDate,
                 new Attendance(Attendance.Status.PRESENT),
                 currentSession.getParticipation()
         );
@@ -107,8 +110,13 @@ public class MarkCommand extends Command {
         model.setPerson(personToUpdate, updatedPerson);
 
         return new CommandResult(
-                String.format(MESSAGE_MARK_SUCCESS, Messages.format(updatedPerson, classSpace, date))
+                String.format(MESSAGE_MARK_SUCCESS, Messages.format(updatedPerson, classSpace, resolvedDate))
         );
+    }
+
+    private LocalDate resolveDate(Model model) throws CommandException {
+        return date.or(() -> model.getAttendanceViewDate())
+                .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_SESSION_DATE));
     }
 
     @Override

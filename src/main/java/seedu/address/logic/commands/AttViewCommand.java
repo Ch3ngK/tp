@@ -1,8 +1,8 @@
 package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
-import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import seedu.address.commons.util.ToStringBuilder;
@@ -19,42 +19,34 @@ public class AttViewCommand extends Command {
     public static final String COMMAND_WORD = "attview";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Shows attendance view for the current view or a specified tutorial group.\n"
-            + "Parameters: [STATUS] [g/GROUP_NAME]\n"
+            + ": Shows attendance and participation for a tutorial group's session on a given date.\n"
+            + "Parameters: [STATUS] d/YYYY-MM-DD g/GROUP_NAME\n"
             + "Allowed values: PRESENT, ABSENT, UNINITIALISED\n"
-            + "Examples: " + COMMAND_WORD + "\n"
-            + "          " + COMMAND_WORD + " PRESENT\n"
-            + "          " + COMMAND_WORD + " g/T01\n"
-            + "          " + COMMAND_WORD + " ABSENT g/T01";
+            + "Examples: " + COMMAND_WORD + " d/2026-03-16 g/T01\n"
+            + "          " + COMMAND_WORD + " PRESENT d/2026-03-16 g/T01";
 
-    public static final String MESSAGE_SUCCESS = "Listed %1$d students with attendance %2$s in the current view";
+    public static final String MESSAGE_SUCCESS =
+            "Listed %1$d students with attendance %2$s in class space %3$s on %4$s";
     public static final String MESSAGE_VIEW_SUCCESS =
-            "Showing attendance and participation for %1$d students in the current view";
+            "Showing attendance and participation for %1$d students in class space %2$s on %3$s";
     public static final String MESSAGE_NO_MATCHES =
-            "No students with attendance %1$s were found in the current view";
+            "No students with attendance %1$s were found in class space %2$s on %3$s";
     public static final String MESSAGE_GROUP_NOT_FOUND =
             "This class space does not exist.";
 
     private final Optional<Attendance> attendance;
-    private final Optional<ClassSpaceName> classSpaceName;
+    private final ClassSpaceName classSpaceName;
+    private final LocalDate date;
 
     /**
-     * Creates an attendance view command for the current view without filtering by attendance status.
+     * Creates an attendance view command for the specified class space and session date without attendance filtering.
      */
-    public AttViewCommand() {
+    public AttViewCommand(ClassSpaceName classSpaceName, LocalDate date) {
+        requireNonNull(classSpaceName);
+        requireNonNull(date);
         this.attendance = Optional.empty();
-        this.classSpaceName = Optional.empty();
-    }
-
-    /**
-     * Creates an attendance view command filtered by the specified attendance status.
-     *
-     * @param attendance Attendance status to filter by.
-     */
-    public AttViewCommand(Attendance attendance) {
-        requireNonNull(attendance);
-        this.attendance = Optional.of(attendance);
-        this.classSpaceName = Optional.empty();
+        this.classSpaceName = classSpaceName;
+        this.date = date;
     }
 
     /**
@@ -62,50 +54,41 @@ public class AttViewCommand extends Command {
      *
      * @param attendance Attendance status to filter by.
      * @param classSpaceName Name of the class space to switch to before filtering.
+     * @param date Session date to display.
      */
-    public AttViewCommand(Attendance attendance, ClassSpaceName classSpaceName) {
+    public AttViewCommand(Attendance attendance, ClassSpaceName classSpaceName, LocalDate date) {
         requireNonNull(attendance);
         requireNonNull(classSpaceName);
+        requireNonNull(date);
         this.attendance = Optional.of(attendance);
-        this.classSpaceName = Optional.of(classSpaceName);
-    }
-
-    /**
-     * Creates an attendance view command for the specified class space without attendance filtering.
-     *
-     * @param classSpaceName Name of the class space to switch to.
-     */
-    public AttViewCommand(ClassSpaceName classSpaceName) {
-        requireNonNull(classSpaceName);
-        this.attendance = Optional.empty();
-        this.classSpaceName = Optional.of(classSpaceName);
+        this.classSpaceName = classSpaceName;
+        this.date = date;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        if (classSpaceName.isPresent()) {
-            ClassSpaceName targetName = classSpaceName.get();
-            if (model.findClassSpaceByName(targetName).isEmpty()) {
-                throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
-            }
-            model.switchToClassSpaceView(targetName);
+        if (model.findClassSpaceByName(classSpaceName).isEmpty()) {
+            throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
         }
 
+        model.switchToClassSpaceView(classSpaceName);
+
         model.setAttendanceViewActive(true);
+        model.setAttendanceViewDate(date);
         if (attendance.isEmpty()) {
-            model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
-            return new CommandResult(String.format(MESSAGE_VIEW_SUCCESS, model.getFilteredPersonList().size()));
+            return new CommandResult(String.format(MESSAGE_VIEW_SUCCESS,
+                    model.getFilteredPersonList().size(), classSpaceName, date));
         }
 
         Attendance targetAttendance = attendance.get();
-        model.updateFilteredPersonList(person -> person.getAttendance().equals(targetAttendance));
+        model.updateFilteredPersonList(person -> person.getAttendance(classSpaceName, date).equals(targetAttendance));
         int matchCount = model.getFilteredPersonList().size();
         if (matchCount == 0) {
-            return new CommandResult(String.format(MESSAGE_NO_MATCHES, targetAttendance));
+            return new CommandResult(String.format(MESSAGE_NO_MATCHES, targetAttendance, classSpaceName, date));
         }
 
-        return new CommandResult(String.format(MESSAGE_SUCCESS, matchCount, targetAttendance));
+        return new CommandResult(String.format(MESSAGE_SUCCESS, matchCount, targetAttendance, classSpaceName, date));
     }
 
     @Override
@@ -119,7 +102,8 @@ public class AttViewCommand extends Command {
         }
 
         return attendance.equals(otherAttViewCommand.attendance)
-                && classSpaceName.equals(otherAttViewCommand.classSpaceName);
+                && classSpaceName.equals(otherAttViewCommand.classSpaceName)
+                && date.equals(otherAttViewCommand.date);
     }
 
     @Override
@@ -127,6 +111,7 @@ public class AttViewCommand extends Command {
         return new ToStringBuilder(this)
                 .add("attendance", attendance)
                 .add("classSpaceName", classSpaceName)
+                .add("date", date)
                 .toString();
     }
 }

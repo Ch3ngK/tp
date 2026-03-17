@@ -1,5 +1,6 @@
 package seedu.address.ui;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 
 import javafx.fxml.FXML;
@@ -7,6 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import seedu.address.model.Model;
+import seedu.address.model.classspace.ClassSpaceName;
+import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Person;
 
 /**
@@ -50,7 +54,8 @@ public class PersonCard extends UiPart<Region> {
     /**
      * Creates a {@code PersonCode} with the given {@code Person} and index to display.
      */
-    public PersonCard(Person person, int displayedIndex, boolean showSessionDetails) {
+    public PersonCard(Person person, int displayedIndex, boolean showSessionDetails,
+                      String currentView, LocalDate attendanceViewDate) {
         super(FXML);
         this.person = person;
         id.setText(displayedIndex + ". ");
@@ -58,8 +63,8 @@ public class PersonCard extends UiPart<Region> {
         phone.setText(person.getPhone().value);
         matricNumber.setText(person.getMatricNumber().value);
         email.setText(person.getEmail().value);
-        attendance.setText(formatAttendance(person));
-        participation.setText("Participation: " + person.getParticipation());
+        attendance.setText(formatAttendance(person, currentView, attendanceViewDate));
+        participation.setText(formatParticipation(person, currentView, attendanceViewDate));
         attendance.setManaged(showSessionDetails);
         attendance.setVisible(showSessionDetails);
         participation.setManaged(showSessionDetails);
@@ -72,11 +77,35 @@ public class PersonCard extends UiPart<Region> {
                 .forEach(classSpaceName -> groups.getChildren().add(new Label(classSpaceName.value)));
     }
 
-    private String formatAttendance(Person person) {
-        return switch (person.getAttendance().value) {
+    private String formatAttendance(Person person, String currentView, LocalDate attendanceViewDate) {
+        return switch (getAttendanceForDisplay(person, currentView, attendanceViewDate).value) {
         case PRESENT -> "Attendance: [X] Present";
         case ABSENT -> "Attendance: [ ] Absent";
         case UNINITIALISED -> "Attendance: [-] Uninitialised";
         };
+    }
+
+    private String formatParticipation(Person person, String currentView, LocalDate attendanceViewDate) {
+        if (!hasSessionContext(currentView, attendanceViewDate)) {
+            return "Participation: " + person.getParticipation();
+        }
+
+        ClassSpaceName classSpaceName = new ClassSpaceName(currentView);
+        return "Participation: " + person.getParticipation(classSpaceName, attendanceViewDate);
+    }
+
+    private Attendance getAttendanceForDisplay(Person person, String currentView, LocalDate attendanceViewDate) {
+        if (!hasSessionContext(currentView, attendanceViewDate)) {
+            return person.getAttendance();
+        }
+
+        ClassSpaceName classSpaceName = new ClassSpaceName(currentView);
+        return person.getAttendance(classSpaceName, attendanceViewDate);
+    }
+
+    private boolean hasSessionContext(String currentView, LocalDate attendanceViewDate) {
+        return attendanceViewDate != null
+                && currentView != null
+                && !Model.ALL_STUDENTS_VIEW_NAME.equals(currentView);
     }
 }

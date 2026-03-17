@@ -1,8 +1,11 @@
 package seedu.address.ui;
 
+import java.time.LocalDate;
 import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -24,11 +27,15 @@ public class PersonListPanel extends UiPart<Region> {
     /**
      * Creates a {@code PersonListPanel} with the given {@code ObservableList}.
      */
-    public PersonListPanel(ObservableList<Person> personList, ReadOnlyBooleanProperty attendanceViewActive) {
+    public PersonListPanel(ObservableList<Person> personList, ReadOnlyBooleanProperty attendanceViewActive,
+                           ReadOnlyStringProperty currentView, ReadOnlyObjectProperty<LocalDate> attendanceViewDate) {
         super(FXML);
         personListView.setItems(personList);
-        personListView.setCellFactory(listView -> new PersonListViewCell(attendanceViewActive));
+        personListView.setCellFactory(listView -> new PersonListViewCell(attendanceViewActive,
+                currentView, attendanceViewDate));
         attendanceViewActive.addListener((observable, oldValue, newValue) -> personListView.refresh());
+        currentView.addListener((observable, oldValue, newValue) -> personListView.refresh());
+        attendanceViewDate.addListener((observable, oldValue, newValue) -> personListView.refresh());
     }
 
     /**
@@ -36,9 +43,15 @@ public class PersonListPanel extends UiPart<Region> {
      */
     class PersonListViewCell extends ListCell<Person> {
         private final ReadOnlyBooleanProperty attendanceViewActive;
+        private final ReadOnlyStringProperty currentView;
+        private final ReadOnlyObjectProperty<LocalDate> attendanceViewDate;
 
-        PersonListViewCell(ReadOnlyBooleanProperty attendanceViewActive) {
+        PersonListViewCell(ReadOnlyBooleanProperty attendanceViewActive,
+                           ReadOnlyStringProperty currentView,
+                           ReadOnlyObjectProperty<LocalDate> attendanceViewDate) {
             this.attendanceViewActive = attendanceViewActive;
+            this.currentView = currentView;
+            this.attendanceViewDate = attendanceViewDate;
         }
 
         @Override
@@ -49,7 +62,8 @@ public class PersonListPanel extends UiPart<Region> {
                 setGraphic(null);
                 setText(null);
             } else {
-                setGraphic(new PersonCard(person, getIndex() + 1, attendanceViewActive.get()).getRoot());
+                setGraphic(new PersonCard(person, getIndex() + 1, attendanceViewActive.get(),
+                        currentView.get(), attendanceViewDate.get()).getRoot());
             }
         }
     }

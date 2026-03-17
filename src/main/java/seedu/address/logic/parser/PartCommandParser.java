@@ -1,10 +1,17 @@
 package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_DATE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_GROUP;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_INDEXES;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.PartCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Participation;
 
 /**
@@ -18,17 +25,29 @@ public class PartCommandParser implements Parser<PartCommand> {
      * @throws ParseException if the user input does not conform the expected format
      */
     public PartCommand parse(String args) throws ParseException {
-        String trimmedArgs = args.trim();
-        String[] parts = trimmedArgs.split("\\s+");
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_DATE, PREFIX_GROUP);
+        String trimmedPreamble = argMultimap.getPreamble().trim();
 
-        if (parts.length != 2) {
+        String[] preambleParts = trimmedPreamble.split("\\s+");
+        if (trimmedPreamble.isEmpty() || preambleParts.length != 2 || !preambleParts[0].startsWith(PREFIX_INDEXES.toString())) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE));
         }
 
         try {
-            Index index = ParserUtil.parseIndex(parts[0]);
-            Participation participation = new Participation(parts[1]);
-            return new PartCommand(index, participation);
+            Index index = ParserUtil.parseIndex(preambleParts[0].substring(PREFIX_INDEXES.toString().length()));
+            Participation participation = new Participation(preambleParts[1]);
+
+            Optional<LocalDate> date = Optional.empty();
+            if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
+                date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
+            }
+
+            Optional<ClassSpaceName> classSpaceName = Optional.empty();
+            if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
+                classSpaceName = Optional.of(ParserUtil.parseClassSpaceName(argMultimap.getValue(PREFIX_GROUP).get()));
+            }
+
+            return new PartCommand(index, participation, date, classSpaceName);
         } catch (IllegalArgumentException | ParseException e) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE), e);
         }

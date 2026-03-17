@@ -3,9 +3,11 @@ package seedu.address.logic;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -81,6 +83,11 @@ public class LogicManager implements Logic {
     @Override
     public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
         return model.attendanceViewActiveProperty();
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<LocalDate> attendanceViewDateProperty() {
+        return model.attendanceViewDateProperty();
     }
 
     @Override

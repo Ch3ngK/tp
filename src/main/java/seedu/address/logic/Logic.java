@@ -1,8 +1,10 @@
 package seedu.address.logic;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -40,6 +42,9 @@ public interface Logic {
 
     /** Returns the attendance view mode property. */
     ReadOnlyBooleanProperty attendanceViewActiveProperty();
+
+    /** Returns the active attendance view date property. */
+    ReadOnlyObjectProperty<LocalDate> attendanceViewDateProperty();
 
     /**
      * Returns the user prefs' address book file path.

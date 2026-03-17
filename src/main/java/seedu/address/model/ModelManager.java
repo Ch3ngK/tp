@@ -4,13 +4,16 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -32,6 +35,7 @@ public class ModelManager implements Model {
     private final FilteredList<Person> filteredPersons;
     private final SimpleStringProperty currentView;
     private final SimpleBooleanProperty attendanceViewActive;
+    private final SimpleObjectProperty<LocalDate> attendanceViewDate;
 
     private Predicate<Person> currentAdditionalPredicate;
     private ClassSpaceName activeClassSpaceName;
@@ -49,6 +53,7 @@ public class ModelManager implements Model {
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         currentView = new SimpleStringProperty(ALL_STUDENTS_VIEW_NAME);
         attendanceViewActive = new SimpleBooleanProperty(false);
+        attendanceViewDate = new SimpleObjectProperty<>(null);
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
         refreshFilteredPersonList();
     }
@@ -233,6 +238,9 @@ public class ModelManager implements Model {
     @Override
     public void setAttendanceViewActive(boolean isActive) {
         attendanceViewActive.set(isActive);
+        if (!isActive) {
+            attendanceViewDate.set(null);
+        }
     }
 
     @Override
@@ -243,6 +251,21 @@ public class ModelManager implements Model {
     @Override
     public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
         return attendanceViewActive;
+    }
+
+    @Override
+    public void setAttendanceViewDate(LocalDate date) {
+        attendanceViewDate.set(date);
+    }
+
+    @Override
+    public Optional<LocalDate> getAttendanceViewDate() {
+        return Optional.ofNullable(attendanceViewDate.get());
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<LocalDate> attendanceViewDateProperty() {
+        return attendanceViewDate;
     }
 
     private void updateCurrentViewLabel() {
@@ -274,6 +297,8 @@ public class ModelManager implements Model {
                 && filteredPersons.equals(otherModelManager.filteredPersons)
                 && currentView.get().equals(otherModelManager.currentView.get())
                 && attendanceViewActive.get() == otherModelManager.attendanceViewActive.get()
+                && Optional.ofNullable(attendanceViewDate.get()).equals(
+                        Optional.ofNullable(otherModelManager.attendanceViewDate.get()))
                 && Optional.ofNullable(activeClassSpaceName).equals(
                         Optional.ofNullable(otherModelManager.activeClassSpaceName));
     }
