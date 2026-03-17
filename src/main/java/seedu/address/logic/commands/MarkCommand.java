@@ -26,7 +26,7 @@ public class MarkCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Marks the person identified by the index number used in the displayed person list as PRESENT.\n"
-            + "Parameters: i/INDEX d/YYYY-MM-DD [g/CLASSSPACE]\n"
+            + "Parameters: i/INDEX d/YYYY-MM-DD [g/CLASS_SPACE]\n"
             + "Example: " + COMMAND_WORD + " i/1 d/2026-03-16 g/T02";
 
     public static final String MESSAGE_MARK_SUCCESS =
@@ -35,7 +35,7 @@ public class MarkCommand extends Command {
     public static final String MESSAGE_NO_ACTIVE_CLASS_SPACE =
             "No class space selected. Enter a class space first or provide g/CLASS_SPACE.";
 
-    public static final String MESSAGE_GROUP_NOT_FOUND =
+    public static final String MESSAGE_CLASS_SPACE_NOT_FOUND =
             "This class space does not exist.";
 
     private final Index targetIndex;
@@ -61,18 +61,18 @@ public class MarkCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        // Step 1: switch classspace if g/ provided
+        // Step 1: switch class space if g/ provided
         if (classSpaceName.isPresent()) {
             ClassSpaceName targetName = classSpaceName.get();
 
             if (model.findClassSpaceByName(targetName).isEmpty()) {
-                throw new CommandException(MESSAGE_GROUP_NOT_FOUND);
+                throw new CommandException(MESSAGE_CLASS_SPACE_NOT_FOUND);
             }
 
             model.switchToClassSpaceView(targetName);
         }
 
-        // Step 2: resolve active classspace
+        // Step 2: resolve active class space
         Optional<ClassSpaceName> activeClassSpace = model.getActiveClassSpaceName();
 
         if (activeClassSpace.isEmpty()) {
