@@ -17,7 +17,7 @@ Teacher Assistant's Assistant (TAA) is a **desktop app for Manage all student-re
 1. Ensure you have Java `17` or above installed in your Computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
-1. Download the latest `.jar` file from [here](https://github.com/AY2526S2-CS2103T-F14-1/tp/releases/tag/v1.3).
+1. Download the latest `.jar` file from [here](https://github.com/AY2526S2-CS2103T-F14-1/tp/releases/latest).
 
 1. Copy the file to the folder you want to use as the _home folder_ for your AddressBook.
 
@@ -229,41 +229,122 @@ Examples:
 
 Assigns participation level of a particular date for a tutorial group to person with the index in the list for current view.
 
-Format: `part i/INDEX d/YYYY-MM-DD [g/CLASSSPACE] pv/PARTICIPATION_VALUE`
+Format: `part i/INDEX d/YYYY-MM-DD pv/PARTICIPATION_VALUE`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
-* If group is not given the participation will be assigned for the group in current view.
+* The participation will be assigned for the group in current view.
 * PARTICIPATION_VALUE **must be an integer from 0 to 5.**
 
 Examples:
-*  `part i/1 d/2026-03-16 g/T02 pv/4` Assigns a participation level of 4 for group T02 on the 16 of March 2026 for the person of index 1 for the list in the current view.
+*  `part i/1 d/2026-03-16 pv/4` Assigns a participation level of 4 on the 16 of March 2026 for the person of index 1 for the list in the current view.
 
 ### Mark attendance for person : `mark`
 
 Mark the attendance for a person (with the index of the list in current view) in a group as PRESENT for a particular date.
 
-Format: `mark i/INDEX d/YYYY-MM-DD [g/CLASS_SPACE]`
+Format: `mark i/INDEX d/YYYY-MM-DD`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
-* If group is not given the attendance will be assigned for the group in current view.
+* The attendance will be assigned for the group in current view.
 
 Examples:
-*  `mark i/1 d/2026-03-16 g/T02` Mark the attendance for group T02 of the person in index 1 of the list in current view as PRESENT for the 16 of March 2026.
+*  `mark i/1 d/2026-03-16` Mark the attendance of the person in index 1 of the list in current view as PRESENT for the 16 of March 2026.
 
 ### Unmark attendance for person : `unmark`
 
 Mark the attendance for a person (with the index of the list in current view) in a group as ABSENT for a particular date.
 
-Format: `unmark i/INDEX d/YYYY-MM-DD [g/CLASS_SPACE]`
+Format: `unmark i/INDEX d/YYYY-MM-DD`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
-* If group is not given the attendance will be assigned for the group in current view.
+* The attendance will be assigned for the group in current view.
 
 Examples:
-*  `unmark i/1 d/2026-03-16 g/T02` Mark the attendance for group T02 of the person in index 1 of the list in current view as ABSENT for the 16 of March 2026.
+*  `unmark i/1 d/2026-03-16` Mark the attendance of the person in index 1 of the list in current view as ABSENT for the 16 of March 2026.
+
+### Enter attendance view : `attview`
+
+Shows the list of students with that attendance status for the tutorial group in current view on that date. 
+
+Format: `attview STATUS d/YYYY-MM-DD` 
+
+After entering attendance view for a session, you can use shorthand follow-up commands without repeating the date/group:
+* mark i/1 
+* unmark i/1 
+* part i/1 pv/4
+
+You can still use the full forms if needed:
+* mark i/1 d/2026-03-16 
+* unmark i/1 d/2026-03-16 
+* part i/1 d/2026-03-16 pv/4
+
+**Tip:** Not including STATUS as a parameter shows:
+* attendance status as [ ] Absent, [X] Present, [-] Uninitialised 
+* class participation score
+
+Examples:
+*  `attview absent d/2026-03-16` Show the list of students who have the attendance status ABSENT on 3 March 2026 for the group in current view.
+
+### Create assignment : `createassignment`
+
+Creates an assignment for people in the group in current view with a due date and maximum marks.
+
+Format: `createassignment a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` `createa a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS`
+
+* assignments are unique within a class space 
+* the same assignment name can exist in different class spaces 
+* when a student is added to a class, they automatically show all class assignments as ungraded 
+* when a student is removed from a class, their grades for that class’s assignments are removed 
+* when a class is deleted, its assignments and grades are deleted too 
+* when a class is renamed, its assignments and grades stay attached
+
+Examples:
+*  `createassignment a/Quiz 1 d/2026-04-05 mm/20` Creates assignment `Quiz 1` for the group in current view with a due date on 5 April 2026 and maximum marks of 20.
+
+### Edit assignment : `editassignment`
+
+Edits an existing assignment for people in the group in current view.
+
+Format: `editassignment a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` `edita a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS`
+
+* assignments are unique within a class space
+* the same assignment name can exist in different class spaces
+* when a class is renamed, its assignments and grades stay attached
+
+Examples:
+*  `editassignment a/Quiz 1 na/Test d/2026-04-08 mm/25` Changes existing assignment `Quiz 1` for the group in current view to have a name Test, a due date on 8 April 2026 and maximum marks of 25.
+
+### Deleting an assignment : `deleteassignment`
+
+Deletes an assignment for the students in the group in current view.
+
+Format: `deleteassignment a/ASSIGNMENT_NAME` `deletea a/ASSIGNMENT_NAME`
+
+* when a class is deleted, its assignments and grades are deleted too
+
+Examples:
+*  `deleteassignment a/Quiz 1` Deletes the assignment `Quiz 1` for the students in the group in current view.
+
+### Listing all assignments : `listassignments`
+
+Shows a list of all assignments for the group in current view.
+
+Format: `listassignments` `lista`
+
+### Grade assignment : `gradeassignment`
+
+Grades an assignment for people in the group in current view.
+
+Format: `gradeassignment a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradeassignment a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` `gradea a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradea a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE`
+
+* grade must be between 0 and max marks 
+* grading again overwrites the old grade
+
+Examples:
+*  `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17` Assigns a grade of 17 for the assignment `Quiz 1` to the students with matriculation number A1234567X and A2345678L for the group in current view.
 
 ### Exiting the program : `exit`
 
@@ -310,22 +391,27 @@ _Details coming soon ..._
 
 Action     | Format, Examples
 -----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-**Add**    | add n/NAME p/PHONE e/EMAIL m/MATRICULATION_NUMBER [t/TAG]… <br> e.g., add n/John Doe p/98765432 e/johnd@example.com m/A1234567X t/friends t/owesMoney
-**Add to Group**   | addtogroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER] addtogroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] <br> e.g., addtogroup g/T01 m/A1234567X m/A2345678L
-**Clear**  | clear
-**Create Group**   | creategroup g/GROUP_NAME <br> e.g., creategroup g/T01
-**Delete** | delete INDEX<br> e.g., delete i/3
-**Delete Group**   | deletegroup g/GROUP_NAME <br> e.g., deletegroup g/T01
-**Edit**   | edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…<br> e.g.,edit 2 n/James Lee e/jameslee@example.com
-**Exit**   | exit
-**Find**   | find KEYWORD [MORE_KEYWORDS]<br> e.g., find James Jake
-**Help**   | help
-**List**   | list
-**List Groups**   | listgroups
-**Mark Attendance**   | mark i/INDEX d/YYYY-MM-DD [g/CLASS_SPACE] <br> e.g., mark i/1 d/2026-03-16 g/T02
-**Participation**   | part i/INDEX d/YYYY-MM-DD [g/CLASSSPACE] pv/PARTICIPATION_VALUE <br> e.g., part i/1 d/2026-03-16 g/T02 pv/4
-**Remove from Group**   | removefromgroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER] removefromgroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] <br> e.g., removefromgroup g/T01 m/A1234567X m/A2345678L
-**Rename Group**   | renamegroup g/OLD_GROUP_NAME new/NEW_GROUP_NAME <br> e.g., renamegroup g/T01 new/Tutorial-01
-**Switch Group**   | switchgroup g/GROUP_NAME switchgroup all <br> e.g., switchgroup g/T01
-**Unmark Attendance**   | unmark i/INDEX d/YYYY-MM-DD [g/CLASS_SPACE] <br> e.g., unmark i/1 d/2026-03-16 g/T02
-
+**Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
+**Add to Group**   | `addtogroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]` `addtogroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION]` <br> e.g., `addtogroup g/T01 m/A1234567X m/A2345678L`
+**Attendance View**   | `attview STATUS d/YYYY-MM-DD` <br> e.g., `attview absent d/2026-03-16`
+**Clear**  | `clear`
+**Create Assignment**   | `createassignment a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` `createa a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` <br> e.g., `createassignment a/Quiz 1 d/2026-04-05 mm/20`
+**Create Group**   | `creategroup g/GROUP_NAME` <br> e.g., `creategroup g/T01`
+**Delete** | `delete INDEX`<br> e.g., `delete 3`
+**Delete Assignment**   | `deleteassignment a/ASSIGNMENT_NAME` `deletea a/ASSIGNMENT_NAME` <br> e.g., `deleteassignment a/Quiz 1`
+**Delete Group**   | `deletegroup g/GROUP_NAME` <br> e.g., `deletegroup g/T01`
+**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
+**Edit Assignment**   | `editassignment a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` `edita a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` <br> e.g., `editassignment a/Quiz 1 na/Test d/2026-04-08 mm/25`
+**Exit**   | `exit`
+**Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
+**Grade Assignment**   | `gradeassignment a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradeassignment a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` `gradea a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradea a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` <br> e.g., `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17`
+**Help**   | `help`
+**List**   | `list`
+**List Assignment**   | `listassignments` `lista`
+**List Groups**   | `listgroups`
+**Mark Attendance**   | `mark i/INDEX d/YYYY-MM-DD` <br> e.g., `mark i/1 d/2026-03-16`
+**Participation**   | `part i/INDEX d/YYYY-MM-DD pv/PARTICIPATION_VALUE` <br> e.g., `part i/1 d/2026-03-16 pv/4`
+**Remove from Group**   | `removefromgroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]` `removefromgroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION]` <br> e.g., `removefromgroup g/T01 m/A1234567X m/A2345678L`
+**Rename Group**   | `renamegroup g/OLD_GROUP_NAME new/NEW_GROUP_NAME` <br> e.g., `renamegroup g/T01 new/Tutorial-01`
+**Switch Group**   | `switchgroup g/GROUP_NAME` `switchgroup all` <br> e.g., `switchgroup g/T01`
+**Unmark Attendance**   | `unmark i/INDEX d/YYYY-MM-DD` <br> e.g., `unmark i/1 d/2026-03-16`
