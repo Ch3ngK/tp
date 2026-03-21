@@ -1,0 +1,10 @@
+{
+  "classSpaces": [],
+  "persons":[ {
+    "name": "Alice Pauline",
+    "phone": "94351253",
+    "email": "alice@example.com",
+    "matricNumber": "A7654321J",
+    "classSpaces": [ "Implicit-Class-Space" ]
+  } ]
+}

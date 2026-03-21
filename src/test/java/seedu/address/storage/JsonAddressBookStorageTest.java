@@ -2,6 +2,7 @@ package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.HOON;
@@ -11,11 +12,13 @@ import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.exceptions.DataLoadingException;
+import seedu.address.commons.util.FileUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.classspace.ClassSpace;
@@ -141,5 +144,58 @@ public class JsonAddressBookStorageTest {
     @Test
     public void saveAddressBook_nullFilePath_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> saveAddressBook(new AddressBook(), null));
+    }
+
+    @Test
+    public void readAddressBook_invalidAndValidPersonAddressBook_populatesLoadWarnings() throws Exception {
+        Path filePath = addToTestDataPathIfNotNull("invalidAndValidPersonAddressBook.json");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        // Read the file which contains 1 valid and 1 invalid person.
+        storage.readAddressBook(filePath);
+
+        // Verify that the storage object successfully captured the warning.
+        List<String> warnings = storage.getLastLoadWarnings();
+        assertEquals(1, warnings.size());
+        assertTrue(warnings.get(0).contains("Skipped invalid contact"));
+    }
+
+    @Test
+    public void readAndSaveAddressBook_invalidPersonPreserved_success() throws Exception {
+        Path originalFilePath = addToTestDataPathIfNotNull("invalidAndValidPersonAddressBook.json");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(originalFilePath);
+
+        // Read the address book (1 valid is loaded, 1 invalid is skipped and preserved).
+        ReadOnlyAddressBook addressBook = storage.readAddressBook(originalFilePath).get();
+
+        // Save it back to a new temporary file.
+        Path saveFilePath = testFolder.resolve("TempAddressBookWithInvalid.json");
+        storage.saveAddressBook(addressBook, saveFilePath);
+
+        // Read the saved file natively as a String to verify the invalid person was written back.
+        String savedJson = FileUtil.readFromFile(saveFilePath);
+
+        // Ensure the valid person is there.
+        assertTrue(savedJson.contains("Valid Person"));
+        // Ensure the invalid person was preserved.
+        assertTrue(savedJson.contains("Person With Invalid Phone Field"));
+    }
+
+    @Test
+    public void readAddressBook_sequentialReads_resetsWarnings() throws Exception {
+        Path invalidFilePath = addToTestDataPathIfNotNull("invalidPersonAddressBook.json");
+        Path validFilePath = testFolder.resolve("TempAddressBook.json");
+
+        // Create a valid file to read from.
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(validFilePath);
+        storage.saveAddressBook(getTypicalAddressBook(), validFilePath);
+
+        // Read the invalid file -> Should have warnings.
+        storage.readAddressBook(invalidFilePath);
+        assertEquals(1, storage.getLastLoadWarnings().size());
+
+        // Read the valid file -> Warnings should be cleared/reset.
+        storage.readAddressBook(validFilePath);
+        assertEquals(0, storage.getLastLoadWarnings().size());
     }
 }
