@@ -22,6 +22,7 @@ public class UiManager implements Ui {
 
     private static final Logger logger = LogsCenter.getLogger(UiManager.class);
     private static final String ICON_APPLICATION = "/images/address_book_32.png";
+    private static final String SAVE_FILE_MESSAGE = "\nYou can fix these entries directly in the save file: ";
 
     private Logic logic;
     private MainWindow mainWindow;
@@ -66,22 +67,24 @@ public class UiManager implements Ui {
     }
 
     private void displayStartUpWarnings() {
-        if (startUpWarnings.isEmpty()) {
-            return;
-        }
-        mainWindow.getResultDisplay().setFeedbackToUser(buildStartUpWarningMessage(startUpWarnings));
+        mainWindow.getResultDisplay().setFeedbackToUser(buildStartUpMessage(startUpWarnings));
     }
 
-    private String buildStartUpWarningMessage(List<String> warnings) {
+    private String buildStartUpMessage(List<String> warnings) {
+        if (warnings.isEmpty()) {
+            return buildSuccessMessage();
+        }
         return buildWarningHeader(warnings.size())
                 + buildWarningList(warnings)
                 + buildWarningFooter();
     }
 
-    private String buildWarningHeader(int count) {
-        return count + (count == 1 ? " contact" : " contacts")
-                + " could not be loaded from the save file and "
-                + (count == 1 ? "was" : "were")
+    private String buildWarningHeader(int skippedCount) {
+        int loadedCount = logic.getFilteredPersonList().size();
+        return loadedCount + (loadedCount == 1 ? " contact" : " contacts") + " loaded successfully. "
+                + skippedCount + (skippedCount == 1 ? " contact" : " contacts")
+                + " could not be loaded and "
+                + (skippedCount == 1 ? "was" : "were")
                 + " skipped:\n\n";
     }
 
@@ -94,7 +97,12 @@ public class UiManager implements Ui {
     }
 
     private String buildWarningFooter() {
-        return "\nYou can fix these entries directly in the save file.";
+        return SAVE_FILE_MESSAGE + logic.getAddressBookFilePath();
+    }
+
+    private String buildSuccessMessage() {
+        int count = logic.getFilteredPersonList().size();
+        return count + (count == 1 ? " contact" : " contacts") + " loaded successfully.";
     }
 
     private Image getImage(String imagePath) {
