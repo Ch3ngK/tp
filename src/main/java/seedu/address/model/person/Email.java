@@ -26,14 +26,16 @@ public class Email {
     public static final String MESSAGE_DOMAIN_LABEL_INVALID = "The domain label '%s' is invalid. "
             + "Each label must start and end with "
             + "an alphanumeric character and may only contain hyphens in between.";
-    private static final char AT_SYMBOL = '@';
-    private static final int MIN_DOMAIN_LAST_PART_LENGTH = 2;
-    private static final String SPECIAL_CHARACTERS = "+_.-";
+    public static final char AT_SYMBOL = '@';
+    public static final int MIN_DOMAIN_LAST_PART_LENGTH = 2;
+    public static final int MAX_LENGTH = 320;
+    public static final String SPECIAL_CHARACTERS = "+_.-";
 
-    private static final String EMAIL_FORMAT_EXAMPLE = "(e.g. johndoe@example.com)";
-    private static final String EMAIL_FORMAT_HINT = "It should be in the format local-part@domain "
+    public static final String EMAIL_FORMAT_EXAMPLE = "(e.g. johndoe@example.com)";
+    public static final String EMAIL_FORMAT_HINT = "It should be in the format local-part@domain "
             + EMAIL_FORMAT_EXAMPLE;
     // Error messages
+    public static final String MESSAGE_EMAIL_TOO_LONG = "Email must not exceed " + MAX_LENGTH + " characters.";
     public static final String EMPTY_EMAIL_MESSAGE = "Email cannot be empty. " + EMAIL_FORMAT_HINT;
     public static final String MESSAGE_MISSING_DOMAIN = "Email is missing a domain after '@'. " + EMAIL_FORMAT_HINT;
 
@@ -84,8 +86,13 @@ public class Email {
 
     /**
      * Returns if a given string is a valid email.
+     *
+     * @param test Email to be tested.
      */
     public static boolean isValidEmail(String test) {
+        if (isExceedingMaxLength(test)) {
+            return false;
+        }
         return test.matches(VALIDATION_REGEX);
     }
 
@@ -100,25 +107,35 @@ public class Email {
         assert email != null : "getDiagnosticMessage should not be called with null";
         logger.fine("Diagnosing invalid email: '" + email + "'");
 
+        if (isExceedingMaxLength(email)) {
+            return MESSAGE_EMAIL_TOO_LONG;
+        }
+
         String atSymbolError = checkAtSymbolErrors(email);
         if (atSymbolError != null) {
             return atSymbolError;
         }
+        return checkEmailComponents(email);
+    }
 
+    private static String checkEmailComponents(String email) {
         String localPart = extractLocalPart(email);
-        String domain = extractDomain(email);
 
         String localPartError = checkLocalPart(localPart);
         if (localPartError != null) {
             return localPartError;
         }
-
+        String domain = extractDomain(email);
         String domainError = checkDomain(domain);
         if (domainError != null) {
             return domainError;
         }
 
         return MESSAGE_CONSTRAINTS;
+    }
+
+    private static boolean isExceedingMaxLength(String email) {
+        return email.length() > MAX_LENGTH;
     }
 
     private static boolean isEmailEmpty(String email) {
@@ -157,33 +174,53 @@ public class Email {
     }
 
     private static String checkLocalPart(String localPart) {
-        if (localPart.isEmpty()) {
+        if (isLocalPartEmpty(localPart)) {
             return MESSAGE_MISSING_LOCAL_PART;
         }
         if (!startsWithAlphanumeric(localPart)) {
-            return String.format(MESSAGE_LOCAL_PART_INVALID_START, localPart.charAt(0));
+            return String.format(MESSAGE_LOCAL_PART_INVALID_START, getFirstCharacter(localPart));
         }
         if (endsWithSpecialCharacter(localPart)) {
-            return String.format(MESSAGE_LOCAL_PART_INVALID_END, localPart.charAt(localPart.length() - 1));
+            return String.format(MESSAGE_LOCAL_PART_INVALID_END, getLastCharacter(localPart));
         }
-        if (!localPart.matches(LOCAL_PART_REGEX)) {
+        if (!isValidLocalPart(localPart)) {
             return MESSAGE_LOCAL_PART_INVALID_CHARS;
         }
         return null;
     }
 
+    private static boolean isLocalPartEmpty(String localPart) {
+        return localPart.isEmpty();
+    }
+
+    private static boolean isValidLocalPart(String localPart) {
+        return localPart.matches(LOCAL_PART_REGEX);
+    }
+
+    private static char getFirstCharacter(String string) {
+        return string.charAt(0);
+    }
+
+    private static char getLastCharacter(String string) {
+        return string.charAt(string.length() - 1);
+    }
+
     private static boolean startsWithAlphanumeric(String localPart) {
-        return String.valueOf(localPart.charAt(0)).matches(ALPHANUMERIC_NO_UNDERSCORE);
+        return String.valueOf(getFirstCharacter(localPart)).matches(ALPHANUMERIC_NO_UNDERSCORE);
     }
     private static boolean endsWithSpecialCharacter(String localPart) {
-        return SPECIAL_CHARACTERS.contains(String.valueOf(localPart.charAt(localPart.length() - 1)));
+        return SPECIAL_CHARACTERS.contains(String.valueOf(getLastCharacter(localPart)));
     }
 
     private static String checkDomain(String domain) {
         if (domain.isEmpty()) {
             return MESSAGE_MISSING_DOMAIN;
         }
-        return checkDomainLabels(domain.split("\\.", -1));
+        return checkDomainLabels(splitIntoDomain(domain));
+    }
+
+    private static String[] splitIntoDomain(String domain) {
+        return domain.split("\\.", -1);
     }
 
     private static String checkDomainLabels(String[] labels) {

@@ -62,7 +62,12 @@ public class EmailTest {
                 Email.getDiagnosticMessage("peterjack@example-.com"));
         assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "exam_ple"),
                 Email.getDiagnosticMessage("peterjack@exam_ple.com"));
+
+        // Email too long
+        String longLocalPart = "a".repeat(311); // 311 + @gmail.com = 321 char.
+        assertEquals(Email.MESSAGE_EMAIL_TOO_LONG, Email.getDiagnosticMessage(longLocalPart + "@gmail.com"));
     }
+
 
     @Test
     public void isValidEmail() {
