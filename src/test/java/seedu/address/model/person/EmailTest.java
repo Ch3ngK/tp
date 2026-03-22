@@ -51,6 +51,7 @@ public class EmailTest {
 
         // Domain TLD too short
         assertEquals(Email.MESSAGE_DOMAIN_TLD_SHORT, Email.getDiagnosticMessage("peterjack@example.c"));
+        assertEquals(Email.MESSAGE_DOMAIN_TLD_SHORT, Email.getDiagnosticMessage("peterjack@example.co.d"));
 
         // Domain contains consecutive periods
         assertEquals(Email.MESSAGE_DOMAIN_CONSECUTIVE_PERIODS, Email.getDiagnosticMessage("peterjack@example..com"));
@@ -62,6 +63,9 @@ public class EmailTest {
                 Email.getDiagnosticMessage("peterjack@example-.com"));
         assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "exam_ple"),
                 Email.getDiagnosticMessage("peterjack@exam_ple.com"));
+
+        // Domain ends with a dot
+        assertEquals(Email.MESSAGE_DOMAIN_ENDS_WITH_PERIOD, Email.getDiagnosticMessage("peterjack@example.com."));
 
         // Email too long
         String longLocalPart = "a".repeat(311); // 311 + @gmail.com = 321 char.
@@ -114,6 +118,7 @@ public class EmailTest {
         assertTrue(Email.isValidEmail("peter_jack@very-very-very-long-example.com")); // long domain name
         assertTrue(Email.isValidEmail("if.you.dream.it_you.can.do.it@example.com")); // long local part
         assertTrue(Email.isValidEmail("e1234567@u.nus.edu")); // more than one period in domain
+        assertTrue(Email.isValidEmail("peter@example.com.de.us.sg"));
     }
 
     @Test
