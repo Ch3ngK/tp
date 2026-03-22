@@ -38,6 +38,7 @@ public class Email {
     public static final String MESSAGE_EMAIL_TOO_LONG = "Email must not exceed " + MAX_LENGTH + " characters.";
     public static final String EMPTY_EMAIL_MESSAGE = "Email cannot be empty. " + EMAIL_FORMAT_HINT;
     public static final String MESSAGE_MISSING_DOMAIN = "Email is missing a domain after '@'. " + EMAIL_FORMAT_HINT;
+    public static final String MESSAGE_DOMAIN_ENDS_WITH_PERIOD = "The domain must not end with a '.'.";
 
     public static final String MISSING_AT_SYMBOL_MESSAGE = "Email is missing '@'. " + EMAIL_FORMAT_HINT;
     public static final String MESSAGE_LOCAL_PART_INVALID_CHARS = "The local-part (before '@') contains invalid "
@@ -213,10 +214,21 @@ public class Email {
     }
 
     private static String checkDomain(String domain) {
-        if (domain.isEmpty()) {
+        if (isDomainEmpty(domain)) {
             return MESSAGE_MISSING_DOMAIN;
         }
+        if (isDomainEndingWithADot(domain)) {
+            return MESSAGE_DOMAIN_ENDS_WITH_PERIOD;
+        }
         return checkDomainLabels(splitIntoDomain(domain));
+    }
+
+    private static boolean isDomainEmpty(String domain) {
+        return domain.isEmpty();
+    }
+
+    private static boolean isDomainEndingWithADot(String domain) {
+        return domain.endsWith(".");
     }
 
     private static String[] splitIntoDomain(String domain) {
