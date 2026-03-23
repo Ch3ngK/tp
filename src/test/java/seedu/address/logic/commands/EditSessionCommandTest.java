@@ -1,7 +1,6 @@
 package seedu.address.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.testutil.Assert.assertThrows;
 
@@ -44,7 +43,8 @@ public class EditSessionCommandTest {
 
         EditSessionCommand command = new EditSessionCommand(ORIGINAL_DATE, NEW_DATE);
         assertCommandSuccess(command, model,
-                String.format(EditSessionCommand.MESSAGE_SUCCESS, ORIGINAL_DATE, NEW_DATE, T01), expectedModel);
+                String.format(EditSessionCommand.MESSAGE_SUCCESS, ORIGINAL_DATE + " -> " + NEW_DATE, T01),
+                expectedModel);
     }
 
     @Test
@@ -54,16 +54,16 @@ public class EditSessionCommandTest {
         model.switchToClassSpaceView(T01);
 
         EditSessionCommand command = new EditSessionCommand(ORIGINAL_DATE, NEW_DATE);
-        assertThrows(CommandException.class,
-                String.format(EditSessionCommand.MESSAGE_SESSION_NOT_FOUND, ORIGINAL_DATE, T01),
-                () -> command.execute(model));
+        String expectedMessage = String.format(EditSessionCommand.MESSAGE_SESSION_NOT_FOUND, ORIGINAL_DATE, T01);
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(model));
     }
 
     @Test
     public void toStringMethod() {
         EditSessionCommand command = new EditSessionCommand(ORIGINAL_DATE, NEW_DATE, T01);
         String expected = EditSessionCommand.class.getCanonicalName()
-                + "{originalDate=" + ORIGINAL_DATE + ", newDate=" + NEW_DATE + ", classSpaceName=Optional[" + T01 + "]}";
+                + "{originalDate=" + ORIGINAL_DATE + ", newDate=Optional[" + NEW_DATE
+                + "], newNote=Optional.empty, classSpaceName=Optional[" + T01 + "]}";
         assertEquals(expected, command.toString());
     }
 }

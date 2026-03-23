@@ -7,6 +7,7 @@ import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,7 @@ public class DeleteSessionCommandTest {
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         expectedModel.setPerson(person, person.withoutSession(T01, SESSION_DATE));
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE);
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
         assertCommandSuccess(command, model,
                 String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
 
@@ -66,7 +67,7 @@ public class DeleteSessionCommandTest {
         expectedModel.clearActiveSessionDate();
         expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE);
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
         assertCommandSuccess(command, model,
                 String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
         assertTrue(model.getActiveSessionDate().isEmpty());
@@ -78,18 +79,18 @@ public class DeleteSessionCommandTest {
         model.addClassSpace(new ClassSpace(T01));
         model.switchToClassSpaceView(T01);
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE);
-        assertThrows(CommandException.class,
-                String.format(DeleteSessionCommand.MESSAGE_SESSION_NOT_FOUND, SESSION_DATE, T01),
-                () -> command.execute(model));
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
+        String expectedMessage = String.format(DeleteSessionCommand.MESSAGE_SESSION_NOT_FOUND, SESSION_DATE, T01);
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(model));
     }
 
     @Test
     public void execute_noActiveGroup_throwsCommandException() {
         Model model = new ModelManager();
         DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE);
-        assertThrows(CommandException.class, DeleteSessionCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE,
-                () -> command.execute(model));
+        assertThrows(CommandException.class, DeleteSessionCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE, () -> {
+            command.execute(model);
+        });
     }
 
     @Test

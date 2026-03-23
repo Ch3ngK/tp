@@ -235,7 +235,8 @@ public class AttViewCommandTest {
         ViewCommand command = new ViewCommand(attendance, SESSION_DATE);
         String expected = ViewCommand.class.getCanonicalName()
                 + "{attendance=Optional[" + attendance + "], classSpaceName=Optional.empty, "
-                + "sessionDate=Optional[" + SESSION_DATE + "]}";
+                + "sessionDate=Optional[" + SESSION_DATE
+                + "], rangeStartDate=Optional.empty, rangeEndDate=Optional.empty}";
         assertEquals(expected, command.toString());
     }
 }

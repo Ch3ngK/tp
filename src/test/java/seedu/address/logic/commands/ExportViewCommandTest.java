@@ -41,7 +41,8 @@ public class ExportViewCommandTest {
     public void execute_withoutActiveGroup_throwsCommandException() {
         Model model = new ModelManager();
         ExportViewCommand command = new ExportViewCommand();
-        assertThrows(CommandException.class, ExportViewCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE,
-                () -> command.execute(model));
+        assertThrows(CommandException.class, ExportViewCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE, () -> {
+            command.execute(model);
+        });
     }
 }

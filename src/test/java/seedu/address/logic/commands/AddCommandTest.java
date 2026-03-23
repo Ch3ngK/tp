@@ -260,6 +260,36 @@ public class AddCommandTest {
         public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
             throw new AssertionError("This method should not be called.");
         }
+
+        @Override
+        public Optional<LocalDate> getVisibleSessionRangeStart() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<LocalDate> getVisibleSessionRangeEnd() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setVisibleSessionRange(LocalDate startDate, LocalDate endDate) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void clearVisibleSessionRange() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyObjectProperty<LocalDate> visibleSessionRangeStartProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyObjectProperty<LocalDate> visibleSessionRangeEndProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
     }
 
     /**

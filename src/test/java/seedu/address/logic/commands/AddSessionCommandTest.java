@@ -58,17 +58,17 @@ public class AddSessionCommandTest {
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 1).build());
 
         AddSessionCommand command = new AddSessionCommand(SESSION_DATE);
-        assertThrows(CommandException.class,
-                String.format(AddSessionCommand.MESSAGE_SESSION_ALREADY_EXISTS, SESSION_DATE, T01),
-                () -> command.execute(model));
+        String expectedMessage = String.format(AddSessionCommand.MESSAGE_SESSION_ALREADY_EXISTS, SESSION_DATE, T01);
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(model));
     }
 
     @Test
     public void execute_noActiveGroup_throwsCommandException() {
         Model model = new ModelManager();
         AddSessionCommand command = new AddSessionCommand(SESSION_DATE);
-        assertThrows(CommandException.class, AddSessionCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE,
-                () -> command.execute(model));
+        assertThrows(CommandException.class, AddSessionCommand.MESSAGE_NO_ACTIVE_CLASS_SPACE, () -> {
+            command.execute(model);
+        });
     }
 
     @Test
