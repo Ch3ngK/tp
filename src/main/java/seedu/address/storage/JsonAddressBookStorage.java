@@ -117,8 +117,8 @@ public class JsonAddressBookStorage implements AddressBookStorage {
         }
 
         FileUtil.createIfMissing(filePath);
-        JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook, lastSkippedPersons, lastSkippedClassSpaces),
-                filePath);
+        JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook, lastSkippedPersons,
+                lastSkippedClassSpaces, lastLoadWarnings), filePath);
     }
 
 }

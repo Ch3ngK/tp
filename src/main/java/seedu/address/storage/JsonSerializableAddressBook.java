@@ -45,12 +45,25 @@ class JsonSerializableAddressBook {
      */
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonNode> persons,
-            @JsonProperty("classSpaces") List<JsonNode> classSpaces) {
+                                       @JsonProperty("classSpaces") List<JsonNode> classSpaces,
+                                       @JsonProperty("preservedSkippedPersons") List<JsonNode> preservedSkippedPersons,
+                                       @JsonProperty("preservedSkippedClassSpaces")
+                                           List<JsonNode> preservedSkippedClassSpaces,
+                                       @JsonProperty("loadWarnings") List<String> loadWarnings) {
         if (persons != null) {
             this.persons.addAll(persons);
         }
         if (classSpaces != null) {
             this.classSpaces.addAll(classSpaces);
+        }
+        if (preservedSkippedPersons != null) {
+            this.preservedSkippedPersons.addAll(preservedSkippedPersons);
+        }
+        if (preservedSkippedClassSpaces != null) {
+            this.preservedSkippedClassSpaces.addAll(preservedSkippedClassSpaces);
+        }
+        if (loadWarnings != null) {
+            this.loadWarnings.addAll(loadWarnings);
         }
     }
 
@@ -58,7 +71,7 @@ class JsonSerializableAddressBook {
      * Converts a given {@code ReadOnlyAddressBook} into this class for Jackson use.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source) {
-        this(source, List.of(), List.of());
+        this(source, List.of(), List.of(), List.of());
     }
 
     /**
@@ -69,7 +82,7 @@ class JsonSerializableAddressBook {
      * @param preservedSkippedPersons Raw person JSON nodes that should be written back unchanged.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source, List<JsonNode> preservedSkippedPersons) {
-        this(source, preservedSkippedPersons, List.of());
+        this(source, preservedSkippedPersons, List.of(), List.of());
     }
 
     /**
@@ -81,14 +94,15 @@ class JsonSerializableAddressBook {
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source,
                                        List<JsonNode> preservedSkippedPersons,
-                                       List<JsonNode> preservedSkippedClassSpaces) {
+                                       List<JsonNode> preservedSkippedClassSpaces,
+                                       List<String> preservedLoadWarnings) {
         persons.addAll(source.getPersonList().stream()
                 .map(JsonAdaptedPerson::new)
                 .map(JsonUtil::toJsonNode)
                 .collect(Collectors.toList()));
         if (preservedSkippedPersons != null) {
             for (JsonNode skippedPerson : preservedSkippedPersons) {
-                persons.add(skippedPerson.deepCopy());
+                this.preservedSkippedPersons.add(skippedPerson.deepCopy());
             }
         }
         classSpaces.addAll(source.getClassSpaceList().stream()
@@ -97,8 +111,11 @@ class JsonSerializableAddressBook {
                 .collect(Collectors.toList()));
         if (preservedSkippedClassSpaces != null) {
             for (JsonNode skippedClassSpace : preservedSkippedClassSpaces) {
-                classSpaces.add(skippedClassSpace.deepCopy());
+                this.preservedSkippedClassSpaces.add(skippedClassSpace.deepCopy());
             }
+        }
+        if (preservedLoadWarnings != null) {
+            this.loadWarnings.addAll(preservedLoadWarnings);
         }
     }
 
@@ -136,15 +153,15 @@ class JsonSerializableAddressBook {
      */
     public AddressBook toModelType() throws IllegalValueException {
         AddressBook addressBook = new AddressBook();
+        List<String> previousWarnings = new ArrayList<>(loadWarnings);
         loadWarnings.clear();
-        preservedSkippedPersons.clear();
-        preservedSkippedClassSpaces.clear();
 
         logger.info("Loading address book: " + classSpaces.size() + " class space(s), "
                 + persons.size() + " person(s)");
 
         loadClassSpaces(addressBook);
         loadPersons(addressBook);
+        loadWarnings.addAll(0, previousWarnings);
 
         logger.info("Address book loaded: " + addressBook.getPersonList().size()
                 + " person(s) loaded, " + loadWarnings.size() + " skipped");

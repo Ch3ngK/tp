@@ -51,6 +51,10 @@ public class JsonSerializableAddressBookTest {
             TEST_DATA_FOLDER.resolve("sessionForNonMemberClassSpaceAddressBook.json");
     private static final Path VALID_GRADES_AND_SESSIONS_FILE =
             TEST_DATA_FOLDER.resolve("validGradesAndSessionsAddressBook.json");
+    private static final Path PRESERVED_SKIPPED_PERSONS_FILE =
+            TEST_DATA_FOLDER.resolve("preservedSkippedPersonsAddressBook.json");
+    private static final Path PRESERVED_SKIPPED_CLASS_SPACES_FILE =
+            TEST_DATA_FOLDER.resolve("preservedSkippedClassSpacesAddressBook.json");
 
     @Test
     public void toModelType_invalidPersonWithMultipleInvalidFields_formatsWarningAsBulletList() throws Exception {
@@ -196,9 +200,8 @@ public class JsonSerializableAddressBookTest {
 
     @Test
     public void constructor_nullLists_doesNotThrow() throws Exception {
-        // Force the "if (persons != null)" to evaluate to false
         JsonSerializableAddressBook serializable = new JsonSerializableAddressBook(
-                (List<JsonNode>) null, (List<JsonNode>) null);
+                (List<JsonNode>) null, (List<JsonNode>) null, null, null, null);
 
         AddressBook addressBook = serializable.toModelType();
         assertEquals(0, addressBook.getPersonList().size());
@@ -354,6 +357,85 @@ public class JsonSerializableAddressBookTest {
 
         assertEquals(1, addressBookFromFile.getPersonList().size());
         assertEquals(0, dataFromFile.getLoadWarnings().size());
+    }
+
+    @Test
+    public void toModelType_preservedSkippedPersonsInFile_survivesReload() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_PERSONS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        // The skipped person from the file should still be preserved after toModelType()
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size());
+        assertEquals("Alex Yeoh",
+                dataFromFile.getPreservedSkippedPersons().get(0).get("name").asText());
+    }
+
+    @Test
+    public void toModelType_preservedSkippedPersonsInFile_doesNotLoadSkippedPersonIntoAddressBook()
+            throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_PERSONS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBook = dataFromFile.toModelType();
+
+        // The preserved skipped person should NOT be loaded as a valid contact.
+        assertEquals(1, addressBook.getPersonList().size()); // only David Li.
+        assertEquals("David Li", addressBook.getPersonList().get(0).getName().fullName);
+    }
+
+    @Test
+    public void toModelType_loadWarningsInFile_survivesReload() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_PERSONS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        // The load warning from the file should still be present after toModelType().
+        assertTrue(dataFromFile.getLoadWarnings().stream()
+                .anyMatch(w -> w.contains("FakeAssignment")));
+    }
+
+    @Test
+    public void toModelType_preservedSkippedClassSpacesInFile_survivesReload() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_CLASS_SPACES_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        dataFromFile.toModelType();
+
+        // The skipped class space from the file should still be preserved after toModelType().
+        assertEquals(1, dataFromFile.getPreservedSkippedClassSpaces().size());
+        assertEquals("T01!!!",
+                dataFromFile.getPreservedSkippedClassSpaces().get(0).get("name").asText());
+    }
+
+    @Test
+    public void toModelType_preservedSkippedClassSpacesInFile_doesNotLoadSkippedClassSpaceIntoAddressBook()
+            throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_CLASS_SPACES_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBook = dataFromFile.toModelType();
+
+        // Only T01 (the valid one) should be loaded, not T01!!!
+        assertEquals(1, addressBook.getClassSpaceList().size());
+        assertEquals("T01", addressBook.getClassSpaceList().get(0).getClassSpaceName().value);
+    }
+
+    @Test
+    public void toModelType_newSkipsAndPreservedSkips_bothPresentInResult() throws Exception {
+        // File has 1 pre-existing preserved skip (Alex) + 1 valid person (David).
+        // toModelType() should keep Alex in preservedSkippedPersons without re-processing him.
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(PRESERVED_SKIPPED_PERSONS_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBook = dataFromFile.toModelType();
+
+        assertEquals(1, addressBook.getPersonList().size()); // David loaded
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size()); // Alex preserved
+        assertTrue(dataFromFile.getLoadWarnings().stream()
+                .anyMatch(w -> w.contains("FakeAssignment"))); // warning preserved
     }
 
 
