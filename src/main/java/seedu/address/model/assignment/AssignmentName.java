@@ -8,7 +8,10 @@ import static java.util.Objects.requireNonNull;
  */
 public class AssignmentName {
 
-    public static final String MESSAGE_CONSTRAINTS = "Assignment names should not be blank.";
+    public static final String MESSAGE_CONSTRAINTS =
+            "Assignment names should only contain alphanumeric characters and spaces, and should not be blank.";
+
+    private static final String VALIDATION_REGEX = "[\\p{Alnum}][\\p{Alnum} ]*";
 
     public final String value;
 
@@ -30,7 +33,7 @@ public class AssignmentName {
      * Returns true if a given string is a valid assignment name.
      */
     public static boolean isValidAssignmentName(String test) {
-        return test != null && !test.trim().isEmpty();
+        return test != null && test.trim().matches(VALIDATION_REGEX);
     }
 
     @Override

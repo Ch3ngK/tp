@@ -2,6 +2,7 @@ package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.nio.file.Path;
@@ -63,6 +64,69 @@ public class StorageManagerTest {
     @Test
     public void getAddressBookFilePath() {
         assertNotNull(storageManager.getAddressBookFilePath());
+    }
+
+    @Test
+    public void getLastLoadWarnings_jsonAddressBookStorage_returnsWarnings() {
+        // storageManager in setUp() is already initialized with JsonAddressBookStorage
+        assertEquals(java.util.List.of(), storageManager.getLastLoadWarnings());
+    }
+
+    @Test
+    public void getLastLoadWarnings_notJsonAddressBookStorage_returnsEmptyList() {
+        AddressBookStorage stubStorage = new AddressBookStorage() {
+            @Override
+            public Path getAddressBookFilePath() {
+                return null;
+            }
+            @Override
+            public java.util.Optional<seedu.address.model.ReadOnlyAddressBook> readAddressBook() {
+                return java.util.Optional.empty();
+            }
+            @Override
+            public java.util.Optional<seedu.address.model.ReadOnlyAddressBook> readAddressBook(Path filePath) {
+                return java.util.Optional.empty();
+            }
+            @Override
+            public void saveAddressBook(seedu.address.model.ReadOnlyAddressBook addressBook) { }
+            @Override
+            public void saveAddressBook(seedu.address.model.ReadOnlyAddressBook addressBook,
+                                                  Path filePath) { }
+        };
+
+        StorageManager manager = new StorageManager(stubStorage,
+                new JsonUserPrefsStorage(java.nio.file.Paths.get("dummy")));
+        assertEquals(java.util.List.of(), manager.getLastLoadWarnings());
+    }
+
+    @Test
+    public void getLastLoadWarnings_afterReadingInvalidData_returnsWarnings() throws Exception {
+        Path filePath = testFolder.resolve("invalidClassSpaceAddressBook.json");
+        String json = """
+            {
+              "persons": [],
+              "classSpaces": [
+                {
+                  "name": "T01",
+                  "assignments": []
+                },
+                {
+                  "name": "T#1",
+                  "assignments": []
+                }
+              ]
+            }
+            """;
+        java.nio.file.Files.writeString(filePath, json);
+
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(filePath);
+        JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(getTempFilePath("prefs"));
+        StorageManager manager = new StorageManager(addressBookStorage, userPrefsStorage);
+
+        manager.readAddressBook();
+
+        assertEquals(1, manager.getLastLoadWarnings().size());
+        assertTrue(manager.getLastLoadWarnings().get(0).contains("Skipped invalid class space"));
     }
 
 }

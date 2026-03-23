@@ -12,7 +12,6 @@ import seedu.address.commons.core.LogsCenter;
  * Guarantees: immutable; is valid as declared in {@link #isValidEmail(String)}
  */
 public class Email {
-
     public static final String MULTIPLE_AT_SYMBOL_MESSAGE = "Email contains more than one '@'. "
             + "There should only be one.";
     public static final String MESSAGE_MISSING_LOCAL_PART = "Email is missing a local-part before '@'. "
@@ -47,6 +46,7 @@ public class Email {
     public static final String MESSAGE_DOMAIN_TLD_SHORT = "The domain's last part "
             + "(e.g. 'com' in 'example.com') must be at least "
             + MIN_DOMAIN_LAST_PART_LENGTH + " characters long.";
+
     public static final String MESSAGE_CONSTRAINTS = "Emails should be of the format local-part@domain "
             + "and adhere to the following constraints:\n"
             + "1. The local-part should only contain alphanumeric characters and these special characters, excluding "
@@ -58,7 +58,6 @@ public class Email {
             + "    - end with a domain label at least 2 characters long\n"
             + "    - have each domain label start and end with alphanumeric characters\n"
             + "    - have each domain label consist of alphanumeric characters, separated only by hyphens, if any.";
-
 
     // alphanumeric and special characters
     private static final String ALPHANUMERIC_NO_UNDERSCORE = "[^\\W_]+"; // alphanumeric characters except underscore

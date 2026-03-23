@@ -1,0 +1,11 @@
+{
+  "persons": [],
+  "classSpaces": [ {
+    "name": "T01",
+    "assignments": [ {
+      "name": "Quiz 1",
+      "dueDate": "2026-01-27",
+      "maxMarks": -10
+    } ]
+  } ]
+}

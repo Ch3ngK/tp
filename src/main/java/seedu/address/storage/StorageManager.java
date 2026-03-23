@@ -2,6 +2,7 @@ package seedu.address.storage;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -73,6 +74,18 @@ public class StorageManager implements Storage {
     public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath) throws IOException {
         logger.fine("Attempting to write to data file: " + filePath);
         addressBookStorage.saveAddressBook(addressBook, filePath);
+    }
+
+    /**
+     * Retrieves the warnings collected during the last reading of the save file.
+     *
+     * @return A list of warnings encountered during the last load operation.
+     */
+    public List<String> getLastLoadWarnings() {
+        if (addressBookStorage instanceof JsonAddressBookStorage jabs) {
+            return jabs.getLastLoadWarnings();
+        }
+        return List.of();
     }
 
 }

@@ -1,0 +1,8 @@
+{
+  "persons": [ {
+      "phone": "91112222",
+      "email": "some@email.com",
+      "matricNumber": "A0123456J"
+    } ]
+}
+

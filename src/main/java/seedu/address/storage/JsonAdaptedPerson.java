@@ -31,6 +31,7 @@ class JsonAdaptedPerson {
 
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Person's %s field is missing!";
 
+
     private final String name;
     private final String phone;
     private final String email;
@@ -132,55 +133,74 @@ class JsonAdaptedPerson {
      * @throws IllegalValueException if there were any data constraints violated in the adapted person.
      */
     public Person toModelType() throws IllegalValueException {
+        final List<String> validationErrors = new ArrayList<>();
+
+        if (name == null) {
+            validationErrors.add(String.format(MISSING_FIELD_MESSAGE_FORMAT, Name.class.getSimpleName()));
+        } else if (!Name.isValidName(name)) {
+            validationErrors.add(Name.MESSAGE_CONSTRAINTS);
+        }
+
+        if (phone == null) {
+            validationErrors.add(String.format(MISSING_FIELD_MESSAGE_FORMAT, Phone.class.getSimpleName()));
+        } else if (!Phone.isValidPhone(phone)) {
+            validationErrors.add(Phone.MESSAGE_CONSTRAINTS);
+        }
+
+        if (email == null) {
+            validationErrors.add(String.format(MISSING_FIELD_MESSAGE_FORMAT, Email.class.getSimpleName()));
+        } else if (!Email.isValidEmail(email)) {
+            validationErrors.add(Email.getDiagnosticMessage(email));
+        }
+
+        if (matricNumber == null) {
+            validationErrors.add(String.format(MISSING_FIELD_MESSAGE_FORMAT,
+                    MatricNumber.class.getSimpleName()));
+        } else {
+            try {
+                new MatricNumber(matricNumber);
+            } catch (IllegalArgumentException e) {
+                validationErrors.add(e.getMessage());
+            }
+        }
+
+        if (attendance != null && !Attendance.isValidAttendance(attendance)) {
+            validationErrors.add(Attendance.MESSAGE_CONSTRAINTS);
+        }
+
+        if (participation != null && !Participation.isValidParticipation(participation)) {
+            validationErrors.add(Participation.MESSAGE_CONSTRAINTS);
+        }
+
         final List<Tag> personTags = new ArrayList<>();
         for (JsonAdaptedTag tag : tags) {
-            personTags.add(tag.toModelType());
+            try {
+                personTags.add(tag.toModelType());
+            } catch (IllegalValueException e) {
+                validationErrors.add(e.getMessage());
+            }
         }
+
+        for (String classSpace : classSpaces) {
+            if (!ClassSpaceName.isValidClassSpaceName(classSpace)) {
+                validationErrors.add(ClassSpaceName.MESSAGE_CONSTRAINTS);
+            }
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new IllegalValueException(String.join("; ", validationErrors));
+        }
+
+        final Name modelName = new Name(name);
+        final Phone modelPhone = new Phone(phone);
+        final Email modelEmail = new Email(email);
+        final MatricNumber modelMatricNumber = new MatricNumber(matricNumber);
+        final Set<Tag> modelTags = new HashSet<>(personTags);
 
         final Set<ClassSpaceName> modelClassSpaces = new HashSet<>();
         for (String classSpace : classSpaces) {
-            if (!ClassSpaceName.isValidClassSpaceName(classSpace)) {
-                throw new IllegalValueException(ClassSpaceName.MESSAGE_CONSTRAINTS);
-            }
             modelClassSpaces.add(new ClassSpaceName(classSpace));
         }
-
-        if (name == null) {
-            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Name.class.getSimpleName()));
-        }
-        if (!Name.isValidName(name)) {
-            throw new IllegalValueException(Name.MESSAGE_CONSTRAINTS);
-        }
-        final Name modelName = new Name(name);
-
-        if (phone == null) {
-            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Phone.class.getSimpleName()));
-        }
-        if (!Phone.isValidPhone(phone)) {
-            throw new IllegalValueException(Phone.MESSAGE_CONSTRAINTS);
-        }
-        final Phone modelPhone = new Phone(phone);
-
-        if (email == null) {
-            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Email.class.getSimpleName()));
-        }
-        if (!Email.isValidEmail(email)) {
-            throw new IllegalValueException(Email.getDiagnosticMessage(email));
-        }
-        final Email modelEmail = new Email(email);
-
-        if (matricNumber == null) {
-            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT,
-                    MatricNumber.class.getSimpleName()));
-        }
-
-        final MatricNumber modelMatricNumber;
-        try {
-            modelMatricNumber = new MatricNumber(matricNumber);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalValueException(e.getMessage());
-        }
-
         final Attendance modelAttendance;
         if (attendance == null) {
             modelAttendance = new Attendance(Attendance.Status.UNINITIALISED);
@@ -199,7 +219,6 @@ class JsonAdaptedPerson {
             modelParticipation = new Participation(participation);
         }
 
-        final Set<Tag> modelTags = new HashSet<>(personTags);
         Person person = new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelClassSpaces, modelTags);
         person = new Person(person, modelAttendance);
         person = new Person(person, modelParticipation);
@@ -252,3 +271,4 @@ class JsonAdaptedPerson {
         return modelAssignmentGrades;
     }
 }
+
