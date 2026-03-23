@@ -32,7 +32,8 @@ class JsonSerializableAddressBook {
 
     private final List<JsonNode> persons = new ArrayList<>();
     private final List<JsonNode> preservedSkippedPersons = new ArrayList<>();
-    private final List<JsonAdaptedClassSpace> classSpaces = new ArrayList<>();
+    private final List<JsonNode> classSpaces = new ArrayList<>();
+    private final List<JsonNode> preservedSkippedClassSpaces = new ArrayList<>();
     private final List<String> loadWarnings = new ArrayList<>();
 
     /**
@@ -40,7 +41,7 @@ class JsonSerializableAddressBook {
      */
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonNode> persons,
-            @JsonProperty("classSpaces") List<JsonAdaptedClassSpace> classSpaces) {
+            @JsonProperty("classSpaces") List<JsonNode> classSpaces) {
         if (persons != null) {
             this.persons.addAll(persons);
         }
@@ -53,7 +54,7 @@ class JsonSerializableAddressBook {
      * Converts a given {@code ReadOnlyAddressBook} into this class for Jackson use.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source) {
-        this(source, List.of());
+        this(source, List.of(), List.of());
     }
 
     /**
@@ -64,6 +65,19 @@ class JsonSerializableAddressBook {
      * @param preservedSkippedPersons Raw person JSON nodes that should be written back unchanged.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source, List<JsonNode> preservedSkippedPersons) {
+        this(source, preservedSkippedPersons, List.of());
+    }
+
+    /**
+     * Converts a given {@code ReadOnlyAddressBook} into this class for Jackson use,
+     * while preserving raw person entries that were skipped during loading.
+     *
+     * @param source Address book data to serialize.
+     * @param preservedSkippedPersons Raw person JSON nodes that should be written back unchanged.
+     */
+    public JsonSerializableAddressBook(ReadOnlyAddressBook source,
+                                       List<JsonNode> preservedSkippedPersons,
+                                       List<JsonNode> preservedSkippedClassSpaces) {
         persons.addAll(source.getPersonList().stream()
                 .map(JsonAdaptedPerson::new)
                 .map(JsonUtil::toJsonNode)
@@ -75,7 +89,13 @@ class JsonSerializableAddressBook {
         }
         classSpaces.addAll(source.getClassSpaceList().stream()
                 .map(JsonAdaptedClassSpace::new)
+                .map(JsonUtil::toJsonNode)
                 .collect(Collectors.toList()));
+        if (preservedSkippedClassSpaces != null) {
+            for (JsonNode skippedClassSpace : preservedSkippedClassSpaces) {
+                classSpaces.add(skippedClassSpace.deepCopy());
+            }
+        }
     }
 
     /**
@@ -95,6 +115,16 @@ class JsonSerializableAddressBook {
     public List<JsonNode> getPreservedSkippedPersons() {
         return Collections.unmodifiableList(preservedSkippedPersons);
     }
+
+    /**
+     * Returns the raw skipped class space entries that should be preserved on the next save.
+     *
+     * @return Unmodifiable list of skipped class space JSON nodes.
+     */
+    public List<JsonNode> getPreservedSkippedClassSpaces() {
+        return Collections.unmodifiableList(preservedSkippedClassSpaces);
+    }
+
     /**
      * Converts this address book into the model's {@code AddressBook} object.
      *
@@ -104,6 +134,7 @@ class JsonSerializableAddressBook {
         AddressBook addressBook = new AddressBook();
         loadWarnings.clear();
         preservedSkippedPersons.clear();
+        preservedSkippedClassSpaces.clear();
 
         logger.info("Loading address book: " + classSpaces.size() + " class space(s), "
                 + persons.size() + " person(s)");
@@ -167,20 +198,68 @@ class JsonSerializableAddressBook {
         }
     }
 
-    private void loadClassSpaces(AddressBook addressBook) throws IllegalValueException {
-        for (JsonAdaptedClassSpace jsonAdaptedClassSpace : classSpaces) {
-            ClassSpace classSpace = jsonAdaptedClassSpace.toModelType();
-            if (addressBook.hasClassSpace(classSpace)) {
-                throw new IllegalValueException(MESSAGE_DUPLICATE_CLASS_SPACE);
-            }
-            addressBook.addClassSpace(classSpace);
+    private void loadClassSpaces(AddressBook addressBook) {
+        requireNonNull(addressBook);
+        for (int i = 0; i < classSpaces.size(); i++) {
+            loadClassSpace(addressBook, classSpaces.get(i), i);
         }
     }
+
+    private void loadClassSpace(AddressBook addressBook, JsonNode rawClassSpaceNode, int index) {
+        requireNonNull(addressBook);
+        requireNonNull(rawClassSpaceNode);
+        assert index >= 0 : "Class space index should never be negative";
+
+        try {
+            JsonAdaptedClassSpace jsonAdaptedClassSpace =
+                    JsonUtil.fromJsonNode(rawClassSpaceNode, JsonAdaptedClassSpace.class);
+            ClassSpace classSpace = jsonAdaptedClassSpace.toModelType();
+
+            if (addressBook.hasClassSpace(classSpace)) {
+                String identifier = "'" + classSpace.getClassSpaceName().value + "'";
+                logger.warning("Skipping duplicate class space at entry #" + (index + 1) + ": " + identifier);
+                preservedSkippedClassSpaces.add(rawClassSpaceNode.deepCopy());
+                loadWarnings.add("Skipped duplicate class space: " + identifier);
+                return;
+            }
+
+            addressBook.addClassSpace(classSpace);
+        } catch (IllegalValueException | JsonProcessingException e) {
+            String identifier = getRawClassSpaceIdentifier(rawClassSpaceNode, index);
+            String formattedWarning = formatInvalidClassSpaceWarning(identifier, e.getMessage());
+            logger.warning(formattedWarning);
+            preservedSkippedClassSpaces.add(rawClassSpaceNode.deepCopy());
+            loadWarnings.add(formattedWarning);
+        }
+    }
+
+    private String getRawClassSpaceIdentifier(JsonNode rawClassSpaceNode, int index) {
+        JsonNode nameNode = rawClassSpaceNode.get("name");
+        if (nameNode != null && !nameNode.isNull()) {
+            return "'" + nameNode.asText() + "'";
+        }
+        return "entry #" + (index + 1) + " (missing name)";
+    }
+
 
     private String formatInvalidContactWarning(String identifier, String errorMessage) {
         String[] errors = errorMessage.split(";\\s*");
 
         StringBuilder sb = new StringBuilder("Skipped invalid contact ")
+                .append(identifier)
+                .append(":\n");
+
+        for (String error : errors) {
+            sb.append("- ").append(error).append("\n");
+        }
+
+        return sb.toString().trim();
+    }
+
+    private String formatInvalidClassSpaceWarning(String identifier, String errorMessage) {
+        String[] errors = errorMessage.split(";\\s*");
+
+        StringBuilder sb = new StringBuilder("Skipped invalid class space ")
                 .append(identifier)
                 .append(":\n");
 

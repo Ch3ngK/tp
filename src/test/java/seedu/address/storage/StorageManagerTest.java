@@ -2,6 +2,7 @@ package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.nio.file.Path;
@@ -96,6 +97,36 @@ public class StorageManagerTest {
         StorageManager manager = new StorageManager(stubStorage,
                 new JsonUserPrefsStorage(java.nio.file.Paths.get("dummy")));
         assertEquals(java.util.List.of(), manager.getLastLoadWarnings());
+    }
+
+    @Test
+    public void getLastLoadWarnings_afterReadingInvalidData_returnsWarnings() throws Exception {
+        Path filePath = testFolder.resolve("invalidClassSpaceAddressBook.json");
+        String json = """
+            {
+              "persons": [],
+              "classSpaces": [
+                {
+                  "name": "T01",
+                  "assignments": []
+                },
+                {
+                  "name": "T#1",
+                  "assignments": []
+                }
+              ]
+            }
+            """;
+        java.nio.file.Files.writeString(filePath, json);
+
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(filePath);
+        JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(getTempFilePath("prefs"));
+        StorageManager manager = new StorageManager(addressBookStorage, userPrefsStorage);
+
+        manager.readAddressBook();
+
+        assertEquals(1, manager.getLastLoadWarnings().size());
+        assertTrue(manager.getLastLoadWarnings().get(0).contains("Skipped invalid class space"));
     }
 
 }

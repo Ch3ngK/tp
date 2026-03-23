@@ -31,7 +31,8 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
     private List<String> lastLoadWarnings = new ArrayList<>();
     private List<JsonNode> lastSkippedPersons = new ArrayList<>();
-    private boolean isLastLoadSuccessful = false;
+    private List<JsonNode> lastSkippedClassSpaces = new ArrayList<>();
+    private boolean shouldSkipSaveAfterFatalLoad = false;
 
     public JsonAddressBookStorage(Path filePath) {
         this.filePath = filePath;
@@ -71,23 +72,27 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
         lastLoadWarnings = new ArrayList<>();
         lastSkippedPersons = new ArrayList<>();
-        isLastLoadSuccessful = false;
+        lastSkippedClassSpaces = new ArrayList<>();
+        shouldSkipSaveAfterFatalLoad = false;
         try {
             Optional<JsonSerializableAddressBook> jsonAddressBook = JsonUtil.readJsonFile(
                     filePath, JsonSerializableAddressBook.class);
             if (!jsonAddressBook.isPresent()) {
-                isLastLoadSuccessful = true;
                 return Optional.empty();
             }
             JsonSerializableAddressBook serializable = jsonAddressBook.get();
             ReadOnlyAddressBook result = serializable.toModelType();
             lastLoadWarnings.addAll(serializable.getLoadWarnings());
             lastSkippedPersons.addAll(serializable.getPreservedSkippedPersons());
-            isLastLoadSuccessful = true;
+            lastSkippedClassSpaces.addAll(serializable.getPreservedSkippedClassSpaces());
             return Optional.of(result);
         } catch (IllegalValueException ive) {
+            shouldSkipSaveAfterFatalLoad = true;
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
             throw new DataLoadingException(ive);
+        } catch (DataLoadingException dle) {
+            shouldSkipSaveAfterFatalLoad = true;
+            throw dle;
         }
     }
 
@@ -105,14 +110,15 @@ public class JsonAddressBookStorage implements AddressBookStorage {
         requireNonNull(addressBook);
         requireNonNull(filePath);
 
-        if (!isLastLoadSuccessful) {
+        if (shouldSkipSaveAfterFatalLoad) {
             logger.warning("Skipping save because the last load failed fatally. "
                     + "This prevents overwriting the original save file.");
             return;
         }
 
         FileUtil.createIfMissing(filePath);
-        JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook, lastSkippedPersons), filePath);
+        JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook, lastSkippedPersons, lastSkippedClassSpaces),
+                filePath);
     }
 
 }

@@ -25,6 +25,7 @@ import seedu.address.testutil.PersonBuilder;
 
 public class UiManagerTest {
 
+
     @Test
     public void buildStartUpMessage_noWarnings_returnsSuccessMessage() {
         // Create a stub that has exactly 5 contacts loaded.
@@ -37,36 +38,40 @@ public class UiManagerTest {
     }
 
     @Test
-    public void buildStartUpMessage_oneWarning_formatsSingularCorrectly() {
-        // Create a stub that has exactly 1 contact loaded.
-        Logic logicStub = new LogicStub(1);
-        UiManager uiManager = new UiManager(logicStub, List.of());
-
-        List<String> warnings = List.of("Skipped invalid contact 'Alice'");
-        String result = uiManager.buildStartUpMessage(warnings);
-
-        assertTrue(result.contains("1 contact loaded successfully."));
-        assertTrue(result.contains("1 contact could not be loaded and was skipped:"));
-        assertTrue(result.contains("1. Skipped invalid contact 'Alice'"));
-    }
-
-    @Test
-    public void buildStartUpMessage_multipleWarnings_formatsPluralCorrectly() {
-        // Create a stub that has 10 contacts loaded.
+    public void buildStartUpMessage_contactAndClassSpaceWarnings_formatsSeparateSections() {
         Logic logicStub = new LogicStub(10);
         UiManager uiManager = new UiManager(logicStub, List.of());
 
         List<String> warnings = List.of(
-                "Skipped invalid contact 'Bob'",
-                "Skipped duplicate contact 'Charlie'"
+                "Skipped invalid contact 'Bob':\n- invalid email",
+                "Skipped invalid class space 'T#1':\n- invalid class space name"
         );
+
         String result = uiManager.buildStartUpMessage(warnings);
 
         assertTrue(result.contains("10 contacts loaded successfully."));
+        assertTrue(result.contains("1 contact could not be loaded and was skipped:"));
+        assertTrue(result.contains("1 class space could not be loaded and was skipped:"));
+        assertTrue(result.contains("1. Skipped invalid contact 'Bob':\n- invalid email"));
+        assertTrue(result.contains("1. Skipped invalid class space 'T#1':\n- invalid class space name"));
+    }
+
+    @Test
+    public void buildStartUpMessage_multipleWarnings_formatsPluralCorrectly() {
+        Logic logicStub = new LogicStub(5);
+        UiManager uiManager = new UiManager(logicStub, List.of());
+
+        List<String> warnings = List.of(
+                "Skipped invalid contact 'Alice':\n- invalid email",
+                "Skipped invalid contact 'Bob':\n- invalid phone"
+        );
+
+        String result = uiManager.buildStartUpMessage(warnings);
+
+        assertTrue(result.contains("5 contacts loaded successfully."));
         assertTrue(result.contains("2 contacts could not be loaded and were skipped:"));
-        assertTrue(result.contains("1. Skipped invalid contact 'Bob'"));
-        assertTrue(result.contains("2. Skipped duplicate contact 'Charlie'"));
-        assertTrue(result.contains("You can fix these entries directly in the save file: dummy.json"));
+        assertTrue(result.contains("1. Skipped invalid contact 'Alice':\n- invalid email"));
+        assertTrue(result.contains("2. Skipped invalid contact 'Bob':\n- invalid phone"));
     }
 
     @Test
@@ -89,72 +94,90 @@ public class UiManagerTest {
 
         assertEquals(expected, result);
     }
-
     /**
      * A stub class to isolate UiManager string testing from the rest of the application.
      * It provides hardcoded, predictable data for testing.
      */
     private static class LogicStub implements Logic {
-        private final int personCount;
+
+        private static final String[] VALID_MATRIC_NUMBERS = {
+                "A0123456J",
+                "A1234567X",
+                "A7654321J",
+                "A0000067Y",
+                "A4567891E",
+                "A0000002W",
+                "A1111111M",
+                "A0408987E",
+                "A1002345X",
+                "A0304556E"
+        };
+
+        private final ReadOnlyAddressBook addressBook;
 
         LogicStub(int personCount) {
-            this.personCount = personCount;
-        }
+            seedu.address.model.AddressBook temp = new seedu.address.model.AddressBook();
 
-        @Override
-        public ObservableList<Person> getFilteredPersonList() {
-            ObservableList<Person> list = FXCollections.observableArrayList();
             for (int i = 0; i < personCount; i++) {
-                list.add(new PersonBuilder().build());
+                temp.addPerson(new PersonBuilder()
+                        .withName("Person " + i)
+                        .withPhone(String.format("91234%03d", i))
+                        .withEmail("person" + i + "@example.com")
+                        .withMatricNumber(VALID_MATRIC_NUMBERS[i])
+                        .build());
             }
-            return list;
-        }
 
-        @Override
-        public Path getAddressBookFilePath() {
-            // Provide a fake file path
-            return Paths.get("dummy.json");
-        }
-
-        // --- Other Logic methods omitted for brevity. We don't use them in the string builders! ---
-        @Override
-        public CommandResult execute(String commandText) {
-            throw new UnsupportedOperationException("This method should not be called.");
+            this.addressBook = temp;
         }
 
         @Override
         public ReadOnlyAddressBook getAddressBook() {
-            throw new UnsupportedOperationException("This method should not be called.");
+            return addressBook;
+        }
+
+        @Override
+        public ObservableList<Person> getFilteredPersonList() {
+            return FXCollections.observableArrayList(addressBook.getPersonList());
+        }
+
+        @Override
+        public Path getAddressBookFilePath() {
+            return Paths.get("dummy.json");
+        }
+
+        @Override
+        public CommandResult execute(String commandText) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public ReadOnlyStringProperty currentViewProperty() {
-            throw new UnsupportedOperationException("This method should not be called.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty() {
-            throw new UnsupportedOperationException("This method should not be called.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public ReadOnlyObjectProperty<LocalDate> activeSessionDateProperty() {
-            throw new UnsupportedOperationException("This method should not be called.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
-            throw new UnsupportedOperationException("This method should not be called.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public GuiSettings getGuiSettings() {
-            throw new UnsupportedOperationException("This method should not be called.");
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void setGuiSettings(GuiSettings guiSettings) {
-            throw new UnsupportedOperationException("This method should not be called.");
+            throw new UnsupportedOperationException();
         }
     }
 }

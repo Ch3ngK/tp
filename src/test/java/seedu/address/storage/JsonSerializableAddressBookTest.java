@@ -37,6 +37,8 @@ public class JsonSerializableAddressBookTest {
             TEST_DATA_FOLDER.resolve("jsonNullNamePersonAddressBook.json");
     private static final Path DUPLICATE_CLASS_SPACE_FILE =
             TEST_DATA_FOLDER.resolve("duplicateClassSpaceAddressBook.json");
+    private static final Path INVALID_CLASS_SPACE_FILE =
+            TEST_DATA_FOLDER.resolve("invalidClassSpaceAddressBook.json");
 
     @Test
     public void toModelType_invalidPersonWithMultipleInvalidFields_formatsWarningAsBulletList() throws Exception {
@@ -169,22 +171,38 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_duplicateClassSpaces_throwsIllegalValueException() throws Exception {
+    public void toModelType_duplicateClassSpaces_skipsDuplicateClassSpaceAndAddsWarning() throws Exception {
         JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(DUPLICATE_CLASS_SPACE_FILE,
                 JsonSerializableAddressBook.class).get();
-        assertThrows(IllegalValueException.class, JsonSerializableAddressBook.MESSAGE_DUPLICATE_CLASS_SPACE,
-                dataFromFile::toModelType);
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(1, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped duplicate class space"));
     }
 
     @Test
     public void constructor_nullLists_doesNotThrow() throws Exception {
         // Force the "if (persons != null)" to evaluate to false
         JsonSerializableAddressBook serializable = new JsonSerializableAddressBook(
-                (List<JsonNode>) null, (List<JsonAdaptedClassSpace>) null);
+                (List<JsonNode>) null, (List<JsonNode>) null);
 
         AddressBook addressBook = serializable.toModelType();
         assertEquals(0, addressBook.getPersonList().size());
         assertEquals(0, addressBook.getClassSpaceList().size());
+    }
+
+    @Test
+    public void toModelType_invalidClassSpaceAddressBook_skipsInvalidClassSpaceAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(INVALID_CLASS_SPACE_FILE,
+                JsonSerializableAddressBook.class).orElseThrow();
+
+        AddressBook addressBookFromFile = dataFromFile.toModelType();
+
+        assertEquals(1, addressBookFromFile.getClassSpaceList().size());
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid class space"));
     }
 
     /**

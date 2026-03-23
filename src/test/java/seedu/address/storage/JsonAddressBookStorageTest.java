@@ -198,4 +198,34 @@ public class JsonAddressBookStorageTest {
         storage.readAddressBook(validFilePath);
         assertEquals(0, storage.getLastLoadWarnings().size());
     }
+
+    @Test
+    public void readAddressBook_invalidClassSpaceAddressBook_populatesLoadWarnings() throws Exception {
+        Path filePath = addToTestDataPathIfNotNull("invalidClassSpaceAddressBook.json");
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
+
+        ReadOnlyAddressBook addressBook = storage.readAddressBook(filePath).orElseThrow();
+
+        assertEquals(1, addressBook.getClassSpaceList().size());
+        assertEquals(1, storage.getLastLoadWarnings().size());
+        assertTrue(storage.getLastLoadWarnings().get(0).contains("Skipped invalid class space"));
+    }
+
+    @Test
+    public void saveAddressBook_afterFailedLoad_doesNotOverwriteOriginalFile() throws Exception {
+        Path sourceFilePath = addToTestDataPathIfNotNull("brokenAddressBook.json");
+        Path tempFilePath = testFolder.resolve("brokenAddressBook.json");
+
+        String originalContents = FileUtil.readFromFile(sourceFilePath);
+        FileUtil.writeToFile(tempFilePath, originalContents);
+
+        JsonAddressBookStorage storage = new JsonAddressBookStorage(tempFilePath);
+
+        assertThrows(DataLoadingException.class, () -> storage.readAddressBook(tempFilePath));
+
+        storage.saveAddressBook(getTypicalAddressBook(), tempFilePath);
+
+        String afterSaveContents = FileUtil.readFromFile(tempFilePath);
+        assertEquals(originalContents, afterSaveContents);
+    }
 }

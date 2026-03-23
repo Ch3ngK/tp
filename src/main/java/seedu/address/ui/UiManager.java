@@ -23,6 +23,11 @@ public class UiManager implements Ui {
     private static final Logger logger = LogsCenter.getLogger(UiManager.class);
     private static final String ICON_APPLICATION = "/images/address_book_32.png";
     private static final String SAVE_FILE_MESSAGE = "\nYou can fix these entries directly in the save file: ";
+    private static final String INVALID_CONTACT_PREFIX = "Skipped invalid contact";
+    private static final String DUPLICATE_CONTACT_PREFIX = "Skipped duplicate contact";
+    private static final String INVALID_CLASS_SPACE_PREFIX = "Skipped invalid class space";
+    private static final String DUPLICATE_CLASS_SPACE_PREFIX = "Skipped duplicate class space";
+    private static final String LINE_SEPARATOR = "\n";
 
     private Logic logic;
     private MainWindow mainWindow;
@@ -71,44 +76,183 @@ public class UiManager implements Ui {
     }
 
     String buildStartUpMessage(List<String> warnings) {
-        if (warnings.isEmpty()) {
-            return buildSuccessMessage();
+        StringBuilder message = new StringBuilder(buildLoadedContactsMessage());
+
+        appendContactWarningSection(message, warnings);
+        appendClassSpaceWarningSection(message, warnings);
+
+        return message.toString();
+    }
+
+    private String buildLoadedContactsMessage() {
+        int loadedContacts = logic.getAddressBook().getPersonList().size();
+        return String.format("%d contacts loaded successfully.", loadedContacts);
+    }
+
+    private void appendContactWarningSection(StringBuilder message, List<String> warnings) {
+        List<String> contactWarnings = getContactWarnings(warnings);
+        if (contactWarnings.isEmpty()) {
+            return;
         }
-        return buildWarningHeader(warnings.size())
-                + buildWarningList(warnings)
-                + buildWarningFooter();
+
+        appendSectionSpacing(message);
+        message.append(buildSkippedSection("contact", contactWarnings));
     }
 
-    String buildWarningHeader(int skippedCount) {
-        int loadedCount = logic.getFilteredPersonList().size();
-        return loadedCount + (loadedCount == 1 ? " contact" : " contacts") + " loaded successfully. "
-                + skippedCount + (skippedCount == 1 ? " contact" : " contacts")
-                + " could not be loaded and "
-                + (skippedCount == 1 ? "was" : "were")
-                + " skipped:\n\n";
+    private void appendClassSpaceWarningSection(StringBuilder message, List<String> warnings) {
+        List<String> classSpaceWarnings = getClassSpaceWarnings(warnings);
+        if (classSpaceWarnings.isEmpty()) {
+            return;
+        }
+
+        appendSectionSpacing(message);
+        message.append(buildSkippedSection("class space", classSpaceWarnings));
     }
 
+    /**
+     * Returns only the warnings related to contacts.
+     *
+     * @param warnings All warnings collected during loading.
+     * @return Contact-related warnings.
+     */
+    private List<String> getContactWarnings(List<String> warnings) {
+        return warnings.stream()
+                .filter(this::isContactWarning)
+                .toList();
+    }
+
+    /**
+     * Returns only the warnings related to class spaces.
+     *
+     * @param warnings All warnings collected during loading.
+     * @return Class-space-related warnings.
+     */
+    private List<String> getClassSpaceWarnings(List<String> warnings) {
+        return warnings.stream()
+                .filter(this::isClassSpaceWarning)
+                .toList();
+    }
+
+    /**
+     * Returns true if the warning is related to a contact.
+     *
+     * @param warning Warning message to check.
+     * @return True if the warning is a contact warning.
+     */
+    private boolean isContactWarning(String warning) {
+        return warning.startsWith(INVALID_CONTACT_PREFIX)
+                || warning.startsWith(DUPLICATE_CONTACT_PREFIX);
+    }
+
+    /**
+     * Returns true if the warning is related to a class space.
+     *
+     * @param warning Warning message to check.
+     * @return True if the warning is a class space warning.
+     */
+    private boolean isClassSpaceWarning(String warning) {
+        return warning.startsWith(INVALID_CLASS_SPACE_PREFIX)
+                || warning.startsWith(DUPLICATE_CLASS_SPACE_PREFIX);
+    }
+
+    /**
+     * Builds one skipped-entry section, such as contacts or class spaces.
+     *
+     * @param itemType Type of item skipped.
+     * @param warnings Warnings for that item type.
+     * @return Formatted skipped-entry section.
+     */
+    private String buildSkippedSection(String itemType, List<String> warnings) {
+        return buildSkippedSummary(itemType, warnings.size())
+                + LINE_SEPARATOR
+                + buildWarningList(warnings);
+    }
+
+    /**
+     * Builds the summary line for one skipped-entry section.
+     *
+     * @param itemType Type of item skipped.
+     * @param count Number of skipped items.
+     * @return Summary line for the section.
+     */
+    private String buildSkippedSummary(String itemType, int count) {
+        if (count == 1) {
+            return String.format("1 %s could not be loaded and was skipped:", itemType);
+        }
+
+        return String.format("%d %ss could not be loaded and were skipped:", count, itemType);
+    }
+
+    /**
+     * Builds a numbered list of warnings.
+     *
+     * @param warnings Warnings to format.
+     * @return Numbered warning list.
+     */
     String buildWarningList(List<String> warnings) {
         StringBuilder list = new StringBuilder();
+
         for (int i = 0; i < warnings.size(); i++) {
-            list.append(i + 1).append(". ").append(warnings.get(i));
-            if (i < warnings.size() - 1) {
-                list.append("\n\n");
-            } else {
-                list.append("\n");
-            }
+            appendNumberedWarning(list, i + 1, warnings.get(i));
+            appendWarningSpacing(list, i, warnings.size());
         }
+
         return list.toString();
     }
 
-    String buildWarningFooter() {
-        return SAVE_FILE_MESSAGE + logic.getAddressBookFilePath();
+    /**
+     * Appends one numbered warning entry.
+     *
+     * @param list StringBuilder holding the warning list.
+     * @param number Display number for the warning.
+     * @param warning Warning message content.
+     */
+    private void appendNumberedWarning(StringBuilder list, int number, String warning) {
+        list.append(number)
+                .append(". ")
+                .append(warning);
     }
 
-    String buildSuccessMessage() {
-        int count = logic.getFilteredPersonList().size();
-        return count + (count == 1 ? " contact" : " contacts") + " loaded successfully.";
+    /**
+     * Appends spacing after a warning entry.
+     *
+     * @param list StringBuilder holding the warning list.
+     * @param currentIndex Index of the current warning.
+     * @param totalWarnings Total number of warnings.
+     */
+    private void appendWarningSpacing(StringBuilder list, int currentIndex, int totalWarnings) {
+        if (currentIndex < totalWarnings - 1) {
+            list.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
+            return;
+        }
+
+        list.append(LINE_SEPARATOR);
     }
+
+    /**
+     * Appends spacing before a new warning section.
+     *
+     * @param message The startup message being built.
+     */
+    private void appendSectionSpacing(StringBuilder message) {
+        message.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
+    }
+
+    private List<String> filterWarningsByPrefixes(List<String> warnings, String... prefixes) {
+        return warnings.stream()
+                .filter(warning -> startsWithAnyPrefix(warning, prefixes))
+                .toList();
+    }
+
+    private boolean startsWithAnyPrefix(String warning, String... prefixes) {
+        for (String prefix : prefixes) {
+            if (warning.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private Image getImage(String imagePath) {
         return new Image(MainApp.class.getResourceAsStream(imagePath));
