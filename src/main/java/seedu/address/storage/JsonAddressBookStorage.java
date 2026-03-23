@@ -31,6 +31,7 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
     private List<String> lastLoadWarnings = new ArrayList<>();
     private List<JsonNode> lastSkippedPersons = new ArrayList<>();
+    private boolean isLastLoadSuccessful = false;
 
     public JsonAddressBookStorage(Path filePath) {
         this.filePath = filePath;
@@ -70,17 +71,19 @@ public class JsonAddressBookStorage implements AddressBookStorage {
 
         lastLoadWarnings = new ArrayList<>();
         lastSkippedPersons = new ArrayList<>();
-
-        Optional<JsonSerializableAddressBook> jsonAddressBook = JsonUtil.readJsonFile(
-                filePath, JsonSerializableAddressBook.class);
-        if (!jsonAddressBook.isPresent()) {
-            return Optional.empty();
-        }
+        isLastLoadSuccessful = false;
         try {
+            Optional<JsonSerializableAddressBook> jsonAddressBook = JsonUtil.readJsonFile(
+                    filePath, JsonSerializableAddressBook.class);
+            if (!jsonAddressBook.isPresent()) {
+                isLastLoadSuccessful = true;
+                return Optional.empty();
+            }
             JsonSerializableAddressBook serializable = jsonAddressBook.get();
             ReadOnlyAddressBook result = serializable.toModelType();
             lastLoadWarnings.addAll(serializable.getLoadWarnings());
             lastSkippedPersons.addAll(serializable.getPreservedSkippedPersons());
+            isLastLoadSuccessful = true;
             return Optional.of(result);
         } catch (IllegalValueException ive) {
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
@@ -101,6 +104,12 @@ public class JsonAddressBookStorage implements AddressBookStorage {
     public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath) throws IOException {
         requireNonNull(addressBook);
         requireNonNull(filePath);
+
+        if (!isLastLoadSuccessful) {
+            logger.warning("Skipping save because the last load failed fatally. "
+                    + "This prevents overwriting the original save file.");
+            return;
+        }
 
         FileUtil.createIfMissing(filePath);
         JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook, lastSkippedPersons), filePath);
