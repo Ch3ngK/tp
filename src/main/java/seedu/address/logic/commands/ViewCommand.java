@@ -223,7 +223,7 @@ public class ViewCommand extends Command {
     public String toString() {
         return new ToStringBuilder(this)
                 .add("attendance", attendance)
-                .add("classSpaceName", classSpaceName)
+                .add("groupName", classSpaceName)
                 .add("sessionDate", sessionDate)
                 .add("rangeStartDate", rangeStartDate)
                 .add("rangeEndDate", rangeEndDate)

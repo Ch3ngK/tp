@@ -474,7 +474,7 @@ public class Person {
                 .add("matricNumber", matricNumber)
                 //.add("participation", participation) // TODO: Remove after Participation is removed from Person
                 .add("tags", tags)
-                .add("classSpaces", classSpaces)
+                .add("groups", classSpaces)
                 .toString();
     }
 
