@@ -3,9 +3,11 @@ package seedu.address.logic;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -17,6 +19,7 @@ import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Person;
 import seedu.address.storage.Storage;
 
@@ -79,8 +82,28 @@ public class LogicManager implements Logic {
     }
 
     @Override
+    public ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty() {
+        return model.activeClassSpaceNameProperty();
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<LocalDate> activeSessionDateProperty() {
+        return model.activeSessionDateProperty();
+    }
+
+    @Override
     public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
         return model.attendanceViewActiveProperty();
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<LocalDate> visibleSessionRangeStartProperty() {
+        return model.visibleSessionRangeStartProperty();
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<LocalDate> visibleSessionRangeEndProperty() {
+        return model.visibleSessionRangeEndProperty();
     }
 
     @Override

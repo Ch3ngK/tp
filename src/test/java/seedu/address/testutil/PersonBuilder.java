@@ -1,10 +1,14 @@
 package seedu.address.testutil;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
@@ -13,6 +17,8 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Session;
+import seedu.address.model.person.SessionList;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.util.SampleDataUtil;
 
@@ -34,6 +40,8 @@ public class PersonBuilder {
     private Set<ClassSpaceName> classSpaces;
     private Attendance attendance;
     private Participation participation;
+    private Map<ClassSpaceName, SessionList> classSpaceSessions;
+    private Map<ClassSpaceName, Map<AssignmentName, Integer>> assignmentGrades;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -47,6 +55,8 @@ public class PersonBuilder {
         classSpaces = new HashSet<>();
         attendance = new Attendance(Attendance.Status.UNINITIALISED);
         participation = new Participation(0);
+        classSpaceSessions = new HashMap<>();
+        assignmentGrades = new HashMap<>();
     }
 
     /**
@@ -61,6 +71,10 @@ public class PersonBuilder {
         classSpaces = new HashSet<>(personToCopy.getClassSpaces());
         attendance = personToCopy.getAttendance();
         participation = personToCopy.getParticipation();
+        classSpaceSessions = new HashMap<>(personToCopy.getClassSpaceSessions());
+        assignmentGrades = new HashMap<>();
+        personToCopy.getAssignmentGrades().forEach((classSpaceName, gradeMap) ->
+                assignmentGrades.put(classSpaceName, new HashMap<>(gradeMap)));
     }
 
     /**
@@ -114,6 +128,33 @@ public class PersonBuilder {
     }
 
     /**
+     * Adds or overwrites a session for the specified class space and date.
+     */
+    public PersonBuilder withSession(String classSpaceName, String date, String attendance, int participation) {
+        ClassSpaceName parsedClassSpaceName = new ClassSpaceName(classSpaceName);
+        classSpaces.add(parsedClassSpaceName);
+
+        SessionList existingSessions = classSpaceSessions.getOrDefault(parsedClassSpaceName, new SessionList());
+        SessionList updatedSessions = new SessionList(existingSessions.getSessions());
+        updatedSessions.addSession(new Session(LocalDate.parse(date), new Attendance(attendance),
+                new Participation(participation)));
+        classSpaceSessions.put(parsedClassSpaceName, updatedSessions);
+        return this;
+    }
+
+
+    /**
+     * Adds or overwrites an assignment grade for the specified class space and assignment.
+     */
+    public PersonBuilder withAssignmentGrade(String classSpaceName, String assignmentName, int grade) {
+        ClassSpaceName parsedClassSpaceName = new ClassSpaceName(classSpaceName);
+        classSpaces.add(parsedClassSpaceName);
+        Map<AssignmentName, Integer> classGrades = assignmentGrades.getOrDefault(parsedClassSpaceName, new HashMap<>());
+        classGrades.put(new AssignmentName(assignmentName), grade);
+        assignmentGrades.put(parsedClassSpaceName, classGrades);
+        return this;
+    }
+    /**
      * Sets the {@code Phone} of the {@code Person} that we are building.
      */
     public PersonBuilder withPhone(String phone) {
@@ -138,6 +179,8 @@ public class PersonBuilder {
         Person person = new Person(name, phone, email, matricNumber, classSpaces, tags);
         person = new Person(person, attendance);
         person = new Person(person, participation);
+        person = new Person(person, classSpaceSessions);
+        person = new Person(person, assignmentGrades, true);
         return person;
     }
 

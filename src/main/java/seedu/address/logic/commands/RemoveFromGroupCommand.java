@@ -3,7 +3,6 @@ package seedu.address.logic.commands;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,11 +62,7 @@ public class RemoveFromGroupCommand extends GroupMembershipCommand {
                 continue;
             }
 
-            HashSet<ClassSpaceName> updatedClassSpaces = new HashSet<>(person.getClassSpaces());
-            updatedClassSpaces.remove(classSpaceName);
-            //Person updatedPerson = new Person(person.getName(), person.getPhone(), person.getEmail(),
-            //        person.getMatricNumber(), person.getTags(), updatedClassSpaces);
-            Person updatedPerson = new Person(person, updatedClassSpaces);
+            Person updatedPerson = person.withoutClassSpaceData(classSpaceName);
             model.setPerson(person, updatedPerson);
             removedStudents.add(person.getName().fullName);
         }

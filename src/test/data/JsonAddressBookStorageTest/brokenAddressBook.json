@@ -1,0 +1,10 @@
+{
+  "persons": [
+    {
+      "name": "Broken Json"
+    }
+  ],
+  "classSpaces": [
+    {
+      "name": "T01",
+      "assignments": []

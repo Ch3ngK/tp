@@ -8,6 +8,7 @@ import static seedu.address.testutil.TypicalPersons.BENSON;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
+import seedu.address.model.person.Participation;
 import seedu.address.model.person.Phone;
 import seedu.address.testutil.PersonBuilder;
 
@@ -29,6 +31,8 @@ public class JsonAdaptedPersonTest {
     private static final String INVALID_TAG = "#friend";
     private static final String INVALID_ATTENDANCE = "LATE";
     private static final String INVALID_CLASS_SPACE = " ";
+    private static final int INVALID_PARTICIPATION = 999;
+    private static final Map<String, List<JsonAdaptedSession>> NULL_CLASS_SPACE_SESSIONS = null;
 
     private static final String VALID_NAME = BENSON.getName().toString();
     private static final String VALID_PHONE = BENSON.getPhone().toString();
@@ -89,7 +93,9 @@ public class JsonAdaptedPersonTest {
     public void toModelType_invalidEmail_throwsIllegalValueException() {
         JsonAdaptedPerson person =
                 new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, INVALID_EMAIL, VALID_MATRIC_NUMBER, VALID_TAGS);
-        String expectedMessage = Email.MESSAGE_CONSTRAINTS;
+
+        String expectedMessage = Email.getDiagnosticMessage(INVALID_EMAIL);
+
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
     }
 
@@ -128,15 +134,76 @@ public class JsonAdaptedPersonTest {
     @Test
     public void toModelType_invalidAttendance_throwsIllegalValueException() {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
-                INVALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, VALID_CLASS_SPACES);
+                INVALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS);
         assertThrows(IllegalValueException.class, Attendance.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
     @Test
     public void toModelType_invalidClassSpace_throwsIllegalValueException() {
         JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
-                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, List.of(INVALID_CLASS_SPACE));
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS, List.of(INVALID_CLASS_SPACE),
+                NULL_CLASS_SPACE_SESSIONS);
         assertThrows(IllegalValueException.class, ClassSpaceName.MESSAGE_CONSTRAINTS, person::toModelType);
     }
 
+    @Test
+    public void toModelType_multipleInvalidFields_throwsIllegalValueException() {
+        // Person with both an invalid email and an invalid matric number.
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, INVALID_EMAIL, "A1234567A", VALID_TAGS);
+
+        String expectedMessage = Email.getDiagnosticMessage(INVALID_EMAIL) + "; "
+                + String.format(MatricNumber.MESSAGE_INVALID_CHECKSUM, 'X');
+
+        assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidParticipation_throwsIllegalValueException() {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, INVALID_PARTICIPATION, VALID_TAGS, VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS);
+
+        String expectedMessage = Participation.MESSAGE_CONSTRAINTS;
+        assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidClassSpaceNameInGrades_throwsIllegalValueException() {
+        // Class space name key in assignmentGrades is invalid (empty string fails validation)
+        Map<String, Map<String, Integer>> invalidGrades = Map.of(
+                " ", Map.of("Assignment 1", 50) // invalid class space name
+        );
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
+                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+        assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidAssignmentNameInGrades_throwsIllegalValueException() {
+        // Assignment name key in grades is invalid (empty string fails validation)
+        Map<String, Map<String, Integer>> invalidGrades = Map.of(
+                "CS2103T-T01", Map.of(" ", 50) // invalid assignment name
+        );
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
+                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+        assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_negativeGradeValue_throwsIllegalValueException() {
+        Map<String, Map<String, Integer>> invalidGrades = Map.of(
+                "CS2103T-T01", Map.of("Assignment 1", -1)
+        );
+        JsonAdaptedPerson person = new JsonAdaptedPerson(
+                VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_MATRIC_NUMBER,
+                VALID_ATTENDANCE, VALID_PARTICIPATION, VALID_TAGS,
+                VALID_CLASS_SPACES, NULL_CLASS_SPACE_SESSIONS, invalidGrades);
+        assertThrows(IllegalValueException.class, person::toModelType);
+    }
+
 }
+

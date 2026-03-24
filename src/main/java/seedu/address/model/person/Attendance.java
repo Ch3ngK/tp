@@ -10,7 +10,7 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 public class Attendance {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Attendance must be one of the following values: PRESENT, ABSENT, UNSET.";
+            "Attendance must be one of the following values: PRESENT, ABSENT, UNINITIALISED.";
 
     /**
      * The allowed attendance states.

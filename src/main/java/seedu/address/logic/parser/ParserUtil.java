@@ -14,6 +14,8 @@ import java.util.TreeSet;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.assignment.Assignment;
+import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
@@ -105,6 +107,52 @@ public class ParserUtil {
         return new Name(trimmedName);
     }
 
+
+    /**
+     * Parses an assignment name.
+     */
+    public static AssignmentName parseAssignmentName(String assignmentName) throws ParseException {
+        requireNonNull(assignmentName);
+        String trimmedAssignmentName = assignmentName.trim();
+        if (!AssignmentName.isValidAssignmentName(trimmedAssignmentName)) {
+            throw new ParseException(AssignmentName.MESSAGE_CONSTRAINTS);
+        }
+        return new AssignmentName(trimmedAssignmentName);
+    }
+
+    /**
+     * Parses max marks as a positive integer.
+     */
+    public static int parseMaxMarks(String maxMarks) throws ParseException {
+        requireNonNull(maxMarks);
+        String trimmedMaxMarks = maxMarks.trim();
+        try {
+            int parsedMaxMarks = Integer.parseInt(trimmedMaxMarks);
+            if (!Assignment.isValidMaxMarks(parsedMaxMarks)) {
+                throw new ParseException(Assignment.MESSAGE_MAX_MARKS_CONSTRAINTS);
+            }
+            return parsedMaxMarks;
+        } catch (NumberFormatException e) {
+            throw new ParseException(Assignment.MESSAGE_MAX_MARKS_CONSTRAINTS);
+        }
+    }
+
+    /**
+     * Parses a grade as a non-negative integer.
+     */
+    public static int parseGrade(String grade) throws ParseException {
+        requireNonNull(grade);
+        String trimmedGrade = grade.trim();
+        try {
+            int parsedGrade = Integer.parseInt(trimmedGrade);
+            if (parsedGrade < 0) {
+                throw new ParseException("Grade should be a non-negative integer.");
+            }
+            return parsedGrade;
+        } catch (NumberFormatException e) {
+            throw new ParseException("Grade should be a non-negative integer.");
+        }
+    }
     /**
      * Parses a class space name.
      */
@@ -158,7 +206,7 @@ public class ParserUtil {
         requireNonNull(email);
         String trimmedEmail = email.trim();
         if (!Email.isValidEmail(trimmedEmail)) {
-            throw new ParseException(Email.MESSAGE_CONSTRAINTS);
+            throw new ParseException(Email.getDiagnosticMessage(trimmedEmail));
         }
         return new Email(trimmedEmail);
     }

@@ -47,6 +47,17 @@ public class SessionList implements Iterable<Session> {
     }
 
     /**
+     * Removes the session for the given date, if it exists.
+     *
+     * @param date Date of the session to remove.
+     * @return true if a session was removed.
+     */
+    public boolean removeSession(LocalDate date) {
+        requireNonNull(date);
+        return sessions.removeIf(session -> session.getDate().equals(date));
+    }
+
+    /**
      * Retrieves the session for a given date, if it exists.
      *
      * @param date Date of the session.

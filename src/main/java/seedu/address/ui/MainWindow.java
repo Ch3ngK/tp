@@ -72,6 +72,25 @@ public class MainWindow extends UiPart<Stage> {
         return primaryStage;
     }
 
+    /**
+     * Displays the provided warning message in the result display.
+     *
+     * @param message The warning message to display in the result display.
+     */
+    public void showStartupWarning(String message) {
+        resultDisplay.setFeedbackToUser(message); // Set the warning message in the result display.
+    }
+
+    /**
+     * Returns the {@link ResultDisplay} component.
+     * Used by {@link UiManager} to display startup warnings after initialization.
+     *
+     * @return {@code ResultDisplay}
+     */
+    public ResultDisplay getResultDisplay() {
+        return resultDisplay;
+    }
+
     private void setAccelerators() {
         setAccelerator(helpMenuItem, KeyCombination.valueOf("F1"));
     }
@@ -110,7 +129,12 @@ public class MainWindow extends UiPart<Stage> {
      * Fills up all the placeholders of this window.
      */
     void fillInnerParts() {
-        personListPanel = new PersonListPanel(logic.getFilteredPersonList(), logic.attendanceViewActiveProperty());
+        personListPanel = new PersonListPanel(logic.getFilteredPersonList(),
+                logic.getAddressBook().getPersonList(),
+                logic.getAddressBook().getClassSpaceList(), logic.attendanceViewActiveProperty(),
+                logic.activeClassSpaceNameProperty(), logic.activeSessionDateProperty(),
+                logic.visibleSessionRangeStartProperty(), logic.visibleSessionRangeEndProperty(),
+                this::executeCommand);
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
 
         resultDisplay = new ResultDisplay();

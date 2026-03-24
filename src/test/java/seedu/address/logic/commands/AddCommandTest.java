@@ -8,6 +8,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
@@ -215,7 +217,32 @@ public class AddCommandTest {
         }
 
         @Override
+        public Optional<LocalDate> getActiveSessionDate() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setActiveSessionDate(LocalDate date) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void clearActiveSessionDate() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
         public ReadOnlyStringProperty currentViewProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyObjectProperty<ClassSpaceName> activeClassSpaceNameProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyObjectProperty<LocalDate> activeSessionDateProperty() {
             throw new AssertionError("This method should not be called.");
         }
 
@@ -231,6 +258,36 @@ public class AddCommandTest {
 
         @Override
         public ReadOnlyBooleanProperty attendanceViewActiveProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<LocalDate> getVisibleSessionRangeStart() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<LocalDate> getVisibleSessionRangeEnd() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setVisibleSessionRange(LocalDate startDate, LocalDate endDate) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void clearVisibleSessionRange() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyObjectProperty<LocalDate> visibleSessionRangeStartProperty() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyObjectProperty<LocalDate> visibleSessionRangeEndProperty() {
             throw new AssertionError("This method should not be called.");
         }
     }

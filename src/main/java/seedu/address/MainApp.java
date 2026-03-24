@@ -2,6 +2,8 @@ package seedu.address;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -36,15 +38,15 @@ import seedu.address.ui.UiManager;
  */
 public class MainApp extends Application {
 
-    public static final Version VERSION = new Version(0, 2, 2, true);
+    public static final Version VERSION = new Version(1, 3, 0, true);
 
     private static final Logger logger = LogsCenter.getLogger(MainApp.class);
-
     protected Ui ui;
     protected Logic logic;
     protected Storage storage;
     protected Model model;
     protected Config config;
+    private String fatalLoadError = null;
 
     @Override
     public void init() throws Exception {
@@ -64,13 +66,20 @@ public class MainApp extends Application {
 
         logic = new LogicManager(model, storage);
 
-        ui = new UiManager(logic);
+        List<String> startupWarnings = new ArrayList<>(storage.getLastLoadWarnings());
+        if (fatalLoadError != null) {
+            startupWarnings.add(0, fatalLoadError);
+        }
+        ui = new UiManager(logic, startupWarnings);
     }
 
     /**
-     * Returns a {@code ModelManager} with the data from {@code storage}'s address book and {@code userPrefs}. <br>
-     * The data from the sample address book will be used instead if {@code storage}'s address book is not found,
-     * or an empty address book will be used instead if errors occur when reading {@code storage}'s address book.
+     * Initializes the ModelManager with data from the storage.
+     * Collects warnings from the storage (if available) and prepares them for display.
+     *
+     * @param storage The storage component where data is loaded from.
+     * @param userPrefs The user preferences for the application.
+     * @return A ModelManager with the loaded data.
      */
     private Model initModelManager(Storage storage, ReadOnlyUserPrefs userPrefs) {
         logger.info("Using data file : " + storage.getAddressBookFilePath());
@@ -87,6 +96,12 @@ public class MainApp extends Application {
         } catch (DataLoadingException e) {
             logger.warning("Data file at " + storage.getAddressBookFilePath() + " could not be loaded."
                     + " Will be starting with an empty AddressBook.");
+            fatalLoadError = "FATAL: The save file at " + storage.getAddressBookFilePath()
+                    + " could not be read — it may contain invalid JSON (e.g. a number with a leading zero"
+                    + " like '02' instead of '2').\n"
+                    + "Your data has NOT been changed and the file will NOT be overwritten.\n"
+                    + "Any changes you make in the app during this session will NOT be saved.\n"
+                    + "Please fix the file manually and restart the app.";
             initialData = new AddressBook();
         }
 
@@ -172,13 +187,25 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         logger.info("Starting AddressBook " + MainApp.VERSION);
         ui.start(primaryStage);
+
     }
 
     @Override
     public void stop() {
         logger.info("============================ [ Stopping AddressBook ] =============================");
         try {
-            storage.saveUserPrefs(model.getUserPrefs());
+            storage.saveAddressBook(model.getAddressBook());
+        } catch (IOException e) {
+            logger.severe("Failed to save address book " + StringUtil.getDetails(e));
+        }
+        try {
+            UserPrefs prefsToSave = new UserPrefs(model.getUserPrefs());
+            prefsToSave.setLastActiveClassSpaceName(
+                    model.getActiveClassSpaceName().map(classSpaceName -> classSpaceName.value).orElse(null));
+            prefsToSave.setLastActiveSessionDate(
+                    model.getActiveSessionDate().map(Object::toString).orElse(null));
+            prefsToSave.setAttendanceViewActive(model.isAttendanceViewActive());
+            storage.saveUserPrefs(prefsToSave);
         } catch (IOException e) {
             logger.severe("Failed to save preferences " + StringUtil.getDetails(e));
         }

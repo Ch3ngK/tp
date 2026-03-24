@@ -21,6 +21,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.classspace.ClassSpaceName;
 import seedu.address.testutil.PersonBuilder;
 
@@ -118,6 +119,50 @@ public class PersonTest {
         assertFalse(originalPerson.equals(updatedPerson));
         assertEquals(updatedSession, updatedPerson.getOrCreateSession(testClassSpaceGroup, date));
         assertEquals(1, updatedPerson.getClassSpaceSessions().get(testClassSpaceGroup).getSessions().size());
+    }
+
+
+    @Test
+    public void withUpdatedAssignmentGrade_addNewGrade_returnsNewPersonWithGrade() {
+        Person originalPerson = new PersonBuilder(ALICE).withClassSpaces("T01").build();
+        AssignmentName assignmentName = new AssignmentName("Quiz 1");
+
+        Person updatedPerson = originalPerson.withUpdatedAssignmentGrade(testClassSpaceGroup, assignmentName, 17);
+
+        assertTrue(originalPerson.getAssignmentGrade(testClassSpaceGroup, assignmentName).isEmpty());
+        assertEquals(17, updatedPerson.getAssignmentGrade(testClassSpaceGroup, assignmentName).orElseThrow());
+    }
+
+    @Test
+    public void withoutClassSpaceData_removesSessionsAndAssignmentGrades() {
+        AssignmentName assignmentName = new AssignmentName("Quiz 1");
+        Person originalPerson = new PersonBuilder(ALICE).withClassSpaces("T01")
+                .withSession("T01", LocalDate.now().toString(), "PRESENT", ONE_PARTICIPATION)
+                .withAssignmentGrade("T01", "Quiz 1", 18)
+                .build();
+
+        Person updatedPerson = originalPerson.withoutClassSpaceData(testClassSpaceGroup);
+
+        assertFalse(updatedPerson.hasClassSpace(testClassSpaceGroup));
+        assertTrue(updatedPerson.getClassSpaceSessions().isEmpty());
+        assertTrue(updatedPerson.getAssignmentGrade(testClassSpaceGroup, assignmentName).isEmpty());
+    }
+
+    @Test
+    public void withRenamedClassSpace_renamesSessionsAndAssignmentGrades() {
+        AssignmentName assignmentName = new AssignmentName("Quiz 1");
+        ClassSpaceName renamedClassSpace = new ClassSpaceName("T02");
+        Person originalPerson = new PersonBuilder(ALICE).withClassSpaces("T01")
+                .withSession("T01", LocalDate.now().toString(), "PRESENT", ONE_PARTICIPATION)
+                .withAssignmentGrade("T01", "Quiz 1", 18)
+                .build();
+
+        Person updatedPerson = originalPerson.withRenamedClassSpace(testClassSpaceGroup, renamedClassSpace);
+
+        assertFalse(updatedPerson.hasClassSpace(testClassSpaceGroup));
+        assertTrue(updatedPerson.hasClassSpace(renamedClassSpace));
+        assertTrue(updatedPerson.getClassSpaceSessions().containsKey(renamedClassSpace));
+        assertEquals(18, updatedPerson.getAssignmentGrade(renamedClassSpace, assignmentName).orElseThrow());
     }
 
     @Test

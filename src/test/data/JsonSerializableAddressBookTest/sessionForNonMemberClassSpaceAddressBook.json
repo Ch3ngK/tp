@@ -1,0 +1,25 @@
+{
+  "persons": [ {
+    "name": "Hans Muster",
+    "phone": "9482424",
+    "email": "hans@example.com",
+    "matricNumber": "A0102034E",
+    "attendance": "UNINITIALISED",
+    "participation": 0,
+    "tags": [],
+    "classSpaces": [],
+    "classSpaceSessions": {
+      "T01": [ {
+        "date": "2026-01-27",
+        "attendance": "PRESENT",
+        "participation": 3
+      } ]
+    },
+    "assignmentGrades": {}
+  } ],
+  "classSpaces": [ {
+    "name": "T01",
+    "assignments": []
+  } ]
+}
+

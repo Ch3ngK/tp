@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -16,8 +17,61 @@ public class EmailTest {
     @Test
     public void constructor_invalidEmail_throwsIllegalArgumentException() {
         String invalidEmail = "";
-        assertThrows(IllegalArgumentException.class, () -> new Email(invalidEmail));
+        assertThrows(IllegalArgumentException.class, Email.EMPTY_EMAIL_MESSAGE, () -> new Email(invalidEmail));
     }
+
+    @Test
+    public void getDiagnosticMessage_invalidEmails_returnsSpecificErrorMessage() {
+        // Missing '@' symbol
+        assertEquals(Email.MISSING_AT_SYMBOL_MESSAGE, Email.getDiagnosticMessage("peterjackexample.com"));
+
+        // Multiple '@' symbols
+        assertEquals(Email.MULTIPLE_AT_SYMBOL_MESSAGE, Email.getDiagnosticMessage("peter@jack@example.com"));
+
+        // Missing local part
+        assertEquals(Email.MESSAGE_MISSING_LOCAL_PART, Email.getDiagnosticMessage("@example.com"));
+
+        // Local part starts with invalid character
+        assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_START, "-"),
+                Email.getDiagnosticMessage("-peterjack@example.com"));
+        assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_START, " "),
+                Email.getDiagnosticMessage(" peterjack@example.com"));
+
+        // Local part ends with invalid character
+        assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_END, "-"),
+                Email.getDiagnosticMessage("peterjack-@example.com"));
+
+        // Local part contains invalid characters (space, consecutive special characters, disallowed symbols)
+        assertEquals(Email.MESSAGE_LOCAL_PART_INVALID_CHARS, Email.getDiagnosticMessage("peter jack@example.com"));
+        assertEquals(Email.MESSAGE_LOCAL_PART_INVALID_CHARS, Email.getDiagnosticMessage("peter..jack@example.com"));
+        assertEquals(Email.MESSAGE_LOCAL_PART_INVALID_CHARS, Email.getDiagnosticMessage("peter!jack@example.com"));
+
+        // Missing domain
+        assertEquals(Email.MESSAGE_MISSING_DOMAIN, Email.getDiagnosticMessage("peterjack@"));
+
+        // Domain TLD too short
+        assertEquals(Email.MESSAGE_DOMAIN_TLD_SHORT, Email.getDiagnosticMessage("peterjack@example.c"));
+        assertEquals(Email.MESSAGE_DOMAIN_TLD_SHORT, Email.getDiagnosticMessage("peterjack@example.co.d"));
+
+        // Domain contains consecutive periods
+        assertEquals(Email.MESSAGE_DOMAIN_CONSECUTIVE_PERIODS, Email.getDiagnosticMessage("peterjack@example..com"));
+
+        // Domain label invalid (starts/ends with hyphen, contains invalid symbols)
+        assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "-example"),
+                Email.getDiagnosticMessage("peterjack@-example.com"));
+        assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "example-"),
+                Email.getDiagnosticMessage("peterjack@example-.com"));
+        assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "exam_ple"),
+                Email.getDiagnosticMessage("peterjack@exam_ple.com"));
+
+        // Domain ends with a dot
+        assertEquals(Email.MESSAGE_DOMAIN_ENDS_WITH_PERIOD, Email.getDiagnosticMessage("peterjack@example.com."));
+
+        // Email too long
+        String longLocalPart = "a".repeat(311); // 311 + @gmail.com = 321 char.
+        assertEquals(Email.MESSAGE_EMAIL_TOO_LONG, Email.getDiagnosticMessage(longLocalPart + "@gmail.com"));
+    }
+
 
     @Test
     public void isValidEmail() {
@@ -64,6 +118,7 @@ public class EmailTest {
         assertTrue(Email.isValidEmail("peter_jack@very-very-very-long-example.com")); // long domain name
         assertTrue(Email.isValidEmail("if.you.dream.it_you.can.do.it@example.com")); // long local part
         assertTrue(Email.isValidEmail("e1234567@u.nus.edu")); // more than one period in domain
+        assertTrue(Email.isValidEmail("peter@example.com.de.us.sg"));
     }
 
     @Test

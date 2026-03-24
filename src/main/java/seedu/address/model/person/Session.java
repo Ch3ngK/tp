@@ -20,6 +20,7 @@ public class Session {
     private final LocalDate date;
     private final Attendance attendance;
     private final Participation participation;
+    private final String note;
 
     /**
      *  Constructs a {@code Session} using a {@code LocalDate}.
@@ -29,10 +30,23 @@ public class Session {
      * @param participation Participation score of the student.
      */
     public Session(LocalDate date, Attendance attendance, Participation participation) {
+        this(date, attendance, participation, "");
+    }
+
+    /**
+     *  Constructs a {@code Session} using a {@code LocalDate}.
+     *
+     * @param date Date of session in yyyy-mm-dd.
+     * @param attendance Attendance of the student.
+     * @param participation Participation score of the student.
+     * @param note Optional note describing the session.
+     */
+    public Session(LocalDate date, Attendance attendance, Participation participation, String note) {
         requireAllNonNull(date, attendance, participation);
         this.date = date;
         this.attendance = attendance;
         this.participation = participation;
+        this.note = normalizeNote(note);
     }
 
     /**
@@ -43,6 +57,18 @@ public class Session {
      * @param participation Participation score of the student.
      */
     public Session(String dateString, Attendance attendance, Participation participation) {
+        this(dateString, attendance, participation, "");
+    }
+
+    /**
+     * Constructs a {@code Session} using a string representation of the date.
+     *
+     * @param dateString String representation of the date.
+     * @param attendance Attendance of the student.
+     * @param participation Participation score of the student.
+     * @param note Optional note describing the session.
+     */
+    public Session(String dateString, Attendance attendance, Participation participation, String note) {
         requireAllNonNull(dateString, attendance, participation);
         try {
             this.date = LocalDate.parse(dateString, DATE_FORMATTER);
@@ -51,6 +77,7 @@ public class Session {
         }
         this.attendance = attendance;
         this.participation = participation;
+        this.note = normalizeNote(note);
     }
 
     /**
@@ -79,6 +106,21 @@ public class Session {
     public Participation getParticipation() {
         return participation;
     }
+
+    /**
+     * Returns the optional note describing the session.
+     */
+    public String getNote() {
+        return note;
+    }
+
+    /**
+     * Returns true if the session has a non-blank note.
+     */
+    public boolean hasNote() {
+        return !note.isBlank();
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == this) {
@@ -90,12 +132,13 @@ public class Session {
         Session otherSession = (Session) other;
         return date.equals(otherSession.date)
                 && attendance.equals(otherSession.attendance)
-                && participation.equals(otherSession.participation);
+                && participation.equals(otherSession.participation)
+                && note.equals(otherSession.note);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, attendance, participation);
+        return Objects.hash(date, attendance, participation, note);
     }
 
     @Override
@@ -104,6 +147,12 @@ public class Session {
                 .add("date", date.format(DATE_FORMATTER))
                 .add("attendance", attendance)
                 .add("participation", participation)
+                .add("note", note)
                 .toString();
+    }
+
+    private static String normalizeNote(String note) {
+        requireAllNonNull(note);
+        return note.trim();
     }
 }

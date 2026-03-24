@@ -282,44 +282,66 @@ _{Explain here how the data archiving feature will be implemented}_
 
 **Value proposition**: manage all student-related TA matters on one platform
 
+---
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                        | I want to …​                                                    | So that I can…​                                                                                                     |
-|----------|--------------------------------|-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| `* * *`  | user                           | add a new student                                               | add students that are in my tutorial group to my app                                                                |
-| `* * *`  | user                           | delete a student                                                | remove students that are no longer in my tutorial group                                                             |
-| `* * *`  | user                           | record a student's class participation                          | keep track of individual class participation in tutorials                                                           |
-| `* * *`  | user                           | record a student's attendance                                   | keep track of individual attendance in tutorials                                                                    |
-| `* * *`  | user                           | list all students                                               | see all students in all tutorial groups                                                                             |
-| `* * *`  | user                           | record student's assignment submissions                         | keep track of individual assignment progress                                                                        |
-| `* * *`  | user                           | find students based on a search field                           | narrow my search space based on the field I am finding for                                                          |
-| `* * *`  | user teaching multiple modules | perform app-specific functions on each module at a time         | mark attendance, record assignment submissions and class participation for students belonging to a specified module |
-| `* *`    | user                           | edit existing student contacts                                  | avoid wasting time deleting and recreating contacts if there’s a typo                                               |
-| `* *`    | user                           | enter information partially (e.g., only name without email)     | add information progressively as I get it                                                                           |
-| `* *`    | user                           | mark attendance using ID and date                               | standardise the commands used for marking attendance                                                                |
-| `* *`    | user                           | add user ID (e.g., matriculation number)                        | differentiate and add students who share the same name                                                              |
-| `* *`    | first-time user                | list the possible commands                                      | view all the commands and use the product without worrying about remembering commands                               |
-| `* *`    | first-time user                | mass delete student contacts                                    | play around with dummy data and easily clear it when I start putting in real data                                   |
-| `* *`    | long-term user                 | import existing student contact data from this app              | restore my previous backups                                                                                         |
-| `*`      | user                           | add notes for certain students                                  | pay specific attention to certain students                                                                          |
-| `*`      | user                           | track operation history                                         | recall my operation history and amend previous mistakes                                                             |
-| `*`      | user                           | identify unfinished student contacts with a tag                 | ensure I remember to finish adding their details later                                                              |
-| `*`      | user                           | view large amounts of information in an organised and clear way | easily find specific information at a glance                                                                        |
-| `*`      | user                           | autocorrect incomplete commands                                 | save time typing and correcting mistakes                                                                            |
-| `*`      | user                           | add multiple tutorial groups to each student                    | input all tutorial groups that a student belongs in                                                                 |
-| `*`      | user                           | do a fuzzy search for names                                     | find information even if I do not remember a student's name fully                                                   |
-| `*`      | first-time user                | import existing contact data from another app                   | migrate easily from a different app                                                                                 |
-| `*`      | long-term user                 | export the program data as a backup                             | prevent losing all my data if I switch devices                                                                      |
-| `*`      | long-term user                 | make new shortcuts for commands or strings                      | use the app more efficiently                                                                                        |
-| `*`      | busy user                      | schedule classes and additional lessons                         | manage my time well and keep track of all classes                                                                   |
-| `*`      | colour-blind user              | change the colour scheme of the UI                              | use the app easily and accessibly                                                                                   |
-| `*`      | forgetful user                 | add profile pictures for each student                           | remember and identify students better                                                                               |
+| Priority | As a …​           | I want to …​                                                         | So that I can…​                                                                               |
+|----------|-------------------|----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `* * *`  | user              | add basic contact details                                            | add students to my app                                                                        |
+| `* * *`  | user              | delete contacts                                                      | remove students from my app                                                                   |
+| `* * *`  | user              | list contact details within a tutorial group                         | see all contacts within a tutorial group                                                      |
+| `* * *`  | user              | find contacts based on a search field within a tutorial group        | filter and narrow my search space to certain fields                                           |
+| `* * *`  | user              | unmark attendance of a student for a tutorial session                | correct mistakes in attendance records                                                        |
+| `* * *`  | user              | verify whether a matriculation number is valid                       | enter correct matriculation numbers                                                           |
+| `* * *`  | user              | create a tutorial group                                              | keep track of new tutorial groups I am teaching                                               |
+| `* * *`  | user              | switch between different tutorial groups                             | view different tutorial groups                                                                |
+| `* * *`  | user              | delete a tutorial group                                              | delete tutorial groups I am no longer teaching                                                |
+| `* * *`  | user              | list tutorial groups                                                 | see all tutorial groups I am teaching                                                         |
+| `* * *`  | user              | rename tutorial groups                                               | update the tutorial group if it changes                                                       |
+| `* * *`  | user              | add students to tutorial groups                                      | sort students into their respective tutorial groups                                           |
+| `* * *`  | user              | remove students from tutorial groups                                 | remove students that are no longer in a specified tutorial group                              |
+| `* * *`  | user              | add a participation score for a student for a tutorial session       | keep track of student participation in tutorials                                              |
+| `* * *`  | user              | delete a participation score for a student for a tutorial session    | delete unwanted participation scores                                                          |
+| `* * *`  | user              | edit participation scores for a student for a tutorial session       | amend a participation score if it is wrong                                                    |
+| `* * *`  | user              | create a tutorial session                                            | mark attendance and add participation scores for a tutorial session                           |
+| `* * *`  | user              | add matriculation numbers of students                                | differentiate and add students with the same name                                             |
+| `* *`    | user              | edit contacts                                                        | avoid wasting time recreating contacts if there’s a typo                                      |
+| `* *`    | user              | enter information partially (e.g., only name without email)          | add information progressively as I get it                                                     |
+| `* *`    | user              | mark attendance using ID and date of a tutorial session              | keep track of attendance for tutorials                                                        |
+| `* *`    | user              | create new assignments for a tutorial group                          | keep track of assignments given to a tutorial group                                           |
+| `* *`    | user              | mark an assignment as completed or uncompleted                       | keep track of the assignment progress of students                                             |
+| `* *`    | user              | delete assignments for a tutorial group                              | remove assignments I no longer need to track                                                  |
+| `* *`    | user              | edit assignments for a tutorial group                                | update assignment information                                                                 |
+| `* *`    | user              | view attendance for a tutorial session of a tutorial group           | keep track of attendance for a tutorial session of a tutorial group                           |
+| `* *`    | user              | view participation scores for a tutorial session of a tutorial group | keep track of participation scores for a tutorial session of a tutorial group                 |
+| `* *`    | first-time user   | list the possible commands easily                                    | use the product without worrying about remembering commands before jumping into it            |
+| `* *`    | first-time user   | mass delete contacts                                                 | play around with the app using dummy data and easily clear it when I want to put in real data |
+| `* *`    | long-term user    | import existing contact data from this app                           | restore my previous backups                                                                   |
+| `*`      | user              | have notes for certain contacts                                      | pay specific attention to certain people                                                      |
+| `*`      | user              | track operation history                                              | remember when things happen and amend previous mistakes                                       |
+| `*`      | user              | identify unfinished contacts with a tag                              | ensure I remember to finish adding their details later                                        |
+| `*`      | user              | view large amounts of information in an organised and clear way      | easily find specific information at a glance                                                  |
+| `*`      | user              | do a fuzzy search for names                                          | find information even if I do not remember their names fully                                  |
+| `*`      | user              | autocorrect incomplete commands                                      | save time typing and correcting mistakes                                                      |
+| `*`      | user              | view an individual student's attendance records                      | monitor their attendance history                                                              |
+| `*`      | user              | mark attendance with date and time                                   | detect if students are late for class                                                         |
+| `*`      | user              | sort students alphabetically                                         | view my student contacts in alphabetical order                                                |
+| `*`      | user              | sort students by tutorial groups                                     | view student contacts based on what tutorial group they are in                                |
+| `*`      | user              | view my students in a paginated list of 40 students per page         | view students page by page without having to keep scrolling down                              |
+| `*`      | busy user         | set a recurring weekly schedule for a tutorial group                 | be reminded of when my tutorial sessions are                                                  |
+| `*`      | busy user         | add a temporary tutorial session                                     | keep track of additional tutorials like consultations or make-up classes                      |
+| `*`      | busy user         | view a list of my upcoming tutorials for the week                    | view how many remaining tutorial sessions I have for the week                                 |
+| `*`      | colour-blind user | change the colour scheme of the UI                                   | use the app easily and accessibly                                                             |
+| `*`      | first-time user   | import existing contact data from elsewhere                          | migrate easily from a different app                                                           |
+| `*`      | forgetful user    | add profile pictures for each contact                                | remember and identify students better                                                         |
+| `*`      | long-term user    | export the program data as a backup                                  | prevent losing all my data if I switch devices                                                |
+| `*`      | long-term user    | make new shortcuts for commands or strings                           | use the app more efficiently                                                                  |
 
 
-
+---
 
 ### Use cases
 
@@ -412,6 +434,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case ends.
 
+---
+
 **Use case: Delete a person**
 
 **MSS**
@@ -435,6 +459,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case resumes at step 2.
 
+---
+
 **Use case: Edit a contact**
 
 **MSS**
@@ -455,6 +481,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
     * 4a1. AddressBook shows an error message.
 
       Use case resumes at step 3.
+
+---
 
 **Use case: Mark attendance**
 
@@ -485,6 +513,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case resumes at step 2.
 
+---
+
 ### Non-Functional Requirements
 
 1. The app shall run on Windows, macOS, and Linux, with Java 17 without requiring external dependencies not bundled in the packaged app.
@@ -494,6 +524,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 5. The app shall provide a descriptive error message for invalid commands and shall not crash on malformed user input.
 6. Users with above-average typing speed for regular English text (not code, not terminal commands) should be able to complete typical tasks faster using keyboard commands than with a mouse.
 7. The codebase shall largely follow Object Oriented Programming principles.
+
+---
 
 ### Glossary
 

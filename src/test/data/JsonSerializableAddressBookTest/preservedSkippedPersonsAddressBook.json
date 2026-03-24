@@ -1,0 +1,33 @@
+{
+  "persons" : [ {
+    "name" : "David Li",
+    "phone" : "91031282",
+    "email" : "lidavid@example.com",
+    "matricNumber" : "A0408987E",
+    "attendance" : "UNINITIALISED",
+    "participation" : 0,
+    "tags" : [ "family" ],
+    "classSpaces" : [ ],
+    "classSpaceSessions" : { },
+    "assignmentGrades" : { }
+  } ],
+  "classSpaces" : [ ],
+  "preservedSkippedPersons" : [ {
+    "name" : "Alex Yeoh",
+    "phone" : "87438807",
+    "email" : "alexyeoh@example.com",
+    "matricNumber" : "A0102035A",
+    "attendance" : "UNINITIALISED",
+    "participation" : 0,
+    "tags" : [ "friends" ],
+    "classSpaces" : [ "T01" ],
+    "classSpaceSessions" : { },
+    "assignmentGrades" : {
+      "T01" : {
+        "FakeAssignment" : 50
+      }
+    }
+  } ],
+  "preservedSkippedClassSpaces" : [ ],
+  "loadWarnings" : [ "Skipped invalid contact 'Alex Yeoh':\n- Person has a grade for assignment 'FakeAssignment' in class space 'T01',but that assignment does not exist." ]
+}

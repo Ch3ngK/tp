@@ -2,7 +2,14 @@ package seedu.address.model.classspace;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
+import java.util.Optional;
+
+import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.assignment.Assignment;
+import seedu.address.model.assignment.AssignmentName;
+import seedu.address.model.assignment.UniqueAssignmentList;
 
 /**
  * Class Space represents a real-world Group, such as Tutorial Group, Lab Group, and similar.
@@ -11,6 +18,7 @@ import seedu.address.commons.util.ToStringBuilder;
  */
 public class ClassSpace {
     private final ClassSpaceName classSpaceName;
+    private final UniqueAssignmentList assignments;
 
     /**
      * Creates a {@code ClassSpace} with the given name.
@@ -18,12 +26,45 @@ public class ClassSpace {
      * @param classSpaceName Name of the class space.
      */
     public ClassSpace(ClassSpaceName classSpaceName) {
+        this(classSpaceName, List.of());
+    }
+
+    /**
+     * Creates a {@code ClassSpace} with the given name and assignments.
+     */
+    public ClassSpace(ClassSpaceName classSpaceName, List<Assignment> assignments) {
         requireNonNull(classSpaceName);
+        requireNonNull(assignments);
         this.classSpaceName = classSpaceName;
+        this.assignments = new UniqueAssignmentList();
+        this.assignments.setAssignments(assignments);
     }
 
     public ClassSpaceName getClassSpaceName() {
         return classSpaceName;
+    }
+
+    /**
+     * Returns an unmodifiable view of the assignments belonging to this class space.
+     */
+    public ObservableList<Assignment> getAssignments() {
+        return assignments.asUnmodifiableObservableList();
+    }
+
+    /**
+     * Returns whether this class space contains an assignment with the given name.
+     */
+    public boolean hasAssignment(AssignmentName assignmentName) {
+        requireNonNull(assignmentName);
+        return findAssignmentByName(assignmentName).isPresent();
+    }
+
+    /**
+     * Returns the assignment with the given name if present.
+     */
+    public Optional<Assignment> findAssignmentByName(AssignmentName assignmentName) {
+        requireNonNull(assignmentName);
+        return assignments.findAssignmentByName(assignmentName);
     }
 
     /**
@@ -49,18 +90,20 @@ public class ClassSpace {
         }
 
         ClassSpace otherClassSpace = (ClassSpace) other;
-        return classSpaceName.equals(otherClassSpace.classSpaceName);
+        return classSpaceName.equals(otherClassSpace.classSpaceName)
+                && assignments.equals(otherClassSpace.assignments);
     }
 
     @Override
     public int hashCode() {
-        return classSpaceName.hashCode();
+        return java.util.Objects.hash(classSpaceName, assignments);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .add("groupName", classSpaceName)
+                .add("assignments", assignments)
                 .toString();
     }
 }

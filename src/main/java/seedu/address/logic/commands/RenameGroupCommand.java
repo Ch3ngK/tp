@@ -2,9 +2,6 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.classspace.ClassSpace;
@@ -53,16 +50,11 @@ public class RenameGroupCommand extends Command {
             if (!person.hasClassSpace(targetName)) {
                 continue;
             }
-            Set<ClassSpaceName> updatedClassSpaces = new HashSet<>(person.getClassSpaces());
-            updatedClassSpaces.remove(targetName);
-            updatedClassSpaces.add(newName);
-            //Person updatedPerson = new Person(person.getName(), person.getPhone(), person.getEmail(),
-            //        person.getMatricNumber(), person.getTags(), updatedClassSpaces);
-            Person updatedPerson = new Person(person, updatedClassSpaces);
+            Person updatedPerson = person.withRenamedClassSpace(targetName, newName);
             model.setPerson(person, updatedPerson);
         }
 
-        model.setClassSpace(target, new ClassSpace(newName));
+        model.setClassSpace(target, new ClassSpace(newName, java.util.List.copyOf(target.getAssignments())));
         return new CommandResult(String.format(MESSAGE_SUCCESS, targetName.value, newName.value));
     }
 
