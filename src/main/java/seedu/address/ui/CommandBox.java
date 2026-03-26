@@ -21,7 +21,7 @@ public class CommandBox extends UiPart<Region> {
     private final CommandExecutor commandExecutor;
 
     @FXML
-    private TextArea commandTextField;
+    private TextArea commandTextArea;
 
     /**
      * Creates a {@code CommandBox} with the given {@code CommandExecutor}.
@@ -30,7 +30,7 @@ public class CommandBox extends UiPart<Region> {
         super(FXML);
         this.commandExecutor = commandExecutor;
         // calls #setStyleToDefault() whenever there is a change to the text of the command box.
-        commandTextField.textProperty().addListener((unused1, unused2, unused3) -> setStyleToDefault());
+        commandTextArea.textProperty().addListener((unused1, unused2, unused3) -> setStyleToDefault());
     }
 
     /**
@@ -38,14 +38,14 @@ public class CommandBox extends UiPart<Region> {
      */
     @FXML
     private void handleCommandEntered() {
-        String commandText = commandTextField.getText();
+        String commandText = commandTextArea.getText();
         if (commandText.isBlank()) {
             return;
         }
 
         try {
             commandExecutor.execute(commandText);
-            commandTextField.setText("");
+            commandTextArea.setText("");
         } catch (CommandException | ParseException e) {
             setStyleToIndicateCommandFailure();
         }
@@ -58,7 +58,7 @@ public class CommandBox extends UiPart<Region> {
      */
     @FXML
     private void initialize() {
-        commandTextField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        commandTextArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER && !event.isShiftDown()) {
                 event.consume(); // stop newline
                 handleCommandEntered();
@@ -70,14 +70,14 @@ public class CommandBox extends UiPart<Region> {
      * Sets the command box style to use the default style.
      */
     private void setStyleToDefault() {
-        commandTextField.getStyleClass().remove(ERROR_STYLE_CLASS);
+        commandTextArea.getStyleClass().remove(ERROR_STYLE_CLASS);
     }
 
     /**
      * Sets the command box style to indicate a failed command.
      */
     private void setStyleToIndicateCommandFailure() {
-        ObservableList<String> styleClass = commandTextField.getStyleClass();
+        ObservableList<String> styleClass = commandTextArea.getStyleClass();
 
         if (styleClass.contains(ERROR_STYLE_CLASS)) {
             return;
