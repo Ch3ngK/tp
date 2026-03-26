@@ -27,10 +27,14 @@ public class PartCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Assigns participation to the person identified by the index number in the displayed person list.\n"
-            + "Parameters: i/INDEX [d/YYYY-MM-DD] [g/GROUP] pv/PARTICIPATION_VALUE\n"
-            + "Participation must be an integer from 0 to 5.\n"
-            + "Example: " + COMMAND_WORD + " i/1 d/2026-03-16 g/T02 pv/4\n"
-            + "         " + COMMAND_WORD + " i/1 pv/4";
+            + "Parameters:\n"
+            + "i/INDEX pv/PARTICIPATION_VALUE d/YYYY-MM-DD"
+            + " (PARTICIPATION_VALUE must be an integer from 0 to 5)\n"
+            + "i/INDEX pv/PARTICIPATION_VALUE"
+            + " (after 'view d/YYYY-MM-DD')\n"
+            + "Examples:\n"
+            + COMMAND_WORD + " i/1 d/2026-03-16\n"
+            + COMMAND_WORD + " i/1 (after 'view d/YYYY-MM-DD')";
 
     public static final String MESSAGE_PARTICIPATION_SUCCESS =
             "Updated participation for Person: %1$s";

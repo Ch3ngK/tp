@@ -1,7 +1,7 @@
 ---
-  layout: default.md
-    title: "User Guide"
-    pageNav: 3
+layout: default.md
+title: "User Guide"
+pageNav: 3
 ---
 
 # TAA User Guide
@@ -234,7 +234,7 @@ Format: `part i/INDEX d/YYYY-MM-DD pv/PARTICIPATION_VALUE`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
-* The participation will be assigned for the group in current view.
+* The participation will be assigned for the group in current view. Please enter a group using `switchgroup` before using this command.
 * PARTICIPATION_VALUE **must be an integer from 0 to 5.**
 
 Examples:
@@ -248,7 +248,7 @@ Format: `mark i/INDEX d/YYYY-MM-DD`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
-* The attendance will be assigned for the group in current view.
+* The attendance will be assigned for the group in current view. Please enter a group using `switchgroup` before using this command.
 
 Examples:
 *  `mark i/1 d/2026-03-16` Mark the attendance of the person in index 1 of the list in current view as PRESENT for the 16 of March 2026.
@@ -261,7 +261,7 @@ Format: `unmark i/INDEX d/YYYY-MM-DD`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
-* The attendance will be assigned for the group in current view.
+* The attendance will be assigned for the group in current view. Please enter a group using `switchgroup` before using this command.
 
 Examples:
 *  `unmark i/1 d/2026-03-16` Mark the attendance of the person in index 1 of the list in current view as ABSENT for the 16 of March 2026.
