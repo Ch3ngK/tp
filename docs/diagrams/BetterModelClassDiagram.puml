@@ -4,7 +4,7 @@ skinparam arrowThickness 1.1
 skinparam arrowColor MODEL_COLOR
 skinparam classBackgroundColor MODEL_COLOR
 
-AddressBook *-right-> "1" UniquePersonList
+AddressBook *-left-> "1" UniquePersonList
 AddressBook *-down-> "1" UniqueGroupList
 
 UniquePersonList -right-> Person
@@ -15,7 +15,7 @@ Group *-down-> "1" UniqueAssignmentList
 UniqueAssignmentList -right-> "*" Assignment
 Assignment *--> AssignmentName
 
-Person -up-> "*" Tag
+Person --up> "*" Tag
 Person -right-> "*" GroupName
 Person *--> Name
 Person *--> Phone
