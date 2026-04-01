@@ -57,6 +57,12 @@ class JsonSerializableAddressBook {
         if (preservedSkippedGroups != null) {
             this.preservedSkippedGroups.addAll(preservedSkippedGroups);
         }
+
+        /*
+         * loadWarnings is intentionally not restored from the file.
+         * Warnings are always regenerated fresh by toModelType() based on the current
+         * state of preserved entries, so stale warnings never persist across sessions
+         */
     }
 
     /**
@@ -83,11 +89,13 @@ class JsonSerializableAddressBook {
      *
      * @param source Address book data to serialize.
      * @param preservedSkippedPersons Raw person JSON nodes that should be written back unchanged.
+     * @param preservedSkippedGroups Raw group JSON nodes that should be written back unchanged.
+     * @param ignoredLoadWarnings Only for JSON compatibility and is intentionally ignored.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source,
                                        List<JsonNode> preservedSkippedPersons,
                                        List<JsonNode> preservedSkippedGroups,
-                                       List<String> preservedLoadWarnings) {
+                                       List<String> ignoredLoadWarnings) {
         persons.addAll(source.getPersonList().stream()
                 .map(JsonAdaptedPerson::new)
                 .map(JsonUtil::toJsonNode)
@@ -98,9 +106,6 @@ class JsonSerializableAddressBook {
                 .map(JsonUtil::toJsonNode)
                 .collect(Collectors.toList()));
         addDeepCopies(this.preservedSkippedGroups, preservedSkippedGroups);
-        if (preservedLoadWarnings != null) {
-            this.loadWarnings.addAll(preservedLoadWarnings);
-        }
     }
 
     /**
@@ -139,7 +144,7 @@ class JsonSerializableAddressBook {
         AddressBook addressBook = new AddressBook();
         loadWarnings.clear();
 
-        // previouslySkippedPersons and previouslySkippedPersons are like snapshots of preserved entries of previous
+        // previouslySkippedPersons and previouslySkippedGroups are like snapshots of preserved entries of previous
         // load. Meant to prevent duplicate warnings by not validating fresh entries.
         List<JsonNode> previouslySkippedPersons = new ArrayList<>(preservedSkippedPersons);
         List<JsonNode> previouslySkippedGroups = new ArrayList<>(preservedSkippedGroups);
@@ -168,12 +173,10 @@ class JsonSerializableAddressBook {
             loadPerson(addressBook, persons.get(i), i);
         }
     }
-
     private void loadPerson(AddressBook addressBook, JsonNode rawPersonNode, int index) {
         requireNonNull(addressBook);
         requireNonNull(rawPersonNode);
         assert index >= 0 : "Person index should never be negative";
-
         try {
             JsonAdaptedPerson jsonAdaptedPerson = JsonUtil.fromJsonNode(rawPersonNode, JsonAdaptedPerson.class);
             Person person = jsonAdaptedPerson.toModelType();
