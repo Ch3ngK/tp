@@ -492,4 +492,40 @@ public class Person {
                 copiedMap.put(groupName, new HashMap<>(assignmentGradeMap)));
         return copiedMap;
     }
+
+    /**
+     * Returns the Name of Person as a String.
+     *
+     * @return Name of Person as a String.
+     */
+    public String getNameValue() {
+        return name.fullName;
+    }
+
+    /**
+     * Returns Phone of Person as a String.
+     *
+     * @return  Phone of Person as a String.
+     */
+    public String getPhoneValue() {
+        return phone.value;
+    }
+
+    /**
+     * Returns Email of Person as a String.
+     *
+     * @return Email of Person as a String.
+     */
+    public String getEmailValue() {
+        return email.value;
+    }
+
+    /**
+     * Returns matriculation number of Person.
+     *
+     * @return Matriculation number of Person as a String.
+     */
+    public String getMatricNumberValue() {
+        return matricNumber.value;
+    }
 }

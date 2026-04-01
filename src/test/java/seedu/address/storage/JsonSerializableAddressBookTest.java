@@ -13,8 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
-import seedu.address.model.group.Group;
-import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
@@ -29,8 +27,8 @@ public class JsonSerializableAddressBookTest {
     private static final Path DUPLICATE_PERSON_FILE = TEST_DATA_FOLDER.resolve("duplicatePersonAddressBook.json");
     private static final Path PERSON_WITH_MULTIPLE_INVALID_FIELDS =
             TEST_DATA_FOLDER.resolve("invalidPersonAddressBookWithMultipleInvalidFields.json");
-    private static final Path IMPLICIT_GROUP_FILE =
-            TEST_DATA_FOLDER.resolve("personWithImplicitGroupAddressBook.json");
+    private static final Path MISSING_GROUP_FILE =
+            TEST_DATA_FOLDER.resolve("personReferencingMissingGroupAddressBook.json");
     private static final Path MISSING_NAME_PERSON_FILE =
             TEST_DATA_FOLDER.resolve("missingNamePersonAddressBook.json");
     private static final Path JSON_NULL_NAME_PERSON_FILE =
@@ -149,24 +147,25 @@ public class JsonSerializableAddressBookTest {
     }
 
     @Test
-    public void toModelType_personWithImplicitGroup_createsGroupAutomatically() throws Exception {
-        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(IMPLICIT_GROUP_FILE,
+    public void toModelType_personWithImplicitGroup_skipsPersonAndAddsWarning() throws Exception {
+        JsonSerializableAddressBook dataFromFile = JsonUtil.readJsonFile(MISSING_GROUP_FILE,
                 JsonSerializableAddressBook.class).get();
 
         AddressBook addressBookFromFile = dataFromFile.toModelType();
 
-        // Verify the person was loaded successfully.
-        assertEquals(1, addressBookFromFile.getPersonList().size());
+        // Person references a group not in the groups list — should be skipped, not loaded.
+        assertEquals(0, addressBookFromFile.getPersonList().size());
 
-        // Verify that the app automatically created the missing group.
-        assertEquals(1, addressBookFromFile.getGroupList().size());
+        // The missing group should not be auto-created.
+        assertEquals(0, addressBookFromFile.getGroupList().size());
 
-        // Verify that it is the expected group.
-        Group expectedGroup =
-                new Group(
-                        new GroupName("Implicit-Group"));
+        // The skipped person should be preserved on reload.
+        assertEquals(1, dataFromFile.getPreservedSkippedPersons().size());
 
-        assertTrue(addressBookFromFile.hasGroup(expectedGroup));
+        // A warning should be generated describing the missing group reference.
+        assertEquals(1, dataFromFile.getLoadWarnings().size());
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Skipped invalid contact"));
+        assertTrue(dataFromFile.getLoadWarnings().get(0).contains("Implicit-Group"));
     }
 
     @Test

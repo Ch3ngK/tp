@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -20,10 +19,7 @@ import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
-import seedu.address.model.assignment.Assignment;
-import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.group.Group;
-import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 
 /**
@@ -31,10 +27,6 @@ import seedu.address.model.person.Person;
  */
 @JsonRootName(value = "addressbook")
 class JsonSerializableAddressBook {
-
-    public static final String MESSAGE_DUPLICATE_PERSON = "Persons list contains duplicate person(s).";
-    public static final String MESSAGE_DUPLICATE_GROUP = "Group list contains duplicate group(s).";
-    public static final String MESSAGE_INVALID_MATRICULATION_NUMBER = "Invalid matriculation number.";
     private static final Logger logger = LogsCenter.getLogger(JsonSerializableAddressBook.class);
 
     private final List<JsonNode> persons = new ArrayList<>();
@@ -103,20 +95,12 @@ class JsonSerializableAddressBook {
                 .map(JsonAdaptedPerson::new)
                 .map(JsonUtil::toJsonNode)
                 .collect(Collectors.toList()));
-        if (preservedSkippedPersons != null) {
-            for (JsonNode skippedPerson : preservedSkippedPersons) {
-                this.preservedSkippedPersons.add(skippedPerson.deepCopy());
-            }
-        }
+        addDeepCopies(this.preservedSkippedPersons, preservedSkippedPersons);
         groups.addAll(source.getGroupList().stream()
                 .map(JsonAdaptedGroup::new)
                 .map(JsonUtil::toJsonNode)
                 .collect(Collectors.toList()));
-        if (preservedSkippedGroups != null) {
-            for (JsonNode skippedGroup : preservedSkippedGroups) {
-                this.preservedSkippedGroups.add(skippedGroup.deepCopy());
-            }
-        }
+        addDeepCopies(this.preservedSkippedGroups, preservedSkippedGroups);
         if (preservedLoadWarnings != null) {
             this.loadWarnings.addAll(preservedLoadWarnings);
         }
@@ -164,7 +148,7 @@ class JsonSerializableAddressBook {
 
         loadGroups(addressBook);
         loadPersons(addressBook);
-        loadWarnings.addAll(0, previousWarnings);
+        loadWarnings.addAll(0, previousWarnings); //insert at start of array
 
         logger.info("Address book loaded: " + addressBook.getPersonList().size()
                 + " person(s) loaded, " + loadWarnings.size() + " skipped");
@@ -191,9 +175,9 @@ class JsonSerializableAddressBook {
                 skipDuplicatePerson(rawPersonNode, person, index);
                 return;
             }
-            ensureGroupsExist(addressBook, person);
-            validateAssignmentGrades(addressBook, person);
-            validateGroupSessions(addressBook, person);
+            PersonLoadValidator.validateGroupsExist(addressBook, person);
+            PersonLoadValidator.validateAssignmentGrades(addressBook, person);
+            PersonLoadValidator.validateGroupSessions(person);
             addressBook.addPerson(person);
         } catch (IllegalValueException | JsonProcessingException e) {
             skipInvalidPerson(rawPersonNode, index, e.getMessage());
@@ -201,97 +185,18 @@ class JsonSerializableAddressBook {
     }
 
     private void skipDuplicatePerson(JsonNode rawPersonNode, Person person, int index) {
-        String identifier = person.getName().fullName + " (Matric: " + person.getMatricNumber().value + ")";
+        String identifier = person.getNameValue() + " (Matric: " + person.getMatricNumberValue() + ")";
         logger.warning("Skipping duplicate contact at entry #" + (index + 1) + ": " + identifier);
         preservedSkippedPersons.add(rawPersonNode.deepCopy());
         loadWarnings.add("Skipped duplicate contact: " + identifier);
     }
 
     private void skipInvalidPerson(JsonNode rawPersonNode, int index, String errorMessage) {
-        String identifier = getRawPersonIdentifier(rawPersonNode, index);
-        String formattedWarning = formatInvalidContactWarning(identifier, errorMessage);
+        String identifier = getRawEntryIdentifier(rawPersonNode, index);
+        String formattedWarning = LoadWarningFormatter.formatInvalidEntryWarning("contact", identifier, errorMessage);
         logger.warning(formattedWarning);
         preservedSkippedPersons.add(rawPersonNode.deepCopy());
         loadWarnings.add(formattedWarning);
-    }
-
-    private void validateAssignmentGrades(AddressBook addressBook, Person person) throws IllegalValueException {
-        for (var groupEntry : person.getAssignmentGrades().entrySet()) {
-            GroupName groupName = groupEntry.getKey();
-            Map<AssignmentName, Integer> grades = groupEntry.getValue();
-
-            validatePersonIsMemberOfGroup(person, groupName);
-            /*
-            This should never be reached as ensureGroupsExist guarantees the group
-            exists before this method is called. The orElseThrow is a defensive guard against
-            future errors in the load sequence.
-             */
-            Group group = addressBook.getGroupList().stream()
-                    .filter(cs -> cs.getGroupName().equals(groupName))
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new AssertionError("Group '" + groupName.value
-                                    + "' should exist after ensureGroupsExist"));
-            validateGradesAgainstGroup(group, groupName, grades);
-        }
-    }
-
-    private void validatePersonIsMemberOfGroup(Person person, GroupName groupName)
-            throws IllegalValueException {
-        if (!person.getGroups().contains(groupName)) {
-            throw new IllegalValueException(String.format(
-                    "Person has grades for group '%s' but is not a member of it.",
-                    groupName.value));
-        }
-    }
-
-    private void validateGradesAgainstGroup(Group group, GroupName groupName,
-                                                 Map<AssignmentName, Integer> grades) throws IllegalValueException {
-        for (var gradeEntry : grades.entrySet()) {
-            AssignmentName assignmentName = gradeEntry.getKey();
-            int grade = gradeEntry.getValue();
-
-            if (!group.hasAssignment(assignmentName)) {
-                throw new IllegalValueException(String.format(
-                        "Person has a grade for assignment '%s' in group '%s',"
-                                + "but that assignment does not exist.",
-                        assignmentName.value, groupName.value));
-            }
-
-            Assignment assignment = group.findAssignmentByName(assignmentName).get();
-            if (grade > assignment.getMaxMarks()) {
-                throw new IllegalValueException(String.format(
-                        "Grade %d for assignment '%s' in group '%s' exceeds max marks of %d.",
-                        grade, assignmentName.value, groupName.value, assignment.getMaxMarks()));
-            }
-        }
-    }
-
-    private void validateGroupSessions(AddressBook addressBook, Person person) throws IllegalValueException {
-        for (GroupName groupName : person.getGroupSessions().keySet()) {
-            if (!person.getGroups().contains(groupName)) {
-                throw new IllegalValueException(String.format(
-                        "Person has sessions for group '%s' but is not a member of it.",
-                        groupName.value));
-            }
-        }
-    }
-
-    private String getRawPersonIdentifier(JsonNode rawPersonNode, int index) {
-        JsonNode nameNode = rawPersonNode.get("name");
-        if (nameNode != null && !nameNode.isNull()) {
-            return "'" + nameNode.asText() + "'";
-        }
-        return "entry #" + (index + 1) + " (missing name)";
-    }
-
-    private void ensureGroupsExist(AddressBook addressBook, Person person) {
-        for (var groupName : person.getGroups()) {
-            Group group = new Group(groupName);
-            if (!addressBook.hasGroup(group)) {
-                addressBook.addGroup(group);
-            }
-        }
     }
 
     private void loadGroups(AddressBook addressBook) {
@@ -312,58 +217,47 @@ class JsonSerializableAddressBook {
             Group group = jsonAdaptedGroup.toModelType();
 
             if (addressBook.hasGroup(group)) {
-                String identifier = "'" + group.getGroupName().value + "'";
-                logger.warning("Skipping duplicate group at entry #" + (index + 1) + ": " + identifier);
-                preservedSkippedGroups.add(rawGroupNode.deepCopy());
-                loadWarnings.add("Skipped duplicate group: " + identifier);
+                skipDuplicateGroup(rawGroupNode, group, index);
                 return;
             }
 
             addressBook.addGroup(group);
         } catch (IllegalValueException | JsonProcessingException e) {
-            String identifier = getRawGroupIdentifier(rawGroupNode, index);
-            String formattedWarning = formatInvalidGroupWarning(identifier, e.getMessage());
-            logger.warning(formattedWarning);
-            preservedSkippedGroups.add(rawGroupNode.deepCopy());
-            loadWarnings.add(formattedWarning);
+            skipInvalidGroup(rawGroupNode, index, e.getMessage());
         }
     }
 
-    private String getRawGroupIdentifier(JsonNode rawGroupNode, int index) {
-        JsonNode nameNode = rawGroupNode.get("name");
+    private void skipDuplicateGroup(JsonNode rawGroupNode, Group group, int index) {
+        String identifier = "'" + group.getGroupNameValue() + "'";
+        String formattedWarning = LoadWarningFormatter.formatDuplicateEntryWarning("group", identifier);
+        logger.warning("Skipping duplicate group at entry #" + (index + 1) + ": " + identifier);
+        preservedSkippedGroups.add(rawGroupNode.deepCopy());
+        loadWarnings.add(formattedWarning);
+    }
+
+    private void skipInvalidGroup(JsonNode rawGroupNode, int index, String errorMessage) {
+        String identifier = getRawEntryIdentifier(rawGroupNode, index);
+        String formattedWarning = LoadWarningFormatter.formatInvalidEntryWarning("group", identifier, errorMessage);
+        logger.warning(formattedWarning);
+        preservedSkippedGroups.add(rawGroupNode.deepCopy());
+        loadWarnings.add(formattedWarning);
+    }
+
+    private static String getRawEntryIdentifier(JsonNode rawNode, int index) {
+        JsonNode nameNode = rawNode.get("name");
         if (nameNode != null && !nameNode.isNull()) {
             return "'" + nameNode.asText() + "'";
         }
         return "entry #" + (index + 1) + " (missing name)";
     }
 
-
-    private String formatInvalidContactWarning(String identifier, String errorMessage) {
-        String[] errors = errorMessage.split(";\\s*");
-
-        StringBuilder sb = new StringBuilder("Skipped invalid contact ")
-                .append(identifier)
-                .append(":\n");
-
-        for (String error : errors) {
-            sb.append("- ").append(error).append("\n");
+    private static void addDeepCopies(List<JsonNode> target, List<JsonNode> source) {
+        if (source == null) {
+            return;
         }
-
-        return sb.toString().trim();
-    }
-
-    private String formatInvalidGroupWarning(String identifier, String errorMessage) {
-        String[] errors = errorMessage.split(";\\s*");
-
-        StringBuilder sb = new StringBuilder("Skipped invalid group ")
-                .append(identifier)
-                .append(":\n");
-
-        for (String error : errors) {
-            sb.append("- ").append(error).append("\n");
+        for (JsonNode node : source) {
+            target.add(node.deepCopy());
         }
-
-        return sb.toString().trim();
     }
 
 }
