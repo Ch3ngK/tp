@@ -97,12 +97,6 @@ public class EmailTest {
 
         //EP: Domain ends with a dot
         assertEquals(Email.MESSAGE_DOMAIN_ENDS_WITH_PERIOD, Email.getDiagnosticMessage("peterjack@example.com."));
-
-        // BVA: 321 characters (MAX_LENGTH + 1)
-        String longLocalPart = "a".repeat(311); // 311 + @gmail.com = 321 char.
-        String invalidEmail = longLocalPart + "@gmail.com";
-        assertEquals(invalidEmail.length(), Email.MAX_LENGTH + 1);
-        assertEquals(Email.MESSAGE_EMAIL_TOO_LONG, Email.getDiagnosticMessage(invalidEmail));
     }
 
     @Test
@@ -167,6 +161,14 @@ public class EmailTest {
         assertFalse(Email.isValidEmail("peterjack@example.com-")); // domain name ends with a hyphen
         assertFalse(Email.isValidEmail("peterjack@example.c")); // top level domain has less than two chars
 
+        // BVA: local part ends with '.', '+', '_' — each should be invalid
+        assertFalse(Email.isValidEmail("peterjack.@example.com"));
+        assertFalse(Email.isValidEmail("peterjack+@example.com"));
+        assertFalse(Email.isValidEmail("peterjack_@example.com"));
+        // BVA: MAX_LENGTH + 1 (321 chars) — should fail
+        String localPart321 = "a".repeat(311);
+        assertFalse(Email.isValidEmail(localPart321 + "@gmail.com"));
+
         // valid email
         assertTrue(Email.isValidEmail("PeterJack_1190@example.com")); // underscore in local part
         assertTrue(Email.isValidEmail("PeterJack.1190@example.com")); // period in local part
@@ -180,6 +182,22 @@ public class EmailTest {
         assertTrue(Email.isValidEmail("if.you.dream.it_you.can.do.it@example.com")); // long local part
         assertTrue(Email.isValidEmail("e1234567@u.nus.edu")); // more than one period in domain
         assertTrue(Email.isValidEmail("peter@example.com.de.us.sg")); //multiple domains, all of valid length
+
+        // BVA: TLD length exactly 2 — lower boundary of valid TLD range, should pass
+        assertTrue(Email.isValidEmail("peter@example.co"));
+
+        // BVA: exactly MAX_LENGTH (320 chars) — should pass
+        String localPart320 = "a".repeat(310);
+        assertTrue(Email.isValidEmail(localPart320 + "@gmail.com"));
+    }
+
+    @Test
+    public void constructor_emailExceedsMaxLength_throwsIllegalArgumentException() {
+        // BVA: MAX_LENGTH + 1 (321 chars) — one above upper boundary; should throw
+        String localPart = "a".repeat(311);
+        String email = localPart + "@gmail.com"; // 311 + 10 = 321
+        assertEquals(Email.MAX_LENGTH + 1, email.length());
+        assertThrows(IllegalArgumentException.class, Email.MESSAGE_EMAIL_TOO_LONG, () -> new Email(email));
     }
 
     @Test
@@ -226,10 +244,10 @@ public class EmailTest {
     }
 
     @Test
-    public void constructor_mixedCaseEmail_normalisesToLowerCase() {
-        // EP: mixed case input — should be stored as lowercase
+    public void constructor_mixedCaseEmail_preservesOriginalCase() {
+        // EP: mixed case input — value stored as-is
         Email email = new Email("User@Example.COM");
-        assertEquals("user@example.com", email.value);
+        assertEquals("User@Example.COM", email.value);
     }
 
     @Test
@@ -241,11 +259,8 @@ public class EmailTest {
 
         // EP: case-insensitivity for domain
         Email domainLower = new Email("valid@email");
-        Email domainUpper = new Email("Valid@EmaiL");
+        Email domainUpper = new Email("valid@EmaiL");
         assertTrue(domainLower.equals(domainUpper));
-
-
-
     }
 
     @Test

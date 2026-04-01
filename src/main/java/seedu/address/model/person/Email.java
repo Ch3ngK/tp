@@ -80,7 +80,7 @@ public class Email {
     public Email(String email) {
         requireNonNull(email);
         checkArgument(isValidEmail(email), getDiagnosticMessage(email));
-        value = email.toLowerCase();
+        value = email;
         logger.fine("Created Email: " + value);
     }
 
