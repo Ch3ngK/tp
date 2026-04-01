@@ -231,4 +231,24 @@ public class PersonTest {
         //different person, different hashcode.
         assertNotEquals(ALICE.hashCode(), BOB.hashCode());
     }
+
+    @Test
+    public void getNameValue_returnsFullNameString() {
+        assertEquals(ALICE.getName().fullName, ALICE.getNameValue());
+    }
+
+    @Test
+    public void getPhoneValue_returnsPhoneString() {
+        assertEquals(ALICE.getPhone().value, ALICE.getPhoneValue());
+    }
+
+    @Test
+    public void getEmailValue_returnsEmailString() {
+        assertEquals(ALICE.getEmail().value, ALICE.getEmailValue());
+    }
+
+    @Test
+    public void getMatricNumberValue_returnsMatricNumberString() {
+        assertEquals(ALICE.getMatricNumber().value, ALICE.getMatricNumberValue());
+    }
 }
