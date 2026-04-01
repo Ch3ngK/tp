@@ -71,12 +71,23 @@ public class CommandBox extends UiPart<Region> {
     @FXML
     private void initialize() {
         commandTextField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            // handle ENTER key
             if (event.getCode() == KeyCode.ENTER && !event.isShiftDown()) {
                 event.consume();
                 handleCommandEntered();
             }
-        });
 
+            // handle TAB key
+            if (event.getCode() == KeyCode.TAB) {
+                event.consume(); // Prevent focus from shifting to another element
+                String suggestion = ghostTextLabel.getText();
+                if (!suggestion.isBlank()) {
+                    commandTextField.setText(suggestion + " ");
+                    commandTextField.positionCaret(commandTextField.getText().length());
+                    clearGhostText();
+                }
+            }
+        });
     }
 
     /**
