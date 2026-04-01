@@ -2,6 +2,7 @@ package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
@@ -11,74 +12,128 @@ public class EmailTest {
 
     @Test
     public void constructor_null_throwsNullPointerException() {
+        //EP: null email
         assertThrows(NullPointerException.class, () -> new Email(null));
     }
 
     @Test
     public void constructor_invalidEmail_throwsIllegalArgumentException() {
+        //EP: empty email
         String invalidEmail = "";
         assertThrows(IllegalArgumentException.class, Email.EMPTY_EMAIL_MESSAGE, () -> new Email(invalidEmail));
     }
 
     @Test
+    public void constructor_validEmail_storesValue() {
+        // EP: valid email
+        Email email = new Email("valid@example.com");
+        assertEquals("valid@example.com", email.value);
+    }
+
+    @Test
+    public void constructor_emailAtMaxLength_success() {
+        // BVA: exactly MAX_LENGTH (320) characters -> should succeed
+        // local part = 310 chars, "@", domain = "gmail.com" (9 chars) → 310 + 1 + 9 = 320
+        String localPart = "a".repeat(310);
+        String email = localPart + "@gmail.com";
+        assertEquals(Email.MAX_LENGTH, email.length());
+        Email result = new Email(email);
+        assertEquals(email, result.value);
+    }
+
+    @Test
     public void getDiagnosticMessage_invalidEmails_returnsSpecificErrorMessage() {
-        // Missing '@' symbol
+        // EP: Missing '@' symbol
         assertEquals(Email.MISSING_AT_SYMBOL_MESSAGE, Email.getDiagnosticMessage("peterjackexample.com"));
 
-        // Multiple '@' symbols
+        // EP: Multiple '@' symbols
         assertEquals(Email.MULTIPLE_AT_SYMBOL_MESSAGE, Email.getDiagnosticMessage("peter@jack@example.com"));
 
-        // Missing local part
+        // EP: Missing local part but '@' is present
         assertEquals(Email.MESSAGE_MISSING_LOCAL_PART, Email.getDiagnosticMessage("@example.com"));
 
-        // Local part starts with invalid character
+        // EP: Local part starts with '-'
         assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_START, "-"),
                 Email.getDiagnosticMessage("-peterjack@example.com"));
+
+        //EP: Local part starts with space
         assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_START, " "),
                 Email.getDiagnosticMessage(" peterjack@example.com"));
 
-        // Local part ends with invalid character
+        // Local part ends with hyphen
         assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_END, "-"),
                 Email.getDiagnosticMessage("peterjack-@example.com"));
 
-        // Local part contains invalid characters (space, consecutive special characters, disallowed symbols)
+        // EP: local part contains a space (disallowed character)
         assertEquals(Email.MESSAGE_LOCAL_PART_INVALID_CHARS, Email.getDiagnosticMessage("peter jack@example.com"));
+
+        // EP: local part has consecutive special characters (two dots)
         assertEquals(Email.MESSAGE_LOCAL_PART_INVALID_CHARS, Email.getDiagnosticMessage("peter..jack@example.com"));
+
+        // EP: local part contains a completely disallowed character ('!')
         assertEquals(Email.MESSAGE_LOCAL_PART_INVALID_CHARS, Email.getDiagnosticMessage("peter!jack@example.com"));
 
-        // Missing domain
+        // EP: Missing domain
         assertEquals(Email.MESSAGE_MISSING_DOMAIN, Email.getDiagnosticMessage("peterjack@"));
 
-        // Domain TLD too short
+        // BVA: TLD too short
         assertEquals(Email.MESSAGE_DOMAIN_TLD_SHORT, Email.getDiagnosticMessage("peterjack@example.c"));
         assertEquals(Email.MESSAGE_DOMAIN_TLD_SHORT, Email.getDiagnosticMessage("peterjack@example.co.d"));
 
-        // Domain contains consecutive periods
+        // EP: Domain contains consecutive periods
         assertEquals(Email.MESSAGE_DOMAIN_CONSECUTIVE_PERIODS, Email.getDiagnosticMessage("peterjack@example..com"));
 
-        // Domain label invalid (starts/ends with hyphen, contains invalid symbols)
+        // EP: domain label starts with hyphen
         assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "-example"),
                 Email.getDiagnosticMessage("peterjack@-example.com"));
+
+        //EP: domain ends with hyphen
         assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "example-"),
                 Email.getDiagnosticMessage("peterjack@example-.com"));
+
+        // EP: domain has underscores (invalid character in domain)
         assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "exam_ple"),
                 Email.getDiagnosticMessage("peterjack@exam_ple.com"));
 
-        // Domain ends with a dot
+        //EP: Domain ends with a dot
         assertEquals(Email.MESSAGE_DOMAIN_ENDS_WITH_PERIOD, Email.getDiagnosticMessage("peterjack@example.com."));
+    }
 
-        // Email too long
-        String longLocalPart = "a".repeat(311); // 311 + @gmail.com = 321 char.
-        assertEquals(Email.MESSAGE_EMAIL_TOO_LONG, Email.getDiagnosticMessage(longLocalPart + "@gmail.com"));
+    @Test
+    public void getDiagnosticMessage_localPartEndsWithPeriod_returnsInvalidEndMessage() {
+        // EP: local part ends with '.' — period is in SPECIAL_CHARACTERS, so triggers invalid-end message
+        assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_END, "."),
+                Email.getDiagnosticMessage("peterjack.@example.com"));
+    }
+
+    @Test
+    public void getDiagnosticMessage_localPartEndsWithPlus_returnsInvalidEndMessage() {
+        // EP: local part ends with '+' — triggers invalid-end message
+        assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_END, "+"),
+                Email.getDiagnosticMessage("peterjack+@example.com"));
+    }
+
+    @Test
+    public void getDiagnosticMessage_localPartEndsWithUnderscore_returnsInvalidEndMessage() {
+        // EP: local part ends with '_' — triggers invalid-end message
+        assertEquals(String.format(Email.MESSAGE_LOCAL_PART_INVALID_END, "_"),
+                Email.getDiagnosticMessage("peterjack_@example.com"));
+    }
+
+    @Test
+    public void getDiagnosticMessage_domainLabelWithDollarSign_returnsLabelInvalidMessage() {
+        // EP: domain label contains '$' (disallowed, not alphanumeric or hyphen)
+        assertEquals(String.format(Email.MESSAGE_DOMAIN_LABEL_INVALID, "exam$ple"),
+                Email.getDiagnosticMessage("peterjack@exam$ple.com"));
     }
 
 
     @Test
     public void isValidEmail() {
-        // null email
+        // EP: null email
         assertThrows(NullPointerException.class, () -> Email.isValidEmail(null));
 
-        // blank email
+        // EP: blank email
         assertFalse(Email.isValidEmail("")); // empty string
         assertFalse(Email.isValidEmail(" ")); // spaces only
 
@@ -106,6 +161,14 @@ public class EmailTest {
         assertFalse(Email.isValidEmail("peterjack@example.com-")); // domain name ends with a hyphen
         assertFalse(Email.isValidEmail("peterjack@example.c")); // top level domain has less than two chars
 
+        // BVA: local part ends with '.', '+', '_' — each should be invalid
+        assertFalse(Email.isValidEmail("peterjack.@example.com"));
+        assertFalse(Email.isValidEmail("peterjack+@example.com"));
+        assertFalse(Email.isValidEmail("peterjack_@example.com"));
+        // BVA: MAX_LENGTH + 1 (321 chars) — should fail
+        String localPart321 = "a".repeat(311);
+        assertFalse(Email.isValidEmail(localPart321 + "@gmail.com"));
+
         // valid email
         assertTrue(Email.isValidEmail("PeterJack_1190@example.com")); // underscore in local part
         assertTrue(Email.isValidEmail("PeterJack.1190@example.com")); // period in local part
@@ -118,26 +181,93 @@ public class EmailTest {
         assertTrue(Email.isValidEmail("peter_jack@very-very-very-long-example.com")); // long domain name
         assertTrue(Email.isValidEmail("if.you.dream.it_you.can.do.it@example.com")); // long local part
         assertTrue(Email.isValidEmail("e1234567@u.nus.edu")); // more than one period in domain
-        assertTrue(Email.isValidEmail("peter@example.com.de.us.sg"));
+        assertTrue(Email.isValidEmail("peter@example.com.de.us.sg")); //multiple domains, all of valid length
+
+        // BVA: TLD length exactly 2 — lower boundary of valid TLD range, should pass
+        assertTrue(Email.isValidEmail("peter@example.co"));
+
+        // BVA: exactly MAX_LENGTH (320 chars) — should pass
+        String localPart320 = "a".repeat(310);
+        assertTrue(Email.isValidEmail(localPart320 + "@gmail.com"));
+    }
+
+    @Test
+    public void constructor_emailExceedsMaxLength_throwsIllegalArgumentException() {
+        // BVA: MAX_LENGTH + 1 (321 chars) — one above upper boundary; should throw
+        String localPart = "a".repeat(311);
+        String email = localPart + "@gmail.com"; // 311 + 10 = 321
+        assertEquals(Email.MAX_LENGTH + 1, email.length());
+        assertThrows(IllegalArgumentException.class, Email.MESSAGE_EMAIL_TOO_LONG, () -> new Email(email));
     }
 
     @Test
     public void equals() {
         Email email = new Email("valid@email");
 
-        // same values -> returns true
+        // EP: same values -> returns true
         assertTrue(email.equals(new Email("valid@email")));
 
-        // same object -> returns true
+        // EP: same object -> returns true
         assertTrue(email.equals(email));
 
-        // null -> returns false
+        // EP: null -> returns false
         assertFalse(email.equals(null));
 
-        // different types -> returns false
+        // EP: different types -> returns false
         assertFalse(email.equals(5.0f));
 
-        // different values -> returns false
+        // EP: different values -> returns false
         assertFalse(email.equals(new Email("other.valid@email")));
+    }
+
+    @Test
+    public void hashCode_equalEmails_returnsSameHashCode() {
+        // EP: two equal Email objects must produce the same hash code
+        Email email1 = new Email("valid@email");
+        Email email2 = new Email("valid@email");
+        assertEquals(email1.hashCode(), email2.hashCode());
+    }
+
+    @Test
+    public void hashCode_differentEmails_returnsDifferentHashCode() {
+        // EP: two unequal emails — hash codes should differ
+        Email email1 = new Email("valid@email");
+        Email email2 = new Email("other@email");
+        assertNotEquals(email1.hashCode(), email2.hashCode());
+    }
+
+    @Test
+    public void hashCode_sameObject_isStable() {
+        // EP: calling hashCode twice on the same object should return the same value
+        Email email = new Email("valid@email");
+        assertEquals(email.hashCode(), email.hashCode());
+    }
+
+    @Test
+    public void constructor_mixedCaseEmail_preservesOriginalCase() {
+        // EP: mixed case input — value stored as-is
+        Email email = new Email("User@Example.COM");
+        assertEquals("User@Example.COM", email.value);
+    }
+
+    @Test
+    public void equals_sameAddressDifferentCase_returnsTrue() {
+        // EP: case-insensitive for local part
+        Email localPartLower = new Email("valid@email");
+        Email localPartUpper = new Email("Valid@email");
+        assertTrue(localPartLower.equals(localPartUpper));
+
+        // EP: case-insensitivity for domain
+        Email domainLower = new Email("valid@email");
+        Email domainUpper = new Email("valid@EmaiL");
+        assertTrue(domainLower.equals(domainUpper));
+    }
+
+    @Test
+    public void hashCode_sameAddressDifferentCase_returnsSameHashCode() {
+        // EP: equal emails (case-insensitive) must produce the same hash code
+        Email lower = new Email("valid@email");
+        Email upper = new Email("Valid@Email");
+        assertEquals(lower.hashCode(), upper.hashCode());
     }
 }
