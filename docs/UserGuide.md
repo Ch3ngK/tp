@@ -113,22 +113,22 @@ Examples:
 *  `edit i/1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st person to be `91234567` and `johndoe@example.com` respectively.
 *  `edit i/2 n/Betsy Crower t/` Edits the name of the 2nd person to be `Betsy Crower` and clears all existing tags.
 
-### Locating persons by name: `find`
+### Locating persons by parameters: `find`
 
-Finds persons whose names contain any of the given keywords.
+Finds and lists people whose fields match any of the given parameters.
 
-Format: `find KEYWORD [MORE_KEYWORDS]`
+Format: `find [n/NAME]... [p/PHONE]... [e/EMAIL]... [m/MATRICULATION_NUMBER]... [t/TAG]...`
 
-* The search is case-insensitive. e.g `hans` will match `Hans`
-* The order of the keywords does not matter. e.g. `Hans Bo` will match `Bo Hans`
-* Only the name is searched.
-* Only full words will be matched e.g. `Han` will not match `Hans`
-* Persons matching at least one keyword will be returned (i.e. `OR` search).
-  e.g. `Hans Bo` will return `Hans Gruber`, `Bo Yang`
+* The search is case-insensitive. e.g `n/john` will match the name `John`
+* At least one parameter must be provided.
+* The search lists partial matches. e.g. `n/john` will match the name `John Doe`
+* People matching at least one parameter will be listed (i.e. `OR` search) though people who match more parameters will have a higher index in the list.
+* Multiple of the same parameter type can be used. e.g. `find n/alex n/david` returns a list of people with names containing `alex` or `david`
 
 Examples:
-* `find John` returns `john` and `John Doe`
-* `find alex david` returns `Alex Yeoh`, `David Li`<br>
+* `find john` returns people with the names `john` and `John Doe`
+* `find n/john p/987 e/example.com m/123 t/friend` returns people with a name containing `john`, a phone number containing `987`, an email containing `example.com`, a matriculation number containing `123` or a tag containing `friend`
+* `find n/alex n/david` returns the people `Alex Yeoh`, `David Li`<br>
   ![result for 'find alex david'](images/findAlexDavidResult.png)
 
 ### Deleting a person : `delete`

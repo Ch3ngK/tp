@@ -157,7 +157,7 @@ mark {
       font-size: 0.65rem !important;
   }
   img {
-      zoom: 0.8;  /* might not work on some browsers */
+      zoom: 0.7;  /* might not work on some browsers */
   }
 }
 
@@ -168,7 +168,8 @@ h5,
 h6 {
   color: #e46c0a;
 }
+
 img[src*=".png"] {
-    max-height: 60vh;
+    max-height: 90vh;
     object-fit: contain; /* Scales to fit without distortion */
 }

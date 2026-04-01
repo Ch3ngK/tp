@@ -12,13 +12,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
-import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonMatchesFieldsPredicate;
 import seedu.address.testutil.AddressBookBuilder;
 
 public class ModelManagerTest {
@@ -113,6 +117,33 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void switchToAllStudentsView_afterSortedFind_restoresOriginalOrder() {
+        AddressBook addressBook = new AddressBookBuilder().withPerson(ALICE).withPerson(BENSON).build();
+        modelManager = new ModelManager(addressBook, new UserPrefs());
+
+        PersonMatchesFieldsPredicate predicate = new PersonMatchesFieldsPredicate(
+                Collections.singletonList("e"),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList());
+
+        Comparator<Person> comparator = Comparator
+                .comparingInt((Person person) -> predicate.getMatchedCriteriaCount(person))
+                .thenComparingInt(person -> predicate.getExactMatchCount(person))
+                .reversed()
+                .thenComparing(person -> person.getName().toString(), String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(person -> person.getMatricNumber().toString(), String.CASE_INSENSITIVE_ORDER);
+
+        List<Person> originalOrder = Arrays.asList(ALICE, BENSON);
+
+        modelManager.updateFilteredPersonList(predicate, comparator);
+        modelManager.switchToAllStudentsView();
+
+        assertEquals(originalOrder, modelManager.getFilteredPersonList());
+    }
+
+    @Test
     public void equals() {
         AddressBook addressBook = new AddressBookBuilder().withPerson(ALICE).withPerson(BENSON).build();
         AddressBook differentAddressBook = new AddressBook();
@@ -136,8 +167,12 @@ public class ModelManagerTest {
         assertFalse(modelManager.equals(new ModelManager(differentAddressBook, userPrefs)));
 
         // different filteredList -> returns false
-        String[] keywords = ALICE.getName().fullName.split("\\s+");
-        modelManager.updateFilteredPersonList(new NameContainsKeywordsPredicate(Arrays.asList(keywords)));
+        modelManager.updateFilteredPersonList(new PersonMatchesFieldsPredicate(
+                Arrays.asList(ALICE.getName().fullName.split("\\s+")),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList()));
         assertFalse(modelManager.equals(new ModelManager(addressBook, userPrefs)));
 
         // resets modelManager to initial state for upcoming tests

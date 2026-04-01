@@ -5,6 +5,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -17,6 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.group.Group;
@@ -33,6 +35,7 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final SortedList<Person> sortedFilteredPersons;
     private final SimpleStringProperty currentView;
     private final SimpleBooleanProperty attendanceViewActive;
     private final SimpleObjectProperty<GroupName> activeGroupName;
@@ -41,6 +44,7 @@ public class ModelManager implements Model {
     private final SimpleObjectProperty<LocalDate> visibleSessionRangeEnd;
 
     private Predicate<Person> currentAdditionalPredicate;
+    private Comparator<Person> currentComparator;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -53,6 +57,7 @@ public class ModelManager implements Model {
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        sortedFilteredPersons = new SortedList<>(filteredPersons);
         currentView = new SimpleStringProperty(ALL_STUDENTS_VIEW_NAME);
         attendanceViewActive = new SimpleBooleanProperty(false);
         activeGroupName = new SimpleObjectProperty<>();
@@ -60,6 +65,7 @@ public class ModelManager implements Model {
         visibleSessionRangeStart = new SimpleObjectProperty<>();
         visibleSessionRangeEnd = new SimpleObjectProperty<>();
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
+        currentComparator = null;
         refreshFilteredPersonList();
     }
 
@@ -203,13 +209,22 @@ public class ModelManager implements Model {
      */
     @Override
     public ObservableList<Person> getFilteredPersonList() {
-        return filteredPersons;
+        return sortedFilteredPersons;
     }
 
     @Override
     public void updateFilteredPersonList(Predicate<Person> predicate) {
         requireNonNull(predicate);
         currentAdditionalPredicate = predicate;
+        currentComparator = null;
+        refreshFilteredPersonList();
+    }
+
+    @Override
+    public void updateFilteredPersonList(Predicate<Person> predicate, Comparator<Person> comparator) {
+        requireAllNonNull(predicate, comparator);
+        currentAdditionalPredicate = predicate;
+        currentComparator = comparator;
         refreshFilteredPersonList();
     }
 
@@ -219,6 +234,7 @@ public class ModelManager implements Model {
         clearActiveSessionDate();
         clearVisibleSessionRange();
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
+        currentComparator = null;
         updateCurrentViewLabel();
         refreshFilteredPersonList();
     }
@@ -228,6 +244,7 @@ public class ModelManager implements Model {
         requireNonNull(groupName);
         activeGroupName.set(groupName);
         currentAdditionalPredicate = PREDICATE_SHOW_ALL_PERSONS;
+        currentComparator = null;
         updateCurrentViewLabel();
         refreshFilteredPersonList();
     }
@@ -326,6 +343,7 @@ public class ModelManager implements Model {
                 ? PREDICATE_SHOW_ALL_PERSONS
                 : person -> person.hasGroup(activeGroupName.get());
         filteredPersons.setPredicate(basePredicate.and(currentAdditionalPredicate));
+        sortedFilteredPersons.setComparator(currentComparator);
     }
 
     @Override
@@ -342,12 +360,12 @@ public class ModelManager implements Model {
         return addressBook.equals(otherModelManager.addressBook)
                 && userPrefs.equals(otherModelManager.userPrefs)
                 && filteredPersons.equals(otherModelManager.filteredPersons)
+                && sortedFilteredPersons.equals(otherModelManager.sortedFilteredPersons)
                 && currentView.get().equals(otherModelManager.currentView.get())
                 && attendanceViewActive.get() == otherModelManager.attendanceViewActive.get()
                 && Optional.ofNullable(activeGroupName.get()).equals(
-                        Optional.ofNullable(otherModelManager.activeGroupName.get()))
+                Optional.ofNullable(otherModelManager.activeGroupName.get()))
                 && Optional.ofNullable(activeSessionDate.get()).equals(
-                        Optional.ofNullable(otherModelManager.activeSessionDate.get()));
+                Optional.ofNullable(otherModelManager.activeSessionDate.get()));
     }
-
 }

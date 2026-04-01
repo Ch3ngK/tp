@@ -2,6 +2,7 @@ package seedu.address.model;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -128,6 +129,13 @@ public interface Model {
      * @throws NullPointerException if {@code predicate} is null.
      */
     void updateFilteredPersonList(Predicate<Person> predicate);
+
+    /**
+     * Updates the filter of the filtered person list within the current view to filter by the given {@code predicate}
+     * and sorts it using the given {@code comparator}.
+     * @throws NullPointerException if {@code predicate} or {@code comparator} is null.
+     */
+    void updateFilteredPersonList(Predicate<Person> predicate, Comparator<Person> comparator);
 
     /** Switches the current view to all students and shows all students. */
     void switchToAllStudentsView();

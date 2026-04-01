@@ -2,27 +2,43 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Comparator;
+
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
-import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonMatchesFieldsPredicate;
 
 /**
- * Finds and lists all persons in address book whose name contains any of the argument keywords.
- * Keyword matching is case insensitive.
+ * Finds and lists all people in the address book matching any of the supplied parameters.
+ * Matching is case-insensitive.
  */
 public class FindCommand extends Command {
 
     public static final String COMMAND_WORD = "find";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Finds all persons whose names contain any of "
-            + "the specified keywords (case-insensitive) and displays them as a list with index numbers.\n"
-            + "Parameters: KEYWORD [MORE_KEYWORDS]...\n"
-            + "Example: " + COMMAND_WORD + " alice bob charlie";
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Finds all people whose fields match any of the "
+            + "specified parameters (case-insensitive) and displays them as a list with better matches "
+            + "first.\n"
+            + "Parameters: "
+            + "[n/NAME]... "
+            + "[p/PHONE]... "
+            + "[e/EMAIL]... "
+            + "[m/MATRICULATION_NUMBER]... "
+            + "[t/TAG]...\n"
+            + "At least one parameter must be provided.\n"
+            + "Example: " + COMMAND_WORD + " "
+            + "n/John Doe "
+            + "p/98765432 "
+            + "e/johnd@example.com "
+            + "m/A1234567X "
+            + "t/friends "
+            + "t/owesMoney";
 
-    private final NameContainsKeywordsPredicate predicate;
+    private final PersonMatchesFieldsPredicate predicate;
 
-    public FindCommand(NameContainsKeywordsPredicate predicate) {
+    public FindCommand(PersonMatchesFieldsPredicate predicate) {
         this.predicate = predicate;
     }
 
@@ -30,7 +46,16 @@ public class FindCommand extends Command {
     public CommandResult execute(Model model) {
         requireNonNull(model);
         model.setAttendanceViewActive(false);
-        model.updateFilteredPersonList(predicate);
+
+        Comparator<Person> relevanceComparator = Comparator
+                .comparingInt((Person person) -> predicate.getMatchedCriteriaCount(person))
+                .thenComparingInt(person -> predicate.getExactMatchCount(person))
+                .reversed()
+                .thenComparing(person -> person.getName().toString(), String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(person -> person.getMatricNumber().toString(), String.CASE_INSENSITIVE_ORDER);
+
+        model.updateFilteredPersonList(predicate, relevanceComparator);
+
         return new CommandResult(
                 String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredPersonList().size()));
     }
@@ -41,7 +66,6 @@ public class FindCommand extends Command {
             return true;
         }
 
-        // instanceof handles nulls
         if (!(other instanceof FindCommand)) {
             return false;
         }
