@@ -14,7 +14,8 @@ import seedu.address.commons.util.ToStringBuilder;
  * Contains the date, attendance, and participation for that session.
  */
 public class Session {
-    public static final String MESSAGE_CONSTRAINTS = "Date should be in the format yyyy-MM-dd.";
+    public static final String MESSAGE_CONSTRAINTS =
+            "Date must be a valid calendar date in the format yyyy-MM-dd.";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final LocalDate date;
