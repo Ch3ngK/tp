@@ -27,6 +27,8 @@ public class PartCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Assigns participation to the person identified by the index number in the displayed person list.\n"
+            + "Participation updates are only available in group view. Run switchgroup g/GROUP_NAME first,\n"
+            + "and use view d/YYYY-MM-DD if you need to select a session before updating participation.\n"
             + "Parameters:\n"
             + "i/INDEX pv/PARTICIPATION_VALUE d/YYYY-MM-DD"
             + " (PARTICIPATION_VALUE must be an integer from 0 to 5)\n"

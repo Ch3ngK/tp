@@ -26,6 +26,8 @@ public class MarkCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Marks the person identified by the index number used in the displayed person list as PRESENT.\n"
+            + "Attendance marking is only available in group view. Run switchgroup g/GROUP_NAME first,\n"
+            + "and use view d/YYYY-MM-DD if you need to select a session before marking.\n"
             + "Parameters:\n"
             + "i/INDEX d/YYYY-MM-DD\n"
             + "i/INDEX"
