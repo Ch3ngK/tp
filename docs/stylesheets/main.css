@@ -173,3 +173,26 @@ img[src*=".png"] {
     max-height: 90vh;
     object-fit: contain; /* Scales to fit without distortion */
 }
+
+/* 1. Remove borders from the table and all its children */
+.invisible-table table,
+.invisible-table th,
+.invisible-table td,
+.invisible-table tr,
+.invisible-table thead,
+.invisible-table tbody {
+    border: 0 !important;
+    background-color: transparent !important;
+    box-shadow: none !important; /* Some themes use shadows for lines */
+}
+
+/* 2. Neutralize Bootstrap's striped/hover row colors */
+.invisible-table .table-striped tbody tr:nth-of-type(odd),
+.invisible-table .table-hover tbody tr:hover {
+    background-color: transparent !important;
+}
+
+/* 3. Remove the line between header and body */
+.invisible-table thead th {
+    border-bottom: 0 !important;
+}

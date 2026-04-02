@@ -1,0 +1,33 @@
+@startuml
+!include style.puml
+skinparam arrowThickness 1.1
+skinparam arrowColor MODEL_COLOR
+skinparam classBackgroundColor MODEL_COLOR
+
+Package Person as PersonPackage <<Rectangle>> {
+Class Person
+Class Name
+Class Phone
+Class Email
+Class MatricNumber
+Class Tag
+}
+
+Person *--up> Name
+Person *--up> Phone
+Person *--up> Email
+Person *--up> MatricNumber
+Person *--up> "~*" Tag
+
+Person --> "*" GroupName
+Person ..> "  *" AssignmentName
+Person *--> " * " SessionList
+
+note bottom of GroupName : See Group diagram for details.
+note bottom of AssignmentName : Used only as a map key. \nSee Assignment diagram for details.
+note bottom of SessionList : Keyed by GroupName.\nSee Session diagram for details.
+
+Name -[hidden]right-> Phone
+Phone -[hidden]right-> MatricNumber
+MatricNumber -[hidden]right-> Email
+@enduml

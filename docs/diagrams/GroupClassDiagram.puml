@@ -1,0 +1,27 @@
+@startuml
+!include style.puml
+skinparam arrowThickness 1.1
+skinparam arrowColor MODEL_COLOR
+skinparam classBackgroundColor MODEL_COLOR
+
+Package Group as GroupPackage <<Rectangle>> {
+Class UniqueGroupList
+Class Group
+Class GroupName
+Class UniqueAssignmentList
+Class Assignment
+Class AssignmentName
+}
+
+Class Person
+
+Person --> " * " GroupName
+Person ...> " * " AssignmentName
+
+UniqueGroupList *--> "~* all" Group
+Group *-> "1   " GroupName
+Group *--> "1 " UniqueAssignmentList
+UniqueAssignmentList *--> "      *" Assignment
+Assignment *-> "1  " AssignmentName
+
+@enduml

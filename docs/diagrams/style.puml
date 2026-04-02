@@ -34,7 +34,7 @@
 !define USER_COLOR #000000
 
 skinparam Package {
-    FontSize 16
+    FontSize 18
     BackgroundColor #FFFFFF
     BorderThickness 1
 }

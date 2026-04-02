@@ -1,0 +1,25 @@
+@startuml
+!include style.puml
+skinparam arrowThickness 1.1
+skinparam arrowColor MODEL_COLOR
+skinparam classBackgroundColor MODEL_COLOR
+
+Class Person
+
+Package Session as SessionPackage <<Rectangle>> {
+Class SessionList
+Class Session
+Class LocalDate
+Class Attendance
+Class Participation
+}
+
+Person *--> " * " SessionList
+
+SessionList *--> " * " Session
+Session *--> "1 " LocalDate
+Session *--> "1 " Attendance
+Session *--> "1 " Participation
+
+note right of SessionList : SessionList is constructed by Person
+@enduml
