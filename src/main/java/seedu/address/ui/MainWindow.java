@@ -171,16 +171,19 @@ public class MainWindow extends UiPart<Stage> {
         SplitPane.setResizableWithParent(personListPanelPlaceholder, true);
         // exclude personListPanelPlaceholder so that it absorbs window resizes
 
-        // Set startup heights of the 2 resizeable placeholders (commandBox, resultDisplay):
+        // Calculate startup heights of the 2 resizeable placeholders (commandBox, resultDisplay):
         Platform.runLater(() -> {
-            double totalHeight = mainSplitPane.getHeight();
-            double commandBoxRatio = (totalHeight > 0)
-                    ? COMMANDBOX_STARTUP_HEIGHT_PX / totalHeight
-                    : 0;
-            double resultDisplayRatio = (totalHeight > 0)
-                    ? (COMMANDBOX_STARTUP_HEIGHT_PX + RESULTDISPLAY_STARTUP_HEIGHT_PX) / totalHeight
-                    : 0;
-            mainSplitPane.setDividerPositions(commandBoxRatio, resultDisplayRatio);
+            // Default to minimum height first
+            double commandBoxStartupHeightRatio = 0;
+            double resultDisplayStartupHeightRatio = 0;
+            double mainSplitPaneHeight = mainSplitPane.getHeight();
+            if (mainSplitPaneHeight > 0) {
+                commandBoxStartupHeightRatio = COMMANDBOX_STARTUP_HEIGHT_PX / mainSplitPaneHeight;
+                resultDisplayStartupHeightRatio = (COMMANDBOX_STARTUP_HEIGHT_PX + RESULTDISPLAY_STARTUP_HEIGHT_PX)
+                        / mainSplitPaneHeight;
+            }
+
+            mainSplitPane.setDividerPositions(commandBoxStartupHeightRatio, resultDisplayStartupHeightRatio);
         });
     }
 
