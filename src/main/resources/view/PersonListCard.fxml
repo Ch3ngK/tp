@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
   <GridPane HBox.hgrow="ALWAYS">
     <columnConstraints>
@@ -32,7 +33,10 @@
       <Label fx:id="participation" styleClass="participation_label" text="$participation" />
       <Label fx:id="phone" styleClass="cell_small_label" text="$phone" />
       <Label fx:id="matricNumber" styleClass="cell_small_label" text="$matricNumber" />
-      <Label fx:id="email" styleClass="cell_small_label" text="$email" />
+        <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" fitToHeight="true"
+                    style="-fx-background: transparent; -fx-background-color: transparent; -fx-padding: 0; -fx-border-width: 0;">
+            <Label fx:id="email" styleClass="cell_small_label" text="$email" />
+        </ScrollPane>
     </VBox>
   </GridPane>
 </HBox>

@@ -106,4 +106,13 @@ public class Group {
                 .add("assignments", assignments)
                 .toString();
     }
+
+    /**
+     * Returns name in GroupName as a String.
+     *
+     * @return GroupName as a String.
+     */
+    public String getGroupNameValue() {
+        return groupName.value;
+    }
 }
