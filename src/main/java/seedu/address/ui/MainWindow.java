@@ -26,6 +26,8 @@ import seedu.address.logic.parser.exceptions.ParseException;
 public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
+    private static final double INPUT_PANE_SIZE_RATIO = 0; // set to minimum size
+    private static final double RESPONSE_PANE_SIZE_RATIO = 0.4;
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
@@ -37,23 +39,24 @@ public class MainWindow extends UiPart<Stage> {
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
 
-    @FXML
-    private StackPane commandBoxPlaceholder;
-
+    // resizeable container containing the following 3 Placeholders:
     @FXML
     private SplitPane mainSplitPane;
 
     @FXML
-    private MenuItem helpMenuItem;
-
-    @FXML
-    private StackPane personListPanelPlaceholder;
+    private StackPane commandBoxPlaceholder;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
 
     @FXML
+    private StackPane personListPanelPlaceholder;
+
+    @FXML
     private StackPane statusbarPlaceholder;
+
+    @FXML
+    private MenuItem helpMenuItem;
 
     /**
      * Creates a {@code MainWindow} with the given {@code Stage} and {@code Logic}.
@@ -149,10 +152,17 @@ public class MainWindow extends UiPart<Stage> {
                 logic.currentViewProperty());
         statusbarPlaceholder.getChildren().add(statusBarFooter.getRoot());
 
-        CommandBox commandBox = new CommandBox(this::executeCommand);
+        CommandBox commandBox = new CommandBox(
+                this::executeCommand,
+
+                // for command autocompletion feature
+                resultDisplay::getResultText,
+                resultDisplay::setFeedbackToUser
+        );
         commandBoxPlaceholder.getChildren().add(commandBox.getRoot());
 
-        Platform.runLater(() -> mainSplitPane.setDividerPositions(0.10, 0.25)); // Startup size of the resizeable pane
+        // Startup sizes of the 3 resizeable placeholders (commandBox, resultDisplay, personListPanel)
+        Platform.runLater(() -> mainSplitPane.setDividerPositions(INPUT_PANE_SIZE_RATIO, RESPONSE_PANE_SIZE_RATIO));
     }
 
     /**
