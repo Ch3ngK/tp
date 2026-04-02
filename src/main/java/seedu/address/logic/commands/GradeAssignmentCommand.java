@@ -32,10 +32,10 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + " (alias: " + SHORT_COMMAND_WORD + ")"
             + ": Grades an assignment for one or more students in the current group.\n"
-            + "Parameters: " + COMMAND_PARAMETERS + "\n"
-            + "Examples:\n"
-            + SHORT_COMMAND_WORD + " a/Quiz 1 i/1,3-5 gr/17\n"
-            + SHORT_COMMAND_WORD + " a/Quiz 1 m/A1234567X m/A2345678L gr/17";
+            + "This command only works when viewing a specific group.\n"
+            + "Parameters: a/ASSIGNMENT_NAME (i/INDEX_EXPRESSION | m/MATRIC_NUMBER [m/MATRIC_NUMBER]...) gr/GRADE\n"
+            + "Examples: " + SHORT_COMMAND_WORD + " a/Quiz 1 i/1,3-5 gr/17\n"
+            + "          " + SHORT_COMMAND_WORD + " a/Quiz 1 m/A1234567X m/A2345678L gr/17";
 
     public static final String MESSAGE_GRADE_OUT_OF_RANGE =
             "Grade must be between 0 and the assignment's max marks inclusive.";

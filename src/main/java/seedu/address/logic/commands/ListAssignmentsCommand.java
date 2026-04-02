@@ -21,6 +21,7 @@ public class ListAssignmentsCommand extends ClassScopedAssignmentCommand {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + " (alias: " + SHORT_COMMAND_WORD + ")"
             + ": Lists all assignments in the current group.\n"
+            + "This command only works when viewing a specific group.\n"
             + "Example: " + SHORT_COMMAND_WORD;
 
     @Override
