@@ -34,6 +34,8 @@ public class AddSessionCommand extends Command {
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
     public static final String MESSAGE_NO_ACTIVE_GROUP =
             "No group selected. Enter a group first or provide g/GROUP_NAME.";
+    public static final String MESSAGE_NO_STUDENTS_IN_GROUP =
+            "Group %1$s has no students yet. Add students to the group before creating a session.";
     public static final String MESSAGE_SESSION_ALREADY_EXISTS =
             "Session %1$s already exists for all students in group %2$s.";
 
@@ -86,10 +88,12 @@ public class AddSessionCommand extends Command {
 
         int createdCount = 0;
         int existingCount = 0;
+        int studentsInGroup = 0;
         for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
             if (!person.hasGroup(targetGroup)) {
                 continue;
             }
+            studentsInGroup++;
             boolean sessionExists = Optional.ofNullable(person.getGroupSessions().get(targetGroup))
                     .flatMap(sessionList -> sessionList.getSession(sessionDate))
                     .isPresent();
@@ -102,6 +106,10 @@ public class AddSessionCommand extends Command {
                     new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), note);
             model.setPerson(person, person.withUpdatedSession(targetGroup, defaultSession));
             createdCount++;
+        }
+
+        if (studentsInGroup == 0) {
+            throw new CommandException(String.format(MESSAGE_NO_STUDENTS_IN_GROUP, targetGroup));
         }
 
         if (createdCount == 0) {
