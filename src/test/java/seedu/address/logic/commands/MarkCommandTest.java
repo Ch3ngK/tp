@@ -65,4 +65,23 @@ public class MarkCommandTest {
         MarkCommand command = new MarkCommand(Index.fromOneBased(1), Optional.empty(), Optional.empty());
         assertThrows(CommandException.class, MarkCommand.MESSAGE_NO_ACTIVE_SESSION, () -> command.execute(model));
     }
+
+    @Test
+    public void execute_missingIndexInAllStudentsView_throwsRequiresGroupView() {
+        Model model = new ModelManager();
+        MarkCommand command = new MarkCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty());
+
+        assertThrows(CommandException.class, MarkCommand.MESSAGE_REQUIRES_GROUP_VIEW, () -> command.execute(model));
+    }
+
+    @Test
+    public void execute_missingIndexInGroupView_throwsMissingIndex() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
+
+        MarkCommand command = new MarkCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty());
+
+        assertThrows(CommandException.class, MarkCommand.MESSAGE_MISSING_INDEX, () -> command.execute(model));
+    }
 }

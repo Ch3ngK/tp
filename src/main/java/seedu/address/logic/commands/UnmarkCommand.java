@@ -29,29 +29,28 @@ public class UnmarkCommand extends Command {
             + ": Marks the person identified by the index number used in the displayed person list as ABSENT.\n"
             + "Attendance marking is only available in group view. Run switchgroup g/GROUP_NAME first,\n"
             + "and use view d/YYYY-MM-DD if you need to select a session before unmarking.\n"
-            + "Parameters:\n"
-            + "i/INDEX d/YYYY-MM-DD\n"
-            + "i/INDEX"
-            + " (after 'view d/YYYY-MM-DD')\n"
             + "Parameters: " + COMMAND_PARAMETERS + "\n"
+            + "            i/INDEX (after 'view d/YYYY-MM-DD')\n"
             + "Examples:\n"
             + COMMAND_WORD + " i/1 d/2026-03-14\n"
             + COMMAND_WORD + " i/1 (after 'view d/2026-03-14')";
 
     public static final String MESSAGE_UNMARK_SUCCESS =
             "Marked Person as ABSENT: %1$s";
+    public static final String MESSAGE_MISSING_INDEX =
+            String.format(Messages.MESSAGE_INVALID_COMMAND_FORMAT, MESSAGE_USAGE);
 
     public static final String MESSAGE_GROUP_NOT_FOUND =
             "This group does not exist.";
 
     public static final String MESSAGE_NO_ACTIVE_GROUP =
-            "No group selected. Enter a group first or provide g/GROUP_NAME.";
+            "Mark attendance from a group view only. Use switchgroup g/GROUP_NAME first.";
     public static final String MESSAGE_REQUIRES_GROUP_VIEW =
             "Mark attendance from a group view only. Use switchgroup g/GROUP_NAME first.";
     public static final String MESSAGE_NO_ACTIVE_SESSION =
             "No session selected. Provide d/YYYY-MM-DD or run view with d/YYYY-MM-DD first.";
 
-    private final Index targetIndex;
+    private final Optional<Index> targetIndex;
     private final Optional<LocalDate> date;
     private final Optional<GroupName> groupName;
 
@@ -64,6 +63,14 @@ public class UnmarkCommand extends Command {
      * @param groupName Group containing this session, if explicitly provided.
      */
     public UnmarkCommand(Index targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName) {
+        this(Optional.of(targetIndex), date, groupName);
+    }
+
+    /**
+     * Creates an UnmarkCommand using an optional index.
+     * This allows execute() to prioritize view-context errors over format errors when appropriate.
+     */
+    public UnmarkCommand(Optional<Index> targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName) {
         requireAllNonNull(targetIndex, date, groupName);
         this.targetIndex = targetIndex;
         this.date = date;
@@ -76,6 +83,10 @@ public class UnmarkCommand extends Command {
 
         if (model.getActiveGroupName().isEmpty()) {
             throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
+        }
+
+        if (targetIndex.isEmpty()) {
+            throw new CommandException(MESSAGE_MISSING_INDEX);
         }
 
         if (groupName.isPresent()) {
@@ -100,15 +111,16 @@ public class UnmarkCommand extends Command {
             throw new CommandException(MESSAGE_NO_ACTIVE_SESSION);
         }
         LocalDate targetDate = resolvedDate.get();
-        SessionCommandHistory.record(model, COMMAND_WORD + " i/" + targetIndex.getOneBased() + " d/" + targetDate);
+        Index resolvedIndex = targetIndex.orElseThrow();
+        SessionCommandHistory.record(model, COMMAND_WORD + " i/" + resolvedIndex.getOneBased() + " d/" + targetDate);
 
         List<Person> lastShownList = model.getFilteredPersonList();
 
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
+        if (resolvedIndex.getZeroBased() >= lastShownList.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
         }
 
-        Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
+        Person personToUpdate = lastShownList.get(resolvedIndex.getZeroBased());
 
         Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
 

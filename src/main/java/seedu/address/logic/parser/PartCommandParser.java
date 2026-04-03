@@ -29,16 +29,17 @@ public class PartCommandParser implements Parser<PartCommand> {
         ArgumentMultimap argMultimap =
                 ArgumentTokenizer.tokenize(args, PREFIX_INDEXES, PREFIX_DATE, PREFIX_GROUP, PREFIX_PARTICIPATION);
 
-        if (!argMultimap.getValue(PREFIX_INDEXES).isPresent()
-                || !argMultimap.getValue(PREFIX_PARTICIPATION).isPresent()
-                || !argMultimap.getPreamble().isEmpty()) {
+        if (!argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE));
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_INDEXES, PREFIX_DATE, PREFIX_GROUP, PREFIX_PARTICIPATION);
 
         try {
-            Index index = ParserUtil.parseIndex(argMultimap.getValue(PREFIX_INDEXES).get());
+            Optional<Index> index = Optional.empty();
+            if (argMultimap.getValue(PREFIX_INDEXES).isPresent()) {
+                index = Optional.of(ParserUtil.parseIndex(argMultimap.getValue(PREFIX_INDEXES).get()));
+            }
             Optional<LocalDate> date = Optional.empty();
             if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
@@ -51,8 +52,14 @@ public class PartCommandParser implements Parser<PartCommand> {
                 );
             }
 
-            Participation participation =
-                    new Participation(argMultimap.getValue(PREFIX_PARTICIPATION).get());
+            Optional<Participation> participation = Optional.empty();
+            if (argMultimap.getValue(PREFIX_PARTICIPATION).isPresent()) {
+                participation = Optional.of(new Participation(argMultimap.getValue(PREFIX_PARTICIPATION).get()));
+            }
+
+            if (index.isEmpty() && date.isEmpty() && groupName.isEmpty() && participation.isEmpty()) {
+                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE));
+            }
 
             return new PartCommand(index, date, groupName, participation);
         } catch (IllegalArgumentException | ParseException e) {

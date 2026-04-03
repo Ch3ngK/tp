@@ -65,4 +65,23 @@ public class UnmarkCommandTest {
         UnmarkCommand command = new UnmarkCommand(Index.fromOneBased(1), Optional.empty(), Optional.empty());
         assertThrows(CommandException.class, UnmarkCommand.MESSAGE_NO_ACTIVE_SESSION, () -> command.execute(model));
     }
+
+    @Test
+    public void execute_missingIndexInAllStudentsView_throwsRequiresGroupView() {
+        Model model = new ModelManager();
+        UnmarkCommand command = new UnmarkCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty());
+
+        assertThrows(CommandException.class, UnmarkCommand.MESSAGE_REQUIRES_GROUP_VIEW, () -> command.execute(model));
+    }
+
+    @Test
+    public void execute_missingIndexInGroupView_throwsMissingIndex() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
+
+        UnmarkCommand command = new UnmarkCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty());
+
+        assertThrows(CommandException.class, UnmarkCommand.MESSAGE_MISSING_INDEX, () -> command.execute(model));
+    }
 }

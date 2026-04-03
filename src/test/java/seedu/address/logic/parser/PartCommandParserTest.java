@@ -33,13 +33,25 @@ public class PartCommandParserTest {
 
     @Test
     public void parse_missingParticipation_failure() {
-        assertParseFailure(parser, " i/1",
-                String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE));
+        assertParseSuccess(parser, " i/1",
+                new PartCommand(Optional.of(Index.fromOneBased(1)), Optional.empty(), Optional.empty(), Optional.empty()));
     }
 
     @Test
     public void parse_missingIndex_failure() {
-        assertParseFailure(parser, " pv/3",
+        assertParseSuccess(parser, " pv/3",
+                new PartCommand(Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(new Participation(3))));
+    }
+
+    @Test
+    public void parse_groupOnly_success() {
+        assertParseSuccess(parser, " g/T01",
+                new PartCommand(Optional.empty(), Optional.empty(), Optional.of(new GroupName("T01")), Optional.empty()));
+    }
+
+    @Test
+    public void parse_noRecognizedPrefixes_failure() {
+        assertParseFailure(parser, "",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE));
     }
 }

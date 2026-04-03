@@ -28,7 +28,7 @@ public class UnmarkCommandParser implements Parser<UnmarkCommand> {
         ArgumentMultimap argMultimap =
                 ArgumentTokenizer.tokenize(args, PREFIX_INDEXES, PREFIX_DATE, PREFIX_GROUP);
 
-        if (!argMultimap.getValue(PREFIX_INDEXES).isPresent() || !argMultimap.getPreamble().isEmpty()) {
+        if (!argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, UnmarkCommand.MESSAGE_USAGE));
         }
@@ -36,7 +36,12 @@ public class UnmarkCommandParser implements Parser<UnmarkCommand> {
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_INDEXES, PREFIX_DATE, PREFIX_GROUP);
 
         try {
-            Index index = ParserUtil.parseIndex(argMultimap.getValue(PREFIX_INDEXES).get());
+            Optional<Index> index = Optional.empty();
+            if (argMultimap.getValue(PREFIX_INDEXES).isPresent()) {
+                index = Optional.of(ParserUtil.parseIndex(argMultimap.getValue(PREFIX_INDEXES).get()));
+            } else if (argMultimap.getValue(PREFIX_DATE).isEmpty() && argMultimap.getValue(PREFIX_GROUP).isEmpty()) {
+                throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, UnmarkCommand.MESSAGE_USAGE));
+            }
             Optional<LocalDate> date = Optional.empty();
             if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));

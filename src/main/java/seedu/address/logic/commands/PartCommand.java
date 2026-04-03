@@ -31,33 +31,31 @@ public class PartCommand extends Command {
             + ": Assigns participation to the person identified by the index number in the displayed person list.\n"
             + "Participation updates are only available in group view. Run switchgroup g/GROUP_NAME first,\n"
             + "and use view d/YYYY-MM-DD if you need to select a session before updating participation.\n"
-            + "Parameters:\n"
-            + "i/INDEX pv/PARTICIPATION_VALUE d/YYYY-MM-DD"
-            + " (PARTICIPATION_VALUE must be an integer from 0 to 5)\n"
-            + "i/INDEX pv/PARTICIPATION_VALUE"
-            + " (after 'view d/YYYY-MM-DD')\n"
-            + "Parameters: " + COMMAND_PARAMETERS + "\n"
+            + "Parameters: " + COMMAND_PARAMETERS
+            + "            i/INDEX pv/PARTICIPATION_VALUE (after 'view d/YYYY-MM-DD')\n"
             + "Examples:\n"
             + COMMAND_WORD + " i/1 pv/5 d/2026-03-14\n"
             + COMMAND_WORD + " i/1 pv/5 (after 'view d/2026-03-14')";
 
     public static final String MESSAGE_PARTICIPATION_SUCCESS =
             "Updated participation for Person: %1$s";
+    public static final String MESSAGE_MISSING_REQUIRED_FIELDS =
+            String.format(Messages.MESSAGE_INVALID_COMMAND_FORMAT, MESSAGE_USAGE);
 
     public static final String MESSAGE_GROUP_NOT_FOUND =
             "This group does not exist.";
 
     public static final String MESSAGE_NO_ACTIVE_GROUP =
-            "No group selected. Enter a group first or provide g/GROUP.";
+            "Update participation from a group view only. Use switchgroup g/GROUP_NAME first.";
     public static final String MESSAGE_REQUIRES_GROUP_VIEW =
             "Update participation from a group view only. Use switchgroup g/GROUP_NAME first.";
     public static final String MESSAGE_NO_ACTIVE_SESSION =
             "No session selected. Provide d/YYYY-MM-DD or run view with d/YYYY-MM-DD first.";
 
-    private final Index targetIndex;
+    private final Optional<Index> targetIndex;
     private final Optional<LocalDate> date;
     private final Optional<GroupName> groupName;
-    private final Participation participation;
+    private final Optional<Participation> participation;
 
     /**
      * Creates a PartCommand to assign the specified {@code Participation}
@@ -72,6 +70,15 @@ public class PartCommand extends Command {
      */
     public PartCommand(Index targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName,
                        Participation participation) {
+        this(Optional.of(targetIndex), date, groupName, Optional.of(participation));
+    }
+
+    /**
+     * Creates a PartCommand using optional required fields so execute() can prioritize
+     * group-view errors over format errors when appropriate.
+     */
+    public PartCommand(Optional<Index> targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName,
+                       Optional<Participation> participation) {
         requireAllNonNull(targetIndex, date, groupName, participation);
         this.targetIndex = targetIndex;
         this.date = date;
@@ -85,6 +92,10 @@ public class PartCommand extends Command {
 
         if (model.getActiveGroupName().isEmpty()) {
             throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
+        }
+
+        if (targetIndex.isEmpty() || participation.isEmpty()) {
+            throw new CommandException(MESSAGE_MISSING_REQUIRED_FIELDS);
         }
 
         // Step 1: switch group if g/ provided
@@ -111,17 +122,20 @@ public class PartCommand extends Command {
             throw new CommandException(MESSAGE_NO_ACTIVE_SESSION);
         }
         LocalDate targetDate = resolvedDate.get();
+        Index resolvedIndex = targetIndex.orElseThrow();
+        Participation resolvedParticipation = participation.orElseThrow();
         SessionCommandHistory.record(model,
-                COMMAND_WORD + " i/" + targetIndex.getOneBased() + " d/" + targetDate + " pv/" + participation.value);
+                COMMAND_WORD + " i/" + resolvedIndex.getOneBased()
+                        + " d/" + targetDate + " pv/" + resolvedParticipation.value);
 
         // Step 3: get person
         List<Person> lastShownList = model.getFilteredPersonList();
 
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
+        if (resolvedIndex.getZeroBased() >= lastShownList.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
         }
 
-        Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
+        Person personToUpdate = lastShownList.get(resolvedIndex.getZeroBased());
 
         // Step 4: get session
         Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
@@ -130,7 +144,7 @@ public class PartCommand extends Command {
         Session updatedSession = new Session(
                 targetDate,
                 currentSession.getAttendance(),
-                participation,
+                resolvedParticipation,
                 currentSession.getNote()
         );
 

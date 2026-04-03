@@ -32,7 +32,19 @@ public class UnmarkCommandParserTest {
 
     @Test
     public void parse_missingIndex_failure() {
-        assertParseFailure(parser, " d/2026-03-16",
+        assertParseSuccess(parser, " d/2026-03-16",
+                new UnmarkCommand(Optional.empty(), Optional.of(LocalDate.of(2026, 3, 16)), Optional.empty()));
+    }
+
+    @Test
+    public void parse_missingIndexAndGroup_success() {
+        assertParseSuccess(parser, " g/T01",
+                new UnmarkCommand(Optional.empty(), Optional.empty(), Optional.of(new GroupName("T01"))));
+    }
+
+    @Test
+    public void parse_noRecognizedPrefixes_failure() {
+        assertParseFailure(parser, "",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, UnmarkCommand.MESSAGE_USAGE));
     }
 

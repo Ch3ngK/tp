@@ -69,4 +69,26 @@ public class PartCommandTest {
                 new Participation(3));
         assertThrows(CommandException.class, PartCommand.MESSAGE_NO_ACTIVE_SESSION, () -> command.execute(model));
     }
+
+    @Test
+    public void execute_missingRequiredFieldsInAllStudentsView_throwsRequiresGroupView() {
+        Model model = new ModelManager();
+        PartCommand command = new PartCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty(),
+                Optional.empty());
+
+        assertThrows(CommandException.class, PartCommand.MESSAGE_REQUIRES_GROUP_VIEW, () -> command.execute(model));
+    }
+
+    @Test
+    public void execute_missingRequiredFieldsInGroupView_throwsInvalidFormat() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
+
+        PartCommand command = new PartCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty(),
+                Optional.of(new Participation(3)));
+
+        assertThrows(CommandException.class, PartCommand.MESSAGE_MISSING_REQUIRED_FIELDS,
+                () -> command.execute(model));
+    }
 }
