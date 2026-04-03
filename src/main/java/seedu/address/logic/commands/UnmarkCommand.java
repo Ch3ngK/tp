@@ -41,7 +41,7 @@ public class UnmarkCommand extends Command {
     public static final String MESSAGE_NO_ACTIVE_GROUP =
             "No group selected. Enter a group first or provide g/GROUP_NAME.";
     public static final String MESSAGE_REQUIRES_GROUP_VIEW =
-            "Mark attendance from a group view only. Use switchgroup g/GROUP_NAME first.";
+            "Unmark attendance from a group view only. Use switchgroup g/GROUP_NAME first.";
     public static final String MESSAGE_NO_ACTIVE_SESSION =
             "No session selected. Provide d/YYYY-MM-DD or run view with d/YYYY-MM-DD first.";
 

@@ -14,6 +14,9 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.CommandResult;
+import seedu.address.logic.commands.MarkCommand;
+import seedu.address.logic.commands.PartCommand;
+import seedu.address.logic.commands.UnmarkCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -51,6 +54,8 @@ public class LogicManager implements Logic {
     public CommandResult execute(String commandText) throws CommandException, ParseException {
         logger.info("----------------[USER COMMAND][" + commandText + "]");
 
+        enforceGroupViewRequirement(commandText);
+
         CommandResult commandResult;
         Command command = addressBookParser.parseCommand(commandText);
         commandResult = command.execute(model);
@@ -64,6 +69,35 @@ public class LogicManager implements Logic {
         }
 
         return commandResult;
+    }
+
+    /**
+     * Ensures mark/unmark/part always show their command-specific group-view error
+     * when used from the All Students view, regardless of command format validity.
+     */
+    private void enforceGroupViewRequirement(String commandText) throws ParseException {
+        if (model.getActiveGroupName().isPresent()) {
+            return;
+        }
+
+        String trimmedCommandText = commandText == null ? "" : commandText.trim();
+        if (trimmedCommandText.isEmpty()) {
+            return;
+        }
+
+        String[] splitInput = trimmedCommandText.split("\\s+", 2);
+        String commandWord = splitInput[0];
+
+        switch (commandWord) {
+        case MarkCommand.COMMAND_WORD:
+            throw new ParseException(MarkCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+        case UnmarkCommand.COMMAND_WORD:
+            throw new ParseException(UnmarkCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+        case PartCommand.COMMAND_WORD:
+            throw new ParseException(PartCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+        default:
+            // Do nothing for other commands.
+        }
     }
 
     @Override
