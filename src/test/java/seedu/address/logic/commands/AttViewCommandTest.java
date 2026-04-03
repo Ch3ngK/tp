@@ -201,8 +201,9 @@ public class AttViewCommandTest {
                 .withEmail("alice@example.com").withPhone("91234567").withGroups("T01").build());
 
         ViewCommand command = new ViewCommand(T01, SESSION_DATE);
+        String expectedMessage = String.format(ViewCommand.MESSAGE_SESSION_NOT_CREATED, SESSION_DATE, T01);
         assertThrows(CommandException.class,
-                String.format(ViewCommand.MESSAGE_SESSION_NOT_CREATED, SESSION_DATE, T01), () -> command.execute(model));
+                expectedMessage, () -> command.execute(model));
 
         assertTrue(model.findPersonByMatricNumber(new MatricNumber(matricNumber))
                 .orElseThrow()
