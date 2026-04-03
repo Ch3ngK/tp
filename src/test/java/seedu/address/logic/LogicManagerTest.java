@@ -21,6 +21,9 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.MarkCommand;
+import seedu.address.logic.commands.PartCommand;
+import seedu.address.logic.commands.UnmarkCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.Model;
@@ -56,6 +59,36 @@ public class LogicManagerTest {
     public void execute_invalidCommandFormat_throwsParseException() {
         String invalidCommand = "uicfhmowqewca";
         assertParseException(invalidCommand, MESSAGE_UNKNOWN_COMMAND);
+    }
+
+    @Test
+    public void execute_markCommandInAllStudentsView_throwsParseException() {
+        assertParseException("mark i/1", MarkCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+    }
+
+    @Test
+    public void execute_unmarkCommandInAllStudentsView_throwsParseException() {
+        assertParseException("unmark i/1", UnmarkCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+    }
+
+    @Test
+    public void execute_partCommandInAllStudentsView_throwsParseException() {
+        assertParseException("part i/1 pv/5", PartCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+    }
+
+    @Test
+    public void execute_malformedMarkCommandInAllStudentsView_throwsParseException() {
+        assertParseException("mark invalid", MarkCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+    }
+
+    @Test
+    public void execute_malformedUnmarkCommandInAllStudentsView_throwsParseException() {
+        assertParseException("unmark invalid", UnmarkCommand.MESSAGE_REQUIRES_GROUP_VIEW);
+    }
+
+    @Test
+    public void execute_malformedPartCommandInAllStudentsView_throwsParseException() {
+        assertParseException("part invalid", PartCommand.MESSAGE_REQUIRES_GROUP_VIEW);
     }
 
     @Test
@@ -95,7 +128,7 @@ public class LogicManagerTest {
      * @see #assertCommandFailure(String, Class, String, Model)
      */
     private void assertCommandSuccess(String inputCommand, String expectedMessage,
-            Model expectedModel) throws CommandException, ParseException {
+                                      Model expectedModel) throws CommandException, ParseException {
         CommandResult result = logic.execute(inputCommand);
         assertEquals(expectedMessage, result.getFeedbackToUser());
         assertEquals(expectedModel, model);
@@ -122,7 +155,7 @@ public class LogicManagerTest {
      * @see #assertCommandFailure(String, Class, String, Model)
      */
     private void assertCommandFailure(String inputCommand, Class<? extends Throwable> expectedException,
-            String expectedMessage) {
+                                      String expectedMessage) {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         assertCommandFailure(inputCommand, expectedException, expectedMessage, expectedModel);
     }
@@ -135,7 +168,7 @@ public class LogicManagerTest {
      * @see #assertCommandSuccess(String, String, Model)
      */
     private void assertCommandFailure(String inputCommand, Class<? extends Throwable> expectedException,
-            String expectedMessage, Model expectedModel) {
+                                      String expectedMessage, Model expectedModel) {
         assertThrows(expectedException, expectedMessage, () -> logic.execute(inputCommand));
         assertEquals(expectedModel, model);
     }
