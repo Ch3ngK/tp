@@ -202,8 +202,7 @@ public class AttViewCommandTest {
 
         ViewCommand command = new ViewCommand(T01, SESSION_DATE);
         assertThrows(CommandException.class,
-                String.format(ViewCommand.MESSAGE_SESSION_NOT_CREATED, SESSION_DATE, T01), () 
-                        -> command.execute(model));
+                String.format(ViewCommand.MESSAGE_SESSION_NOT_CREATED, SESSION_DATE, T01), () -> command.execute(model));
 
         assertTrue(model.findPersonByMatricNumber(new MatricNumber(matricNumber))
                 .orElseThrow()
