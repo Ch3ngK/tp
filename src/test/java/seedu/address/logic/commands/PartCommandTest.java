@@ -88,7 +88,9 @@ public class PartCommandTest {
         PartCommand command = new PartCommand(Optional.empty(), Optional.of(SESSION_DATE), Optional.empty(),
                 Optional.of(new Participation(3)));
 
-        assertThrows(CommandException.class, PartCommand.MESSAGE_MISSING_REQUIRED_FIELDS,
+        assertThrows(
+                CommandException.class,
+                PartCommand.MESSAGE_MISSING_REQUIRED_FIELDS,
                 () -> command.execute(model));
     }
 }
