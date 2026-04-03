@@ -462,13 +462,7 @@ You do not need to save any changes manually.
 You are welcome to update data directly by editing the `TAA_savefile.json` data file. 
 We recommend that you back up your data before beginning.
 
-<panel header="How do I back up my data?" type="seamless">
 
-1. Open the folder where `TAA.jar` is located.
-2. Locate the `data` folder, which contains `TAA_savefile.json`.
-3. Copy the `data` folder to another location of your choice.
-
-</panel>
 
 <box type="warning" seamless>
 You should follow the format below closely to prevent an invalid file.
@@ -477,33 +471,33 @@ You should follow the format below closely to prevent an invalid file.
 ```json
 {
   "persons" : [ {
-    "name" : NAME,
-    "phone" : PHONE_NUMBER,
-    "email" : EMAIL,
-    "matricNumber" : MATRIC_NUMBER,
-    "attendance" : ATTENDANCE_STATUS,
+    "name" : "NAME",
+    "phone" : "PHONE_NUMBER",
+    "email" : "EMAIL",
+    "matricNumber" : "MATRIC_NUMBER",
+    "attendance" : "ATTENDANCE_STATUS",
     "participation" : PARTICIPATION_VALUE,
-    "tags" : [ TAGS ],
-    "groups" : [ GROUP_NAME ],
+    "tags" : [ "TAGS" ],
+    "groups" : [ "GROUP_NAME" ],
     "groupSessions" : {
-      GROUP_NAME : [ {
-        "date" : YYYY-MM-DD,
-        "attendance" : ATTENDANCE_STATUS,
+      "GROUP_NAME" : [ {
+        "date" : "YYYY-MM-DD",
+        "attendance" : "ATTENDANCE_STATUS",
         "participation" : PARTICIPATION_VALUE,
-        "note" : NOTE
+        "note" : "NOTE"
       } ]
     },
     "assignmentGrades" : {
-      GROUP_NAME : {
-        ASSIGNMENT_NAME : ASSIGNMENT_MARKS (integer, must be less than or equal to MAX_MARKS)
+      "GROUP_NAME" : {
+        "ASSIGNMENT_NAME" : ASSIGNMENT_MARKS (integer, must be less than or equal to MAX_MARKS)
       }
     }
   } ],
   "groups" : [ {
-    "name" : GROUP_NAME,
+    "name" : "GROUP_NAME",
     "assignments" : [ {
-      "name" : ASSIGNMENT_NAME,
-      "dueDate" : YYYY-MM-DD,
+      "name" : "ASSIGNMENT_NAME",
+      "dueDate" : "YYYY-MM-DD",
       "maxMarks" : MAX_MARKS
     } ]
   } ]
@@ -554,10 +548,86 @@ The example below will load 1 contact, named `John`, belonging to the group `T02
 <box type="tip" seamless>
 
 **Tip:**
-If your changes to the data file makes its format invalid, TAA will not overwrite your data file. You can close TAA and manually fix the data file.
+If your changes to the data file makes its format invalid, TAA will not load your contacts and will not overwrite your data file. This means that any changes you make will not be saved.
+<br>You should close TAA and manually fix the data file before continuing your use of the app.
 </box>
 
-<panel header="I see `preservedSkippedPersons`, `preservedSkippedGroups` and `loadWarnings` in my data file. What are they?" type="seamless" expanded>
+**Related FAQs:**
+
+* [How do I back up my data?](#faq-backup)
+* [How do I transfer my data to another computer?](#faq-transfer)
+* [I see `preservedSkippedPersons`, `preservedSkippedGroups` and `loadWarnings` in my data file. What are they?](#faq-unknown_sections)
+* [What happens if my manually edited person contacts are invalid?](#faq-invalid_persons)
+* [What happens if my manually edited groups are invalid?](#faq-invalid_groups)
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+## Known issues
+
+1. **When using multiple screens**, if you move the application to a secondary screen, and later switch to using only the primary screen, the GUI will open off-screen. The remedy is to delete the `preferences.json` file created by the application before running the application again.
+2. **If you minimize the Help Window** and then run the `help` command (or use the `Help` menu, or the keyboard shortcut `F1`) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
+
+--------------------------------------------------------------------------------------------------------------------
+
+## Command summary
+
+Action     | Format, Examples
+-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
+**Add to Group**   | `addtogroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]` `addtogroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION]` <br> e.g., `addtogroup g/T01 m/A1234567X m/A2345678L`
+**Add Session**   | `addsession d/YYYY-MM-DD [g/GROUP_NAME] [n/NOTE]` <br> e.g., `addsession d/2026-03-16 g/T01 n/tutorial`
+**Edit Session**   | `editsession d/OLD_DATE [nd/NEW_DATE] [nn/NEW_NOTE] [g/GROUP_NAME]` <br> e.g., `editsession d/2026-03-16 nd/2026-03-23 nn/lab g/T01`
+**View Attendance/Participation**   | `view [STATUS] [d/YYYY-MM-DD] [g/GROUP_NAME] [from/YYYY-MM-DD] [to/YYYY-MM-DD]` <br> e.g., `view absent from/2026-03-01 to/2026-03-31`
+**Export View**   | `exportview [f/FILE_PATH]` <br> e.g., `exportview f/exports/t01-view.csv`
+**Undo Session Change**   | `undosession`
+**Clear**  | `clear`
+**Create Assignment**   | `createassignment a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` `createa a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` <br> e.g., `createassignment a/Quiz 1 d/2026-04-05 mm/20`
+**Create Group**   | `creategroup g/GROUP_NAME` <br> e.g., `creategroup g/T01`
+**Delete** | `delete INDEX`<br> e.g., `delete 3`
+**Delete Assignment**   | `deleteassignment a/ASSIGNMENT_NAME` `deletea a/ASSIGNMENT_NAME` <br> e.g., `deleteassignment a/Quiz 1`
+**Delete Group**   | `deletegroup g/GROUP_NAME` <br> e.g., `deletegroup g/T01`
+**Delete Session**   | `deletesession [confirm] d/YYYY-MM-DD [g/GROUP_NAME]` <br> e.g., `deletesession confirm d/2026-03-16 g/T01`
+**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
+**Edit Assignment**   | `editassignment a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` `edita a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` <br> e.g., `editassignment a/Quiz 1 na/Test d/2026-04-08 mm/25`
+**Exit**   | `exit`
+**Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
+**Grade Assignment**   | `gradeassignment a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradeassignment a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` `gradea a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradea a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` <br> e.g., `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17`
+**Help**   | `help`
+**List**   | `list`
+**List Assignment**   | `listassignments` `lista`
+**List Groups**   | `listgroups`
+**Mark Attendance**   | `mark i/INDEX d/YYYY-MM-DD` <br> e.g., `mark i/1 d/2026-03-16`
+**Participation**   | `part i/INDEX d/YYYY-MM-DD pv/PARTICIPATION_VALUE` <br> e.g., `part i/1 d/2026-03-16 pv/4`
+**Remove from Group**   | `removefromgroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]` `removefromgroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION]` <br> e.g., `removefromgroup g/T01 m/A1234567X m/A2345678L`
+**Rename Group**   | `renamegroup g/OLD_GROUP_NAME new/NEW_GROUP_NAME` <br> e.g., `renamegroup g/T01 new/Tutorial-01`
+**Switch Group**   | `switchgroup g/GROUP_NAME` `switchgroup all` <br> e.g., `switchgroup g/T01`
+**Unmark Attendance**   | `unmark i/INDEX d/YYYY-MM-DD` <br> e.g., `unmark i/1 d/2026-03-16`
+
+-----------------------------------------------
+
+## Frequently Asked Questions (FAQ)
+
+<panel id="faq-backup" header="How do I back up my data?" type="seamless" expanded>
+
+1. Open the folder where `TAA.jar` is located.
+2. Locate the `data` folder, which contains `TAA_savefile.json`.
+3. Copy the `data` folder to another location of your choice.
+
+</panel>
+
+<panel id="faq-transfer" header="How do I transfer my data to another computer?" type="seamless" expanded>
+
+1. Ensure you have the [latest version of TAA installed](https://github.com/AY2526S2-CS2103T-F14-1/tp/releases) on the new computer.
+2. On your old computer, open the folder where `TAA.jar` is located.
+3. Locate the `data` folder, which contains `TAA_savefile.json`.
+4. Copy this `data` folder into another location of your choice on your new computer.
+5. Launch TAA on your new computer. A new `data` folder will be created. Replace this with the version from your old computer.
+6. Relaunch TAA. Your data should appear as they did in your old computer.
+
+</panel>
+
+<panel id="faq-unknown_sections" header="I see `preservedSkippedPersons`, `preservedSkippedGroups` and `loadWarnings` in my data file. What are they?" type="seamless" expanded>
 
 These sections will be loaded into your data file once you start TAA.
 
@@ -579,7 +649,7 @@ You can read the <code>loadWarnings</code> as a reference to fix your data file.
 
 </panel>
 
-<panel header="What happens if my manually edited person contacts are invalid?" type="seamless" expanded>
+<panel id="faq-invalid_persons" header="What happens if my manually edited person contacts are invalid?" type="seamless" expanded>
 
 You will see an error message telling you how many contacts are invalid once TAA starts running.
 
@@ -625,9 +695,9 @@ Rerun TAA and `John` will now be loaded into the contact list!
 
 </panel>
 
-</panel>
+</>
 
-<panel header="What happens if my manually edited groups are invalid?" type="seamless" expanded>
+<panel id="faq-invalid_groups" header="What happens if my manually edited groups are invalid?" type="seamless" expanded>
 
 You will see an error message telling you how many groups are invalid once TAA starts running.
 
@@ -694,68 +764,35 @@ Rerun TAA and group `T02` will exist. `John` will also be loaded into the contac
 
 </panel>
 
---------------------------------------------------------------------------------------------------------------------
-
-## FAQ
-
-**Q**: How do I transfer my data to another Computer?<br>
-**A**: Install the app in the other computer and overwrite the empty data file it creates with the file that contains the data of your previous AddressBook home folder.
-
---------------------------------------------------------------------------------------------------------------------
-
-## Known issues
-
-1. **When using multiple screens**, if you move the application to a secondary screen, and later switch to using only the primary screen, the GUI will open off-screen. The remedy is to delete the `preferences.json` file created by the application before running the application again.
-2. **If you minimize the Help Window** and then run the `help` command (or use the `Help` menu, or the keyboard shortcut `F1`) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
-
---------------------------------------------------------------------------------------------------------------------
-
-## Command summary
-
-Action     | Format, Examples
------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-**Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
-**Add to Group**   | `addtogroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]` `addtogroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION]` <br> e.g., `addtogroup g/T01 m/A1234567X m/A2345678L`
-**Add Session**   | `addsession d/YYYY-MM-DD [g/GROUP_NAME] [n/NOTE]` <br> e.g., `addsession d/2026-03-16 g/T01 n/tutorial`
-**Edit Session**   | `editsession d/OLD_DATE [nd/NEW_DATE] [nn/NEW_NOTE] [g/GROUP_NAME]` <br> e.g., `editsession d/2026-03-16 nd/2026-03-23 nn/lab g/T01`
-**View Attendance/Participation**   | `view [STATUS] [d/YYYY-MM-DD] [g/GROUP_NAME] [from/YYYY-MM-DD] [to/YYYY-MM-DD]` <br> e.g., `view absent from/2026-03-01 to/2026-03-31`
-**Export View**   | `exportview [f/FILE_PATH]` <br> e.g., `exportview f/exports/t01-view.csv`
-**Undo Session Change**   | `undosession`
-**Clear**  | `clear`
-**Create Assignment**   | `createassignment a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` `createa a/ASSIGNMENT_NAME d/DUE_DATE mm/MAX_MARKS` <br> e.g., `createassignment a/Quiz 1 d/2026-04-05 mm/20`
-**Create Group**   | `creategroup g/GROUP_NAME` <br> e.g., `creategroup g/T01`
-**Delete** | `delete INDEX`<br> e.g., `delete 3`
-**Delete Assignment**   | `deleteassignment a/ASSIGNMENT_NAME` `deletea a/ASSIGNMENT_NAME` <br> e.g., `deleteassignment a/Quiz 1`
-**Delete Group**   | `deletegroup g/GROUP_NAME` <br> e.g., `deletegroup g/T01`
-**Delete Session**   | `deletesession [confirm] d/YYYY-MM-DD [g/GROUP_NAME]` <br> e.g., `deletesession confirm d/2026-03-16 g/T01`
-**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
-**Edit Assignment**   | `editassignment a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` `edita a/ASSIGNMENT_NAME na/NEW_ASSIGNMENT_NAME d/NEW_DUE_DATE mm/NEW_MAX_MARKS` <br> e.g., `editassignment a/Quiz 1 na/Test d/2026-04-08 mm/25`
-**Exit**   | `exit`
-**Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
-**Grade Assignment**   | `gradeassignment a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradeassignment a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` `gradea a/ASSIGNMENT_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION] gr/GRADE` `gradea a/ASSIGNMENT_NAME m/MATRICULATION_NUMBER [m/MATRICULATION_NUMBER] gr/GRADE` <br> e.g., `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17`
-**Help**   | `help`
-**List**   | `list`
-**List Assignment**   | `listassignments` `lista`
-**List Groups**   | `listgroups`
-**Mark Attendance**   | `mark i/INDEX d/YYYY-MM-DD` <br> e.g., `mark i/1 d/2026-03-16`
-**Participation**   | `part i/INDEX d/YYYY-MM-DD pv/PARTICIPATION_VALUE` <br> e.g., `part i/1 d/2026-03-16 pv/4`
-**Remove from Group**   | `removefromgroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]` `removefromgroup g/GROUP_NAME i/INDEX_EXPRESSION [i/INDEX_EXPRESSION]` <br> e.g., `removefromgroup g/T01 m/A1234567X m/A2345678L`
-**Rename Group**   | `renamegroup g/OLD_GROUP_NAME new/NEW_GROUP_NAME` <br> e.g., `renamegroup g/T01 new/Tutorial-01`
-**Switch Group**   | `switchgroup g/GROUP_NAME` `switchgroup all` <br> e.g., `switchgroup g/T01`
-**Unmark Attendance**   | `unmark i/INDEX d/YYYY-MM-DD` <br> e.g., `unmark i/1 d/2026-03-16`
+---------------------------------------------------
 
 ## Troubleshooting
 
 ### Manual editing
 
+You should refer to this section to find out more about some common errors faced when manually editing the data file.
+
 #### Troubleshooting manual editing of persons
- Problem                               | Error shown |                              How to fix                              |
-:--------------------------------------|:-----------:|:--------------------------------------------------------------------:|
- Invalid or blank name                 |    TODO     |         Ensure that name follows the constraints given here.         
- Invalid or blank phone                |    TODO     |        Ensure that phone follows the constraints given here.         
- Invalid or blank matriculation number |    TODO     | Ensure that matriculation number follows the constraints given here. 
- Invalid matriculation number number checksum        | TODO | Change the matriculation number checksum to the correct one as given in the error message |
-Person has
+| Problem                                                              | Error shown                                                                            | How to fix                                                                                                              |
+|:---------------------------------------------------------------------|:---------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------|
+| Invalid or blank name                                                | TODO                                                                                   | Ensure that `Name` follows the constraints given in the error message                                                   |
+| Invalid or blank phone                                               | TODO                                                                                   | Ensure that `Phone` follows the constraints given in the error message                                                  |
+| Invalid or blank matriculation number                                | TODO                                                                                   | Ensure that `matricNumber` follows the constraints given in the error message.                                          |
+| Invalid matriculation number number checksum                         | TODO                                                                                   | Change the `matricNumber` checksum to the correct one as given in the error message.                                    |
+| Person has grades for a group they are not part of                   | `Person has grades for group 'X' but is not a member of it`                             | Add the respective group into `"groups": [ ]` for that person under `"persons": [ ]`.                                   |
+| Person has grades for an assignment that does not exist in the group | `Person has a grade for assignment 'X' in group 'Y', but that assignment does not exist` | Add the assignment into `"groups": [ ]`.<br> This is not the same `"groups": [ ]` as the one found in `"persons": [ ]`. |
+| Person has grades for an assignment that exceeds the max marks       | `Grade 'A' for assignment 'X' in group 'Y' exceeds max marks of 'B'`                     | Ensure that grade is below max marks for the assignment.                                                                |
+| Person has session for a group they are not a part of                | `Person has sessions for group 'X' but is not a member of it`                            | Ensure that person has matching groups in `"groups": [ ]` and `"groupSessions": { }` in `"persons": [ ]`.               |
+
+### Troubleshooting manual editing of groups
+| Problem | Error shown                                                                                                      | How to fix                                                                                                                     |
+:--------|:-----------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+Invalid or blank group name | `Group names should only contain letters, numbers, spaces, hyphens, and underscores, and it should not be blank` | Ensure that the group name follows the constraints given in the error message.                                                               
+Duplicate group name | `Skipped duplicate group: 'X'` | Delete the group by deleting `{ "name": "X", "assignments": [ ] }` from `"preservedSkippedGroups": [ ]` , or rename the group. |
+Invalid or blank assignment name | `Assignment names should only contain alphanumeric characters and spaces, and should not be blank` | Ensure that the assignment name follows the constraints given in the error message.
+Assignment has non-positive max marks | `Max marks should be a positive integer` | Ensure that max marks is a positive integer. |
+
+
 
 
 
