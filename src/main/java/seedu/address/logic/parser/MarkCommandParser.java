@@ -51,8 +51,7 @@ public class MarkCommandParser implements Parser<MarkCommand> {
 
             return new MarkCommand(index, date, groupName);
         } catch (ParseException e) {
-            throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, MarkCommand.MESSAGE_USAGE), e);
+            throw e;
         }
     }
 }

@@ -2,15 +2,22 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -32,6 +39,24 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INDEX = "Index is not a non-zero unsigned integer.";
     public static final String MESSAGE_INVALID_INDEX_EXPRESSION = "Index expression must be made up of positive "
             + "integers, comma-separated integers, or ranges like 1-3.";
+
+    private static final String DATE_PATTERN_NO_HYPHENS = "\\d{8}";
+    private static final String DATE_PATTERN_DAY_FIRST_SLASHES = "\\d{2}/\\d{2}/\\d{4}";
+    private static final String DATE_PATTERN_DAY_FIRST_HYPHENS = "\\d{2}-\\d{2}-\\d{4}";
+    private static final String DATE_PATTERN_YYYY_MM_DD = "\\d{4}-\\d{2}-\\d{2}";
+    private static final String DATE_FIELD_SEPARATOR = "-";
+    private static final int MONTH_MIN = 1;
+    private static final int MONTH_MAX = 12;
+    private static final int DAY_MIN = 1;
+
+    private static final int DATE_NO_HYPHENS_YEAR_START = 0;
+    private static final int DATE_NO_HYPHENS_YEAR_END = 4;
+    private static final int DATE_NO_HYPHENS_MONTH_START = 4;
+    private static final int DATE_NO_HYPHENS_MONTH_END = 6;
+    private static final int DATE_NO_HYPHENS_DAY_START = 6;
+    private static final int DATE_NO_HYPHENS_DAY_END = 8;
+
+    private static final Logger logger = LogsCenter.getLogger(ParserUtil.class);
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -240,17 +265,143 @@ public class ParserUtil {
 
     /**
      * Parses a date string in yyyy-MM-dd format.
+     *
+     * @param date The date to parse.
+     * @return the Date in {@code LocalDate}.
+     * @throws ParseException if input is not in valid yyyy-mm-dd format.
      */
     public static LocalDate parseSessionDate(String date)
             throws ParseException {
         requireNonNull(date);
         String trimmedDate = date.trim();
-
+        if (trimmedDate.isEmpty()) {
+            throw new ParseException(Session.MESSAGE_CONSTRAINTS);
+        }
         try {
             return LocalDate.parse(trimmedDate, Session.DATE_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new ParseException(Session.MESSAGE_CONSTRAINTS);
-            // TODO: Show specific and nicer error messages for user
+            String errorMessage = getDateErrorMessage(trimmedDate);
+            logger.warning("Invalid date input: " + trimmedDate + " -- " + errorMessage);
+            throw new ParseException(errorMessage);
         }
+    }
+
+    /**
+     * Returns a specific error message explaining why the input is not a valid yyyy-MM-dd date.
+     * Falls back to {@link Session#MESSAGE_CONSTRAINTS} if no specific reason applies.
+     */
+    private static String getDateErrorMessage(String input) {
+        assert input != null;
+
+        if (!hasCorrectDateStructure(input)) {
+            return getStructuralErrorMessage(input);
+        }
+        return getCalendarErrorMessage(input);
+    }
+
+    /**
+     * Returns true if the input matches the yyyy-MM-dd skeleton (digits and hyphens only).
+     */
+    private static boolean hasCorrectDateStructure(String input) {
+        return input.matches(DATE_PATTERN_YYYY_MM_DD);
+    }
+
+    /**
+     * Returns an error message for inputs that fail the structural yyyy-MM-dd check.
+     * Recognizes formats like "dd-mm-yyyy" and "yyyymmdd" and suggests a correction where possible.
+     */
+    private static String getStructuralErrorMessage(String input) {
+        if (hasMissingHyphens(input)) {
+            return "Date format is incorrect. Did you mean " + insertHyphens(input) + "? "
+                    + Session.MESSAGE_CONSTRAINTS;
+        }
+        if (hasDayAtStartOfDateString(input)) {
+            return "Date appears to be in day-month-year order. "
+                    + "Please use year-month-day instead. "
+                    + Session.MESSAGE_CONSTRAINTS;
+        }
+        return Session.MESSAGE_CONSTRAINTS;
+    }
+
+    /**
+     * Returns true if input looks like a date with hyphens omitted, e.g. {"20260316"}.
+     */
+    private static boolean hasMissingHyphens(String input) {
+        return input.matches(DATE_PATTERN_NO_HYPHENS);
+    }
+
+    /**
+     * Returns true if input looks like a dd/MM/yyyy or dd-MM-yyyy date.
+     */
+    private static boolean hasDayAtStartOfDateString(String input) {
+        return input.matches(DATE_PATTERN_DAY_FIRST_HYPHENS) || input.matches(DATE_PATTERN_DAY_FIRST_SLASHES);
+    }
+
+    /**
+     * Inserts hyphens into an 8-digit string to produce a yyyy-MM-dd suggestion.
+     * Precondition: input matches a "yyyymmdd" format.
+     */
+    private static String insertHyphens(String input) {
+        assert input.matches(DATE_PATTERN_NO_HYPHENS);
+        return input.substring(DATE_NO_HYPHENS_YEAR_START, DATE_NO_HYPHENS_YEAR_END) + "-"
+                + input.substring(DATE_NO_HYPHENS_MONTH_START, DATE_NO_HYPHENS_MONTH_END) + "-"
+                + input.substring(DATE_NO_HYPHENS_DAY_START, DATE_NO_HYPHENS_DAY_END);
+    }
+
+    /**
+     * Returns a specific error message explaining why the input is not a valid yyyy-MM-dd date.
+     * Assumes input has already been trimmed.
+     */
+    private static String getCalendarErrorMessage(String input) {
+        String[] parts = input.split(DATE_FIELD_SEPARATOR);
+        try {
+            int year = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int day = Integer.parseInt(parts[2]);
+
+            if (!isValidMonth(month)) {
+                return getInvalidMonthMessage(month);
+            }
+            if (!isValidDay(year, month, day)) {
+                return getInvalidDayMessage(year, month, day);
+            }
+        } catch (NumberFormatException | DateTimeException e) {
+            assert false : "Unexpected parse failure for structurally valid date: " + input;
+        }
+
+        assert false : "Date passed structural and calendar checks but was still invalid: " + input;
+        return Session.MESSAGE_CONSTRAINTS;
+    }
+
+    /**
+     * Returns true if month is within the valid range 1–12.
+     */
+    private static boolean isValidMonth(int month) {
+        return month >= MONTH_MIN && month <= MONTH_MAX;
+    }
+
+    /**
+     * Returns true if day is a valid day for the given month and year.
+     */
+    private static boolean isValidDay(int year, int month, int day) {
+        return day >= DAY_MIN && day <= YearMonth.of(year, month).lengthOfMonth();
+    }
+
+    /**
+     * Returns an error message for an out-of-range month value.
+     */
+    private static String getInvalidMonthMessage(int month) {
+        return String.format("Invalid month: %d. Month must be between %02d and %02d.",
+                month, MONTH_MIN, MONTH_MAX);
+    }
+
+    /**
+     * Returns an error message for an out-of-range day value, naming the month and its actual length.
+     */
+    private static String getInvalidDayMessage(int year, int month, int day) {
+        YearMonth ym = YearMonth.of(year, month);
+        int daysInMonth = ym.lengthOfMonth();
+        String monthName = Month.of(month).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        return String.format("Invalid day: %d. %s %d only has %d days.", day, monthName, year, daysInMonth);
     }
 }

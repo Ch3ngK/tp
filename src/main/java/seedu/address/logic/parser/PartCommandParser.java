@@ -55,8 +55,10 @@ public class PartCommandParser implements Parser<PartCommand> {
                     new Participation(argMultimap.getValue(PREFIX_PARTICIPATION).get());
 
             return new PartCommand(index, date, groupName, participation);
-        } catch (IllegalArgumentException | ParseException e) {
+        } catch (IllegalArgumentException e) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE), e);
+        } catch (ParseException e) {
+            throw e;
         }
     }
 }

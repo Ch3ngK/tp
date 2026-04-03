@@ -12,8 +12,8 @@ import seedu.address.commons.core.LogsCenter;
  */
 public class MatricNumber {
 
-    public static final String MESSAGE_CONSTRAINTS = "Matriculation numbers should start with `A`,"
-            + " followed by 7 digits and end with a valid checksum letter.";
+    public static final String MESSAGE_CONSTRAINTS = "Matriculation number should not be blank "
+            + "and should start with `A`, followed by 7 digits and end with a valid checksum letter.";
 
     public static final String MESSAGE_INVALID_CHECKSUM =
             "The matriculation number checksum letter is incorrect. For the given digits, it should be '%c'.";
