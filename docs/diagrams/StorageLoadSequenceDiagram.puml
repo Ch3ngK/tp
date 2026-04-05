@@ -1,0 +1,43 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+skinparam defaultFontSize 14
+
+box Storage STORAGE_COLOR_T1
+participant ":StorageManager" as StorageManager STORAGE_COLOR
+participant ":JsonAddressBookStorage" as JsonAddressBookStorage STORAGE_COLOR
+participant ":JsonSerializable\nAddressBook" as JsonSerializableAddressBook STORAGE_COLOR
+end box
+
+[-> StorageManager : readAddressBook()
+activate StorageManager
+
+StorageManager -> JsonAddressBookStorage : readAddressBook(...)
+activate JsonAddressBookStorage
+
+create JsonSerializableAddressBook
+JsonAddressBookStorage -> JsonSerializableAddressBook : toModelType()
+activate JsonSerializableAddressBook
+
+JsonSerializableAddressBook --> JsonAddressBookStorage
+deactivate JsonSerializableAddressBook
+JsonSerializableAddressBook -[hidden]-> JsonAddressBookStorage
+destroy JsonSerializableAddressBook
+
+JsonAddressBookStorage --> StorageManager
+deactivate JsonAddressBookStorage
+
+[<-- StorageManager
+deactivate StorageManager
+
+[-> StorageManager : getLastLoadWarnings()
+activate StorageManager
+StorageManager -> JsonAddressBookStorage : getLastLoadWarnings()
+activate JsonAddressBookStorage
+JsonAddressBookStorage --> StorageManager
+deactivate JsonAddressBookStorage
+[<-- StorageManager
+deactivate StorageManager
+
+@enduml
+

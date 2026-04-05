@@ -13,7 +13,8 @@ pageNav: 3
 
 ## **Acknowledgements**
 
-_{ list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well }_
+* The algorithm used to calculate the matric number checksum was posted by Beng Hee Eu. It can be found [here](http://interrobeng.com/2014/01/19/nus-matriculation-number-check-digit-algorithm/). Our implementation was made based on his algorithm.
+
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -168,6 +169,23 @@ The `Model` component,
 
 -> <puml src="diagrams/StorageClassDiagram.puml" width="800px"/> <-
 
+The sequence diagram below illustrates the interactions within the `Storage` component when data is loaded during initialization.
+
+-> <puml src="diagrams/StorageLoadSequenceDiagram.puml" width="600px"/> <-
+
+<box type="info" seamless>
+
+**Note:** The lifeline for `JsonSerializableAddressBook` should end at the destroy marker (X) but due to a limitation of PlantUML, the lifeline continues till the end of diagram.
+
+</box>
+
+How the load works:
+* `JsonAddressBookStorage` delegates to `JsonSerializableAddressBook#toModelType()` to parse the JSON data into `Model` objects. During this process, each person and group entry is validated against the current group and assignment data.
+* Entries with invalid fields, missing group references, or inconsistent assignment grades are skipped rather than causing the entire load to fail. The app continues loading with the remaining valid entries.
+* Skipped entries are preserved back into the data file on the next save, so no data is permanently lost. Warnings generated during this process are retrieved via `StorageManager#getLastLoadWarnings()` and displayed to the user on startup.
+* Previously skipped entries are re-attempted on every subsequent load. If the underlying issue has been resolved (e.g., a missing group was manually added back to the file), the entry will be successfully loaded on the next launch.
+* If the data file is blank or empty, the app loads sample data instead. If the file contains malformed JSON, the app starts with an empty address book and blocks all saves for that session to prevent overwriting the original file.
+
 The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
 * inherits from both `AddressBookStorage` and `UserPrefStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
@@ -317,6 +335,12 @@ _{Explain here how the data archiving feature will be implemented}_
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
+<box type="info" seamless>
+
+The term `contacts` and `students` are used interchangeably in user stories and use cases.
+
+</box>
+
 | Priority | As a …​           | I want to …​                                                         | So that I can…​                                                                               |
 |----------|-------------------|----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
 | `* * *`  | user              | add basic contact details                                            | add students to my app                                                                        |
@@ -360,6 +384,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `*`      | user              | sort students alphabetically                                         | view my student contacts in alphabetical order                                                |
 | `*`      | user              | sort students by tutorial groups                                     | view student contacts based on what tutorial group they are in                                |
 | `*`      | user              | view my students in a paginated list of 40 students per page         | view students page by page without having to keep scrolling down                              |
+|   `*`    | user              | undo my previous action                                              | undo my most recent command                                                                   |
+|   `*`    | user              | redo my previous action                                              | redo my most recent undo                                                                      |
 | `*`      | busy user         | set a recurring weekly schedule for a tutorial group                 | be reminded of when my tutorial sessions are                                                  |
 | `*`      | busy user         | add a temporary tutorial session                                     | keep track of additional tutorials like consultations or make-up classes                      |
 | `*`      | busy user         | view a list of my upcoming tutorials for the week                    | view how many remaining tutorial sessions I have for the week                                 |
@@ -369,14 +395,124 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `*`      | long-term user    | export the program data as a backup                                  | prevent losing all my data if I switch devices                                                |
 | `*`      | long-term user    | make new shortcuts for commands or strings                           | use the app more efficiently                                                                  |
 
-
 ---
 
 <div style="page-break-after: always;"></div>
 
 ### Use cases
 
-(For all use cases below, the **System** is the `Teacher Assistant's Assistant (TAA)` and the **Actor** is the `Teaching Assistant (TA)`, unless specified otherwise)
+(For all use cases below, the **System** is the `Teacher Assistant's Assistant (TAA)`, referred to as `TAA`, and the **Actor** is the `Teaching Assistant (TA)`, unless specified otherwise)
+
+**Use case: UC1 - Add a contact**
+
+**MSS**
+
+1. User chooses to add a contact with the required details.
+2. TAA adds the contact.
+
+   Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects missing fields.
+
+    * 1a1. TAA rejects the command.
+    * 1a2. User re-enters the command with the missing fields.
+  
+        Steps 1a1-1a2 are repeated till all fields are present.
+        Use case resumes from step 1.
+
+* 1b. TAA detects errors in fields provided.
+
+    * 1b1. TAA rejects the command.
+    * 1b2. User re-enters corrected fields.
+
+        Steps 1b1-1b2 are repeated till all fields are correct.
+       
+        Use case ends resumes from step 1.
+
+* 1c. TAA detects a duplicate matriculation number in existing contacts.
+
+    * 1c1. TAA rejects the command.
+    * 1c2. User re-enters the matriculation number field.
+  
+        Steps 1c1-1c2 are repeated until contact is no longer a duplicate.
+
+        Use case resumes from step 1.
+---
+
+**Use case: UC2 - Delete a contact**
+
+**MSS**
+
+1.  User requests to list contacts.
+2.  TAA shows a list of contacts.
+3.  User requests to delete a specific contact by index.
+4.  TAA deletes the contact.
+
+    Use case ends.
+
+**Extensions**
+
+* 2a. The list is empty. 
+
+    Use case ends.
+
+* 3a. The given index is invalid.
+
+    * 3a1. TAA rejects the command.
+    * 3a2. User re-enters command with a valid index.
+
+      Use case resumes at step 3.
+
+---
+
+**Use case: UC3 - Edit a contact**
+
+**MSS**
+
+1.  User requests to list contacts.
+2.  TAA shows a list of contacts.
+3.  User requests to edit a specific contact in the list by index.
+4.  TAA updates the contact.
+
+    Use case ends.
+
+**Extensions**
+
+* 3a. The given index is invalid.
+
+    * 3a1. TAA rejects the command.
+    * 3a2. User re-enters command with a valid index.
+
+      Use case resumes at step 3.
+
+* 3b. No fields to edit are provided.
+
+    * 3b1. TAA rejects the command.
+    * 3b2. User re-enters command with the missing fields.
+
+      Use case resumes at step 3.
+  
+* 3c. An edited field value is invalid.
+
+    * 3c1. TAA rejects the command.
+    * 3c2. User re-enters the command with the corrected fields.
+  
+        Steps 3c1-3c2 are repeated until the fields are valid.
+  
+        Use case resumes at step 3.
+  
+* 3d. The edit would result in a duplicate contact.
+
+    * 3d1. TAA rejects the command. 
+    * 3d2. User re-enters command with a different matriculation number.
+
+        Steps 3d1-3d2 are repeated until the contact is no longer a duplicate.     
+
+        Use case resumes at step 3.
+
+---
 
 **Use case: Switch to a class space**
 
@@ -464,58 +600,6 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
     * 4a1. AddressBook shows a message indicating no change was made.
 
       Use case ends.
-
----
-
-**Use case: Delete a person**
-
-**MSS**
-
-1.  User requests to list persons
-2.  AddressBook shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
-
-    Use case ends.
-
-**Extensions**
-
-* 2a. The list is empty.
-
-  Use case ends.
-
-* 3a. The given index is invalid.
-
-    * 3a1. AddressBook shows an error message.
-
-      Use case resumes at step 2.
-
----
-
-**Use case: Edit a contact**
-
-**MSS**
-
-1.  User requests to list persons
-2.  AddressBook shows a list of persons
-3.  User requests to edit a specific contact in the list
-4.  AddressBook updates the contact and shows a confirmation message
-
-    Use case ends.
-
-**Extensions**
-
-* 3a. The given index is invalid.
-
-    * 3a1. AddressBook shows an error message.
-
-      Use case resumes at step 2.
-
-* 3b. No fields to edit are provided.
-
-    * 3b1. AddressBook shows an error message.
-
-      Use case resumes at step 2.
 
 ---
 
@@ -628,3 +712,14 @@ testers are expected to do more *exploratory* testing.
    1. _{explain how to simulate a missing/corrupted file, and the expected behavior}_
 
 1. _{ more test cases …​ }_
+
+
+## Appendix: Effort
+
+### Difficulties & Challenges
+
+### Effort & Achievements
+
+## Appendix: Planned Enhancements
+
+Team size: 5

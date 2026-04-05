@@ -57,6 +57,9 @@ class JsonSerializableAddressBook {
         if (preservedSkippedGroups != null) {
             this.preservedSkippedGroups.addAll(preservedSkippedGroups);
         }
+
+        // loadWarnings parameter is meant for JSON deserialization but is intentionally discarded.
+        // It prevents old warnings from persisting across sessions.
     }
 
     /**
