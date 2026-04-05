@@ -480,6 +480,18 @@
     -fx-border-radius: 8;
 }
 
+.attendance-matrix-year-header {
+    -fx-font-size: 11px;
+    -fx-text-fill: #f7fbfc;
+    -fx-alignment: center;
+    -fx-padding: 6 10 6 10;
+}
+
+.attendance-matrix-year-header-active {
+    -fx-border-color: #f3e3a2;
+    -fx-border-width: 1.5;
+}
+
 .attendance-matrix-header-student {
     -fx-alignment: center-left;
     -fx-min-width: 180;
@@ -493,9 +505,50 @@
     -fx-background-color: linear-gradient(to bottom, #5a6a6d, #485255);
 }
 
+.attendance-matrix-year-tone-teal {
+    -fx-background-color: linear-gradient(to bottom, #2f6f63, #25584f);
+    -fx-border-color: #6fc7b2;
+}
+
+.attendance-matrix-year-tone-amber {
+    -fx-background-color: linear-gradient(to bottom, #7a5a25, #62471d);
+    -fx-border-color: #e0bd67;
+}
+
+.attendance-matrix-year-tone-coral {
+    -fx-background-color: linear-gradient(to bottom, #7a4341, #633534);
+    -fx-border-color: #e18d88;
+}
+
+.attendance-matrix-year-tone-violet {
+    -fx-background-color: linear-gradient(to bottom, #5f4d85, #4d3f6c);
+    -fx-border-color: #b19be6;
+}
+
+.attendance-matrix-year-tone-slate {
+    -fx-background-color: linear-gradient(to bottom, #475e72, #394b5b);
+    -fx-border-color: #87abc8;
+}
+
+.attendance-matrix-year-tone-emerald {
+    -fx-background-color: linear-gradient(to bottom, #2f7a4f, #255f3e);
+    -fx-border-color: #73d49d;
+}
+
+.attendance-matrix-year-tone-copper {
+    -fx-background-color: linear-gradient(to bottom, #8a5938, #6f472d);
+    -fx-border-color: #e1a57a;
+}
+
+.attendance-matrix-year-tone-indigo {
+    -fx-background-color: linear-gradient(to bottom, #405c8a, #334970);
+    -fx-border-color: #8fb0ea;
+}
+
 .attendance-matrix-header-active {
     -fx-background-color: #3e7b91;
     -fx-border-color: #8fd4ea;
+    -fx-effect: dropshadow(gaussian, rgba(143, 212, 234, 0.32), 10, 0.35, 0, 0);
 }
 
 .attendance-matrix-header-summary {

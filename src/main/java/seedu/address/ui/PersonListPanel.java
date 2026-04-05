@@ -3,6 +3,7 @@ package seedu.address.ui;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,11 +43,14 @@ public class PersonListPanel extends UiPart<Region> {
             DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
     private static final DateTimeFormatter COMMAND_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final int STUDENT_COLUMN_INDEX = 0;
-    private static final int HEADER_ROW_INDEX = 0;
-    private static final int FIRST_DATA_ROW_OFFSET = 1;
+    private static final int YEAR_HEADER_ROW_INDEX = 0;
+    private static final int DATE_HEADER_ROW_INDEX = 1;
+    private static final int FIRST_DATA_ROW_OFFSET = 2;
     private static final int COLUMN_INDEX_OFFSET = 1;
     private static final int EVEN_ROW_MODULUS = 2;
     private static final double STUDENT_COLUMN_WIDTH = 180;
+    private static final double DATE_COLUMN_WIDTH = 96;
+    private static final double MATRIX_GRID_GAP = 4;
     private static final double MATRIX_CELL_HEIGHT = 64;
     private final ObservableList<Person> allPersons;
     private final CommandBox.CommandExecutor commandExecutor;
@@ -166,6 +170,7 @@ public class PersonListPanel extends UiPart<Region> {
         }
 
         List<LocalDate> sessionDates = getSessionDates(activeGroupName);
+        boolean hasMultipleSessionYears = spansMultipleYears(sessionDates);
 
         LocalDate focusDate = activeSessionDate != null
                 ? activeSessionDate
@@ -176,9 +181,10 @@ public class PersonListPanel extends UiPart<Region> {
                 : getSessionNote(activeGroupName, activeSessionDate);
         attendanceMatrixTitle.setText(buildMatrixTitle(activeGroupName, activeSessionDate));
         attendanceMatrixSubtitle.setText(buildMatrixSubtitle(activeSessionDate, activeSessionNote));
-        populateMatrixMeta(personList.size(), sessionDates.size(), activeSessionDate, activeSessionNote);
+        populateMatrixMeta(personList.size(), sessionDates.size(), activeSessionDate, activeSessionNote,
+                hasMultipleSessionYears);
         populateLegend();
-        populateSummary(personList, activeGroupName, focusDate);
+        populateSummary(personList, activeGroupName, focusDate, hasMultipleSessionYears);
         attendanceMatrixScrollHint.setVisible(sessionDates.size() > 4);
         attendanceMatrixScrollHint.setManaged(sessionDates.size() > 4);
 
@@ -234,22 +240,25 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private void populateMatrixMeta(int studentCount, int sessionCount, LocalDate activeSessionDate,
-                                    String activeSessionNote) {
+                                    String activeSessionNote, boolean hasMultipleSessionYears) {
         attendanceMatrixMeta.getChildren().clear();
         attendanceMatrixMeta.getChildren().add(createMetaChip(studentCount + " students"));
         attendanceMatrixMeta.getChildren().add(createMetaChip(sessionCount + " sessions"));
         attendanceMatrixMeta.getChildren().add(createMetaChip(
                 activeSessionDate == null
                         ? "No date highlighted"
-                        : "Highlight " + activeSessionDate.format(MATRIX_DATE_FORMATTER)));
+                        : "Highlight " + formatMatrixContextDate(activeSessionDate, hasMultipleSessionYears)));
         if (!activeSessionNote.isBlank()) {
             attendanceMatrixMeta.getChildren().add(createMetaChip("Note: " + activeSessionNote,
                     "attendance-matrix-note-chip"));
         }
         if (currentVisibleRangeStart != null || currentVisibleRangeEnd != null) {
+            boolean includeYearInRange = shouldIncludeYearForRange(currentVisibleRangeStart, currentVisibleRangeEnd);
             String rangeText = String.format("Range %s to %s",
-                    currentVisibleRangeStart == null ? "start" : currentVisibleRangeStart.format(MATRIX_DATE_FORMATTER),
-                    currentVisibleRangeEnd == null ? "end" : currentVisibleRangeEnd.format(MATRIX_DATE_FORMATTER));
+                    currentVisibleRangeStart == null ? "start"
+                            : formatMatrixContextDate(currentVisibleRangeStart, includeYearInRange),
+                    currentVisibleRangeEnd == null ? "end"
+                            : formatMatrixContextDate(currentVisibleRangeEnd, includeYearInRange));
             attendanceMatrixMeta.getChildren().add(createMetaChip(rangeText));
         }
     }
@@ -264,7 +273,8 @@ public class PersonListPanel extends UiPart<Region> {
 
     private void populateSummary(ObservableList<Person> personList,
                                  GroupName activeGroupName,
-                                 LocalDate focusDate) {
+                                 LocalDate focusDate,
+                                 boolean hasMultipleSessionYears) {
         if (focusDate == null) {
             attendanceMatrixSummary.setText("Create or add a session to see per-session attendance totals.");
             return;
@@ -286,21 +296,41 @@ public class PersonListPanel extends UiPart<Region> {
         String noteSuffix = buildSessionNoteSuffix(activeGroupName, focusDate);
         attendanceMatrixSummary.setText(String.format(
                 "Summary for %s%s: %d present, %d absent, %d uninitialised.",
-                focusDate.format(MATRIX_DATE_FORMATTER), noteSuffix, presentCount, absentCount, uninitialisedCount));
+                formatMatrixContextDate(focusDate, hasMultipleSessionYears),
+                noteSuffix, presentCount, absentCount, uninitialisedCount));
     }
 
     private void addHeaderRow(List<LocalDate> sessionDates,
                               GroupName activeGroupName,
                               LocalDate activeSessionDate) {
-        attendanceMatrixGrid.add(createHeaderLabel("Student", true, null), STUDENT_COLUMN_INDEX, HEADER_ROW_INDEX);
+        attendanceMatrixGrid.add(createHeaderLabel("Student", true, null),
+                STUDENT_COLUMN_INDEX, YEAR_HEADER_ROW_INDEX, 1, 2);
+        List<YearHeaderGroup> yearGroups = addYearHeaderRow(sessionDates, activeSessionDate);
         for (int columnIndex = 0; columnIndex < sessionDates.size(); columnIndex++) {
             LocalDate sessionDate = sessionDates.get(columnIndex);
-            Label headerLabel = createHeaderLabel(sessionDate.format(MATRIX_DATE_FORMATTER), false, sessionDate);
+            Label headerLabel = createHeaderLabel(formatMatrixHeaderDate(sessionDates, columnIndex), false, sessionDate);
             if (sessionDate.equals(activeSessionDate)) {
                 headerLabel.getStyleClass().add("attendance-matrix-header-active");
             }
-            attendanceMatrixGrid.add(headerLabel, columnIndex + COLUMN_INDEX_OFFSET, HEADER_ROW_INDEX);
+            headerLabel.getStyleClass().add(yearToneStyleClass(sessionDate.getYear()));
+            attendanceMatrixGrid.add(headerLabel, columnIndex + COLUMN_INDEX_OFFSET, DATE_HEADER_ROW_INDEX);
         }
+    }
+
+    private List<YearHeaderGroup> addYearHeaderRow(List<LocalDate> sessionDates, LocalDate activeSessionDate) {
+        List<YearHeaderGroup> yearGroups = buildYearHeaderGroups(sessionDates);
+        for (int groupIndex = 0; groupIndex < yearGroups.size(); groupIndex++) {
+            YearHeaderGroup yearGroup = yearGroups.get(groupIndex);
+            Label yearHeader = createYearHeaderLabel(yearGroup.year(), yearGroup.startColumn(),
+                    yearGroup.columnSpan(), activeSessionDate, sessionDates);
+            yearHeader.getStyleClass().add(yearToneStyleClass(yearGroup.year()));
+            attendanceMatrixGrid.add(yearHeader,
+                    yearGroup.startColumn() + COLUMN_INDEX_OFFSET,
+                    YEAR_HEADER_ROW_INDEX,
+                    yearGroup.columnSpan(),
+                    1);
+        }
+        return yearGroups;
     }
 
     private void addStudentRows(ObservableList<Person> personList,
@@ -324,7 +354,8 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private void addEmptyStateStudentRows(ObservableList<Person> personList) {
-        attendanceMatrixGrid.add(createHeaderLabel("Student", true, null), STUDENT_COLUMN_INDEX, HEADER_ROW_INDEX);
+        attendanceMatrixGrid.add(createHeaderLabel("Student", true, null),
+                STUDENT_COLUMN_INDEX, YEAR_HEADER_ROW_INDEX, 1, 2);
         for (int rowIndex = 0; rowIndex < personList.size(); rowIndex++) {
             Person person = personList.get(rowIndex);
             String rowStyleClass = getRowStyleClass(rowIndex);
@@ -363,9 +394,9 @@ public class PersonListPanel extends UiPart<Region> {
             headerLabel.setPrefWidth(STUDENT_COLUMN_WIDTH);
             headerLabel.setMaxWidth(STUDENT_COLUMN_WIDTH);
         } else {
-            headerLabel.setMinWidth(96);
-            headerLabel.setPrefWidth(96);
-            headerLabel.setMaxWidth(96);
+            headerLabel.setMinWidth(DATE_COLUMN_WIDTH);
+            headerLabel.setPrefWidth(DATE_COLUMN_WIDTH);
+            headerLabel.setMaxWidth(DATE_COLUMN_WIDTH);
             headerLabel.setWrapText(true);
             headerLabel.getStyleClass().add("attendance-matrix-header-clickable");
             String sessionNote = currentActiveGroupName == null
@@ -383,6 +414,39 @@ public class PersonListPanel extends UiPart<Region> {
         headerLabel.setPrefHeight(MATRIX_CELL_HEIGHT);
         headerLabel.setMaxHeight(MATRIX_CELL_HEIGHT);
         return headerLabel;
+    }
+
+    private Label createYearHeaderLabel(int year, int startColumn, int columnSpan, LocalDate activeSessionDate,
+                                        List<LocalDate> sessionDates) {
+        Label headerLabel = new Label(String.valueOf(year));
+        headerLabel.getStyleClass().addAll("attendance-matrix-header", "attendance-matrix-year-header");
+        if (activeSessionDate != null && activeSessionDate.getYear() == year) {
+            headerLabel.getStyleClass().add("attendance-matrix-year-header-active");
+        }
+        headerLabel.setTooltip(new Tooltip(buildYearHeaderTooltip(year, startColumn, columnSpan, sessionDates)));
+        headerLabel.setPadding(new Insets(6, 8, 6, 8));
+        headerLabel.setMinHeight(36);
+        headerLabel.setPrefHeight(36);
+        headerLabel.setMaxHeight(36);
+        double headerWidth = computeYearHeaderWidth(columnSpan);
+        headerLabel.setMinWidth(headerWidth);
+        headerLabel.setPrefWidth(headerWidth);
+        headerLabel.setMaxWidth(headerWidth);
+        return headerLabel;
+    }
+
+    private static double computeYearHeaderWidth(int columnSpan) {
+        return (columnSpan * DATE_COLUMN_WIDTH) + ((columnSpan - 1) * MATRIX_GRID_GAP);
+    }
+
+    private String buildYearHeaderTooltip(int year, int startColumn, int columnSpan, List<LocalDate> sessionDates) {
+        LocalDate firstDate = sessionDates.get(startColumn);
+        LocalDate lastDate = sessionDates.get(startColumn + columnSpan - 1);
+        return String.format("%d sessions in %d\n%s to %s",
+                columnSpan,
+                year,
+                firstDate.format(COMMAND_DATE_FORMATTER),
+                lastDate.format(COMMAND_DATE_FORMATTER));
     }
 
     private Label createMetaChip(String text) {
@@ -488,6 +552,65 @@ public class PersonListPanel extends UiPart<Region> {
             // MainWindow already updates the result display on failure.
         }
     }
+
+    static String formatMatrixHeaderDate(List<LocalDate> sessionDates, int columnIndex) {
+        return sessionDates.get(columnIndex).format(MATRIX_DATE_FORMATTER);
+    }
+
+    static boolean spansMultipleYears(List<LocalDate> sessionDates) {
+        return sessionDates.stream()
+                .map(LocalDate::getYear)
+                .distinct()
+                .limit(2)
+                .count() > 1;
+    }
+
+    static List<YearHeaderGroup> buildYearHeaderGroups(List<LocalDate> sessionDates) {
+        if (sessionDates.isEmpty()) {
+            return List.of();
+        }
+
+        java.util.ArrayList<YearHeaderGroup> groups = new java.util.ArrayList<>();
+        int currentYear = sessionDates.get(0).getYear();
+        int startColumn = 0;
+
+        for (int columnIndex = 1; columnIndex < sessionDates.size(); columnIndex++) {
+            int year = sessionDates.get(columnIndex).getYear();
+            if (year != currentYear) {
+                groups.add(new YearHeaderGroup(currentYear, startColumn, columnIndex - startColumn));
+                currentYear = year;
+                startColumn = columnIndex;
+            }
+        }
+
+        groups.add(new YearHeaderGroup(currentYear, startColumn, sessionDates.size() - startColumn));
+        return groups;
+    }
+
+    private static boolean shouldIncludeYearForRange(LocalDate rangeStart, LocalDate rangeEnd) {
+        return rangeStart != null && rangeEnd != null && rangeStart.getYear() != rangeEnd.getYear();
+    }
+
+    private static String formatMatrixContextDate(TemporalAccessor date, boolean includeYear) {
+        return includeYear
+                ? MATRIX_TITLE_DATE_FORMATTER.format(date)
+                : MATRIX_DATE_FORMATTER.format(date);
+    }
+
+    static String yearToneStyleClass(int year) {
+        return switch (Math.floorMod(year, 8)) {
+        case 0 -> "attendance-matrix-year-tone-teal";
+        case 1 -> "attendance-matrix-year-tone-amber";
+        case 2 -> "attendance-matrix-year-tone-coral";
+        case 3 -> "attendance-matrix-year-tone-violet";
+        case 4 -> "attendance-matrix-year-tone-slate";
+        case 5 -> "attendance-matrix-year-tone-emerald";
+        case 6 -> "attendance-matrix-year-tone-copper";
+        default -> "attendance-matrix-year-tone-indigo";
+        };
+    }
+
+    record YearHeaderGroup(int year, int startColumn, int columnSpan) { }
 
     /**
      * Custom {@code ListCell} that displays the graphics of a {@code Person} using a {@code PersonCard}.
