@@ -25,5 +25,8 @@
   "deploy": {
     "message": "Site Update."
   },
-  "timeZone": "Asia/Singapore"
+  "timeZone": "Asia/Singapore",
+  "plugins": [
+    "codeBlockCopyButtons"
+  ]
 }
