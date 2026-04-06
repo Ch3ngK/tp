@@ -104,7 +104,7 @@ Format: `add n/NAME p/PHONE e/EMAIL m/MATRICULATION_NUMBER [t/TAG]…​`
 </box>
 
 **Related FAQs:**
-* [What are the valid formats for each field of an `add` command?](#faq-add_valid_formats)
+* [What are the valid formats for the fields of an `add` or `edit` command?](#faq-add_edit_valid_formats)
 * [What is considered a duplicate contact?](#faq-duplicate)
 
 Examples:
@@ -134,6 +134,7 @@ Examples:
 *  `edit i/2 n/Betsy Crower t/` Edits the name of the 2nd person to be `Betsy Crower` and clears all existing tags.
 
 **Related FAQs:**
+* [What are the valid formats for the fields of an `add` or `edit` command?](#faq-add_edit_valid_formats)
 * [What is considered a duplicate contact?](#faq-duplicate)
 * [What happens when I edit the tags of a contact?](#faq-edit_tags)
 * [How can I remove all tags from a contact?](#faq-remove_tags)
@@ -614,11 +615,20 @@ Action     | Format, Examples
 
 ## Frequently Asked Questions (FAQs)
 
-<panel id="faq-add_valid_formats" header="What are the valid formats for each field of an `add` command?" type="seamless" expanded>
+<panel id="faq-add_edit_valid_formats" header="What are the valid formats for the fields of an `add` or `edit` command?" type="seamless" expanded>
 
 
-* **Name:**
-  * Examples:
+* **Name:** Cannot start or end with a space, apostrophe (`'`), hyphen (`-`), or forward slash (`/`) and must adhere to these constraints:
+  * Separators like apostrophes, hyphens and forward slashes must be followed by a letter, number or combining mark.
+    * Combining mark refers to characters like `á`, `é`, `í`, `ó`, `ú`.
+  * Valid name characters include: 
+    * Unicode letters (examples: `ã`, `ó`, `ô`, `ç`)
+    * Numbers
+    * Spaces
+    * Apostrophes
+    * Hyphens
+    * Forward slashes
+  * Examples: `Mary-Jane O'Brien`, `X Æ A-Xii`, `Renée`
 * **Phone:** Must only contain numbers and be at least 3 digits long
   * Examples: `123`, `88702270`, `2244668899`
 * **Email:** Must be in format of local-part@domain and adhere to these constraints:
@@ -629,7 +639,7 @@ Action     | Format, Examples
     * Have each domain label start and end with alphanumeric characters
     * Have each domain label consist of alphanumeric characters, separated only by hyphens, if any.
   * Examples: `example@gmail.com`, `e1111111@u.nus.edu.sg`, `jack_neo@u.nus.edu.sg`
-* **Matriculation number:** Must start with `A`, followed by 7 digits, and end with a valid checksum letter.
+* **Matriculation number:** Must be a valid NUS matriculation number, starting with `A`, followed by 7 digits, and end with a letter.
   * Examples:`A0123456J`, `A0308440M`, `A0308676R`
 * **Tags:** Must only contain alphanumeric characters and cannot contain spaces.
   * Examples:`groupB`, `exchangeStudent`, `bestFriends` 
