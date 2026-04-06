@@ -13,11 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.group.GroupName;
-import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Name;
-import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.person.Session;
@@ -36,8 +34,6 @@ class JsonAdaptedPerson {
     private final String phone;
     private final String email;
     private final String matricNumber;
-    private final String attendance;
-    private final Integer participation;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
     private final List<String> groups = new ArrayList<>();
     private final Map<String, List<JsonAdaptedSession>> groupSessions = new HashMap<>();
@@ -47,10 +43,11 @@ class JsonAdaptedPerson {
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
      */
     @JsonCreator
-    public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
-            @JsonProperty("email") String email, @JsonProperty("matricNumber") String matricNumber,
-            @JsonProperty("attendance") String attendance,
-            @JsonProperty("participation") Integer participation,
+    public JsonAdaptedPerson(
+            @JsonProperty("name") String name,
+            @JsonProperty("phone") String phone,
+            @JsonProperty("email") String email,
+            @JsonProperty("matricNumber") String matricNumber,
             @JsonProperty("tags") List<JsonAdaptedTag> tags,
             @JsonProperty("groups") List<String> groups,
             @JsonProperty("groupSessions") Map<String, List<JsonAdaptedSession>> groupSessions,
@@ -59,8 +56,6 @@ class JsonAdaptedPerson {
         this.phone = phone;
         this.email = email;
         this.matricNumber = matricNumber;
-        this.attendance = attendance;
-        this.participation = participation;
         if (tags != null) {
             this.tags.addAll(tags);
         }
@@ -83,18 +78,8 @@ class JsonAdaptedPerson {
         }
     }
 
-    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
-                             String attendance, Integer participation,
-                             List<JsonAdaptedTag> tags, List<String> groups,
-                             Map<String, List<JsonAdaptedSession>> groupSessions) {
-        this(name, phone, email, matricNumber, attendance, participation,
-                tags, groups, groupSessions, null);
-    }
-
-    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
-                             List<JsonAdaptedTag> tags) {
-        this(name, phone, email, matricNumber, null,
-                null, tags, null, null, null);
+    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber, List<JsonAdaptedTag> tags) {
+        this(name, phone, email, matricNumber, tags, null, null, null);
     }
 
     /**
@@ -105,8 +90,6 @@ class JsonAdaptedPerson {
         phone = source.getPhoneValue();
         email = source.getEmailValue();
         matricNumber = source.getMatricNumberValue();
-        attendance = source.getAttendance().toString();
-        participation = source.getParticipation().value;
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .toList());
@@ -164,14 +147,6 @@ class JsonAdaptedPerson {
             }
         }
 
-        if (attendance != null && !Attendance.isValidAttendance(attendance)) {
-            validationErrors.add(Attendance.MESSAGE_CONSTRAINTS);
-        }
-
-        if (participation != null && !Participation.isValidParticipation(participation)) {
-            validationErrors.add(Participation.MESSAGE_CONSTRAINTS);
-        }
-
         final List<Tag> personTags = new ArrayList<>();
         for (JsonAdaptedTag tag : tags) {
             try {
@@ -201,27 +176,8 @@ class JsonAdaptedPerson {
         for (String group : groups) {
             modelGroups.add(new GroupName(group));
         }
-        final Attendance modelAttendance;
-        if (attendance == null) {
-            modelAttendance = new Attendance(Attendance.Status.UNINITIALISED);
-        } else if (!Attendance.isValidAttendance(attendance)) {
-            throw new IllegalValueException(Attendance.MESSAGE_CONSTRAINTS);
-        } else {
-            modelAttendance = new Attendance(attendance);
-        }
-
-        final Participation modelParticipation;
-        if (participation == null) {
-            modelParticipation = new Participation(0);
-        } else if (!Participation.isValidParticipation(participation)) {
-            throw new IllegalValueException(Participation.MESSAGE_CONSTRAINTS);
-        } else {
-            modelParticipation = new Participation(participation);
-        }
 
         Person person = new Person(modelName, modelPhone, modelEmail, modelMatricNumber, modelGroups, modelTags);
-        person = new Person(person, modelAttendance);
-        person = new Person(person, modelParticipation);
         person = new Person(person, parseGroupSessions());
         person = new Person(person, parseAssignmentGrades(), true);
         return person;

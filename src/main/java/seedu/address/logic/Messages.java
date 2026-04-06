@@ -36,22 +36,16 @@ public class Messages {
 
     /**
      * Formats the {@code person} for generic display to the user.
-     * Uses the legacy person-level attendance and participation fields.
      */
     public static String format(Person person) {
-
         final StringBuilder builder = new StringBuilder();
         builder.append(person.getName())
-                .append("; Attendance: ")
-                .append(person.getAttendance())
                 .append("; Phone: ")
                 .append(person.getPhone())
                 .append("; Email: ")
                 .append(person.getEmail())
                 .append("; Matric Number: ")
                 .append(person.getMatricNumber())
-                .append("; Participation: ") // TODO: Remove. This is legacy from pre-Session class.
-                .append(person.getParticipation())
                 .append("; Tags: ");
         return getString(person, builder);
     }
@@ -64,14 +58,14 @@ public class Messages {
         builder.append(person.getName())
                 .append("; Attendance: ")
                 .append(person.getAttendance(groupName, date))
+                .append("; Participation: ")
+                .append(person.getParticipation(groupName, date))
                 .append("; Phone: ")
                 .append(person.getPhone())
                 .append("; Email: ")
                 .append(person.getEmail())
                 .append("; Matric Number: ")
                 .append(person.getMatricNumber())
-                .append("; Participation: ")
-                .append(person.getParticipation(groupName, date))
                 .append("; Tags: ");
         return getString(person, builder);
     }

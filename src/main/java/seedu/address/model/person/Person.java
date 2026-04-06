@@ -33,10 +33,7 @@ public class Person {
     private final Set<Tag> tags = new HashSet<>();
     private final Set<GroupName> groups = new HashSet<>();
 
-    // Session fields (to be refactored into Session class)
-    private final Attendance attendance;
-    private final Participation participation;
-
+    // Session fields (stored per group)
     private final Map<GroupName, SessionList> groupSessions = new HashMap<>();
     private final Map<GroupName, Map<AssignmentName, Integer>> assignmentGrades = new HashMap<>();
 
@@ -45,8 +42,7 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags) {
         this(name, phone, email, matricNumber, tags,
-                Collections.emptySet(), new Attendance(Attendance.Status.UNINITIALISED), new Participation(0),
-                new HashMap<>(), new HashMap<>()
+                Collections.emptySet(), new HashMap<>(), new HashMap<>()
         );
     }
 
@@ -55,10 +51,7 @@ public class Person {
      */
     public Person(Name name, Phone phone, Email email, MatricNumber matricNumber, Set<GroupName> groups,
                   Set<Tag> tags) {
-        this(name, phone, email, matricNumber, tags, groups,
-                new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), new HashMap<>(),
-                new HashMap<>()
-        );
+        this(name, phone, email, matricNumber, tags, groups, new HashMap<>(), new HashMap<>());
     }
 
     /**
@@ -66,33 +59,16 @@ public class Person {
      */
     public Person(Person person, Name name, Phone phone, Email email, MatricNumber matricNumber, Set<Tag> tags) {
         this(name, phone, email, matricNumber, tags,
-                person.groups, person.attendance, person.participation, person.groupSessions,
-                person.assignmentGrades);
-    }
-
-    /**
-     * Used for Attendance commands. Every field must be present and not null.
-     */
-    public Person(Person person, Attendance attendance) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
-                attendance, person.participation, person.groupSessions, person.assignmentGrades);
-    }
-
-    /**
-     * Used for Participation commands. Every field must be present and not null.
-     */
-    public Person(Person person, Participation participation) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
-                person.attendance, participation, person.groupSessions, person.assignmentGrades
-        );
+                person.groups, person.groupSessions, person.assignmentGrades);
     }
 
     /**
      * Used for Group commands. Every field must be present and not null.
      */
     public Person(Person person, Set<GroupName> groups) {
-        this(person.name, person.phone, person.email, person.matricNumber, person.tags, groups,
-                person.attendance, person.participation, person.groupSessions, person.assignmentGrades
+        this(person.name, person.phone, person.email, person.matricNumber, person.tags,
+                groups,
+                person.groupSessions, person.assignmentGrades
         );
     }
 
@@ -101,7 +77,8 @@ public class Person {
      */
     public Person(Person person, Map<GroupName, SessionList> updatedSessionMap) {
         this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
-                person.attendance, person.participation, updatedSessionMap, person.assignmentGrades);
+                updatedSessionMap,
+                person.assignmentGrades);
     }
 
     /**
@@ -110,7 +87,8 @@ public class Person {
     public Person(Person person, Map<GroupName, Map<AssignmentName, Integer>> updatedAssignmentGrades,
                   boolean ignored) {
         this(person.name, person.phone, person.email, person.matricNumber, person.tags, person.groups,
-                person.attendance, person.participation, person.groupSessions, updatedAssignmentGrades);
+                person.groupSessions,
+                updatedAssignmentGrades);
     }
 
     private Person(Name name,
@@ -119,20 +97,15 @@ public class Person {
                    MatricNumber matricNumber,
                    Set<Tag> tags,
                    Set<GroupName> groups,
-                   Attendance attendance,
-                   Participation participation,
                    Map<GroupName, SessionList> groupSessions,
                    Map<GroupName, Map<AssignmentName, Integer>> assignmentGrades) {
-        requireAllNonNull(name, phone, email, matricNumber, attendance, participation, tags, groups,
-                groupSessions, assignmentGrades);
+        requireAllNonNull(name, phone, email, matricNumber, tags, groups, groupSessions, assignmentGrades);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.matricNumber = matricNumber;
         this.tags.addAll(tags);
         this.groups.addAll(groups);
-        this.attendance = attendance;
-        this.participation = participation;
         this.groupSessions.putAll(copySessionMap(groupSessions));
         this.assignmentGrades.putAll(copyAssignmentGradeMap(assignmentGrades));
     }
@@ -156,7 +129,8 @@ public class Person {
         // Update the map.
         updatedSessionMap.put(groupName, newSessionList);
         return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
-                this.attendance, this.participation, updatedSessionMap, this.assignmentGrades);
+                updatedSessionMap,
+                this.assignmentGrades);
     }
 
     /**
@@ -183,7 +157,8 @@ public class Person {
         }
 
         return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
-                this.attendance, this.participation, updatedSessionMap, this.assignmentGrades);
+                updatedSessionMap,
+                this.assignmentGrades);
     }
 
     /**
@@ -198,7 +173,8 @@ public class Person {
         classAssignmentGrades.put(assignmentName, grade);
         updatedAssignmentGrades.put(groupName, classAssignmentGrades);
         return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
-                this.attendance, this.participation, this.groupSessions, updatedAssignmentGrades);
+                this.groupSessions,
+                updatedAssignmentGrades);
     }
 
     /**
@@ -217,8 +193,8 @@ public class Person {
         updatedAssignmentGrades.remove(groupName);
 
         // consider converting this to Wither Pattern
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, updatedGroups,
-                this.attendance, this.participation, updatedSessionMap, updatedAssignmentGrades);
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags,
+                updatedGroups, updatedSessionMap, updatedAssignmentGrades);
 
     }
 
@@ -246,8 +222,8 @@ public class Person {
             updatedAssignmentGrades.put(newGroupName, existingGrades);
         }
 
-        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, updatedGroups,
-                this.attendance, this.participation, updatedSessionMap, updatedAssignmentGrades);
+        return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags,
+                updatedGroups, updatedSessionMap, updatedAssignmentGrades);
     }
 
     /**
@@ -268,7 +244,8 @@ public class Person {
             updatedAssignmentGrades.put(groupName, classAssignmentGrades);
         }
         return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
-                this.attendance, this.participation, this.groupSessions, updatedAssignmentGrades);
+                this.groupSessions,
+                updatedAssignmentGrades);
     }
 
     /**
@@ -287,7 +264,8 @@ public class Person {
         classAssignmentGrades.put(newAssignmentName, existingGrade);
         updatedAssignmentGrades.put(groupName, classAssignmentGrades);
         return new Person(this.name, this.phone, this.email, this.matricNumber, this.tags, this.groups,
-                this.attendance, this.participation, this.groupSessions, updatedAssignmentGrades);
+                this.groupSessions,
+                updatedAssignmentGrades);
     }
 
     /**
@@ -362,11 +340,6 @@ public class Person {
         return getOrCreateSession(groupName, date).getAttendance();
     }
 
-    // TODO: Remove. This is legacy from pre-Session class.
-    public Attendance getAttendance() {
-        return attendance;
-    }
-
     /**
      * Returns the participation for the specified group and session date.
      * If the session does not exist, returns 0 participation.
@@ -378,11 +351,6 @@ public class Person {
     public Participation getParticipation(GroupName groupName, LocalDate date) {
         requireAllNonNull(groupName, date);
         return getOrCreateSession(groupName, date).getParticipation();
-    }
-
-    // TODO: Remove. This is legacy from pre-Session class.
-    public Participation getParticipation() {
-        return participation;
     }
 
     /**
@@ -440,17 +408,14 @@ public class Person {
             return true;
         }
 
-        if (!(other instanceof Person)) {
+        if (!(other instanceof Person otherPerson)) {
             return false;
         }
 
-        Person otherPerson = (Person) other;
         return name.equals(otherPerson.name)
                 && phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
                 && matricNumber.equals(otherPerson.matricNumber)
-                && attendance.equals(otherPerson.attendance) // TODO: Remove. This is legacy from pre-Session class.
-                && participation.equals(otherPerson.participation) // TODO: Remove. This is legacy pre-Session class.
                 && tags.equals(otherPerson.tags)
                 && groups.equals(otherPerson.groups)
                 && groupSessions.equals(otherPerson.groupSessions)
@@ -460,9 +425,7 @@ public class Person {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, matricNumber,
-                attendance, participation, // TODO: Remove. This is legacy from pre-Session class.
-                tags, groups, groupSessions, assignmentGrades);
+        return Objects.hash(name, phone, email, matricNumber, tags, groups, groupSessions, assignmentGrades);
     }
 
     @Override
