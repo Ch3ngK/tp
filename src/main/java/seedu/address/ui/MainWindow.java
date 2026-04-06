@@ -194,9 +194,27 @@ public class MainWindow extends UiPart<Stage> {
         primaryStage.setHeight(guiSettings.getWindowHeight());
         primaryStage.setWidth(guiSettings.getWindowWidth());
         if (guiSettings.getWindowCoordinates() != null) {
-            primaryStage.setX(guiSettings.getWindowCoordinates().getX());
-            primaryStage.setY(guiSettings.getWindowCoordinates().getY());
+            int x = (int) guiSettings.getWindowCoordinates().getX();
+            int y = (int) guiSettings.getWindowCoordinates().getY();
+            if (isWithinScreenBounds(x, y, guiSettings.getWindowWidth(), guiSettings.getWindowHeight())) {
+                primaryStage.setX(x);
+                primaryStage.setY(y);
+            }
         }
+    }
+
+    /**
+     * Returns true if the given app window position/size is in the screen's visual bounds.
+     */
+    private boolean isWithinScreenBounds(int x, int y, double width, double height) {
+        for (javafx.stage.Screen screen : javafx.stage.Screen.getScreens()) {
+            javafx.geometry.Rectangle2D bounds = screen.getVisualBounds();
+            // Require that at least the top-left corner is within this screen
+            if (bounds.contains(x, y)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -206,6 +224,8 @@ public class MainWindow extends UiPart<Stage> {
     public void handleHelp() {
         if (!helpWindow.isShowing()) {
             helpWindow.show();
+        } else if (helpWindow.isMinimized()) {
+            helpWindow.restoreAndFocus();
         } else {
             helpWindow.focus();
         }
