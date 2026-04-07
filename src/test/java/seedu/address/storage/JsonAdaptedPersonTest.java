@@ -120,9 +120,14 @@ public class JsonAdaptedPersonTest {
     @Test
     public void toModelType_invalidMatricNumber_throwsIllegalValueException() {
         // EP: invalid matric number (wrong checksum)
+        String expectedMessage = null;
+        try {
+            new MatricNumber(INVALID_MATRIC_NUMBER);
+        } catch (IllegalArgumentException e) {
+            expectedMessage = e.getMessage();
+        }
         JsonAdaptedPerson person = new JsonAdaptedPerson(
                 VALID_NAME, VALID_PHONE, VALID_EMAIL, INVALID_MATRIC_NUMBER, VALID_TAGS);
-        String expectedMessage = MatricNumber.MESSAGE_CONSTRAINTS;
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
     }
 

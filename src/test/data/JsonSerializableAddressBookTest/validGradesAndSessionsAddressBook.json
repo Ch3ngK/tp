@@ -4,8 +4,6 @@
     "phone": "9482424",
     "email": "hans@example.com",
     "matricNumber": "A0102034E",
-    "attendance": "UNINITIALISED",
-    "participation": 0,
     "tags": [],
     "groups": [ "T01" ],
     "groupSessions": {

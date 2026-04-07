@@ -96,14 +96,11 @@ class JsonAdaptedPerson {
                              String attendance, Integer participation,
                              List<JsonAdaptedTag> tags, List<String> groups,
                              Map<String, List<JsonAdaptedSession>> groupSessions) {
-        this(name, phone, email, matricNumber, attendance, participation,
-                tags, groups, groupSessions, null);
+        this(name, phone, email, matricNumber, attendance, participation, tags, groups, groupSessions, null);
     }
 
-    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber,
-                             List<JsonAdaptedTag> tags) {
-        this(name, phone, email, matricNumber, null,
-                null, tags, null, null, null);
+    public JsonAdaptedPerson(String name, String phone, String email, String matricNumber, List<JsonAdaptedTag> tags) {
+        this(name, phone, email, matricNumber, null, null, tags, null, null, null);
     }
 
     /**
