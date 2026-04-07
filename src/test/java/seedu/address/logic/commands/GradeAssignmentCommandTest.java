@@ -58,6 +58,6 @@ public class GradeAssignmentCommandTest {
         GradeAssignmentCommand command = GradeAssignmentCommand.forIndexes(new AssignmentName("Quiz 1"),
                 List.of(Index.fromOneBased(1)), 25);
 
-        assertCommandFailure(command, model, GradeAssignmentCommand.MESSAGE_GRADE_OUT_OF_RANGE);
+        assertCommandFailure(command, model, String.format(GradeAssignmentCommand.MESSAGE_GRADE_OUT_OF_RANGE, 20));
     }
 }

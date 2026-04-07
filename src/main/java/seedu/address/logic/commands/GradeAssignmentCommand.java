@@ -38,7 +38,7 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
             + "          " + SHORT_COMMAND_WORD + " a/Quiz 1 m/A1234567X m/A2345678L gr/17";
 
     public static final String MESSAGE_GRADE_OUT_OF_RANGE =
-            "Grade must be between 0 and the assignment's max marks inclusive.";
+            "Grade must be between 0 and %d (the assignment's max marks) inclusive.";
 
     private final AssignmentName assignmentName;
     private final List<Index> targetIndexes;
@@ -72,8 +72,9 @@ public class GradeAssignmentCommand extends ClassScopedAssignmentCommand {
         requireNonNull(model);
         Group activeGroup = getActiveGroup(model);
         Assignment assignment = getRequiredAssignment(activeGroup, assignmentName);
-        if (grade > assignment.getMaxMarks()) {
-            throw new CommandException(MESSAGE_GRADE_OUT_OF_RANGE);
+        int maxMarks = assignment.getMaxMarks();
+        if (grade > maxMarks) {
+            throw new CommandException(String.format(MESSAGE_GRADE_OUT_OF_RANGE, maxMarks));
         }
 
         List<Person> targetPersons = resolveTargetPersons(model, activeGroup.getGroupName());
