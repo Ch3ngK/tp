@@ -38,8 +38,6 @@ public class PersonBuilder {
     private MatricNumber matricNumber;
     private Set<Tag> tags;
     private Set<GroupName> groups;
-    private Attendance attendance;
-    private Participation participation;
     private Map<GroupName, SessionList> groupSessions;
     private Map<GroupName, Map<AssignmentName, Integer>> assignmentGrades;
 
@@ -53,8 +51,6 @@ public class PersonBuilder {
         matricNumber = new MatricNumber(DEFAULT_MATRIC_NUMBER);
         tags = new HashSet<>();
         groups = new HashSet<>();
-        attendance = new Attendance(Attendance.Status.UNINITIALISED);
-        participation = new Participation(0);
         groupSessions = new HashMap<>();
         assignmentGrades = new HashMap<>();
     }
@@ -69,8 +65,6 @@ public class PersonBuilder {
         matricNumber = personToCopy.getMatricNumber();
         tags = new HashSet<>(personToCopy.getTags());
         groups = new HashSet<>(personToCopy.getGroups());
-        attendance = personToCopy.getAttendance();
-        participation = personToCopy.getParticipation();
         groupSessions = new HashMap<>(personToCopy.getGroupSessions());
         assignmentGrades = new HashMap<>();
         personToCopy.getAssignmentGrades().forEach((groupName, gradeMap) ->
@@ -112,22 +106,6 @@ public class PersonBuilder {
     }
 
     /**
-     * Sets the {@code Attendance} of the {@code Person} that we are building.
-     */
-    public PersonBuilder withAttendance(String attendance) {
-        this.attendance = new Attendance(attendance);
-        return this;
-    }
-
-    /**
-     * Sets the {@code Participation} of the {@code Person} that we are building.
-     */
-    public PersonBuilder withParticipation(int participation) {
-        this.participation = new Participation(participation);
-        return this;
-    }
-
-    /**
      * Adds or overwrites a session for the specified group and date.
      */
     public PersonBuilder withSession(String groupName, String date, String attendance, int participation) {
@@ -136,13 +114,13 @@ public class PersonBuilder {
 
         SessionList existingSessions = groupSessions.getOrDefault(parsedGroupName, new SessionList());
         SessionList updatedSessions = new SessionList(existingSessions.getSessions());
-        updatedSessions.addSession(new Session(LocalDate.parse(date), new Attendance(attendance),
-                new Participation(participation)));
+        updatedSessions.addSession(
+                new Session(LocalDate.parse(date), new Attendance(attendance), new Participation(participation)));
         groupSessions.put(parsedGroupName, updatedSessions);
         return this;
     }
 
-
+    //@@author ongrussell
     /**
      * Adds or overwrites an assignment grade for the specified group and assignment.
      */
@@ -154,6 +132,8 @@ public class PersonBuilder {
         assignmentGrades.put(parsedGroupName, classGrades);
         return this;
     }
+    //@@author
+
     /**
      * Sets the {@code Phone} of the {@code Person} that we are building.
      */
@@ -177,8 +157,6 @@ public class PersonBuilder {
      */
     public Person build() {
         Person person = new Person(name, phone, email, matricNumber, groups, tags);
-        person = new Person(person, attendance);
-        person = new Person(person, participation);
         person = new Person(person, groupSessions);
         person = new Person(person, assignmentGrades, true);
         return person;

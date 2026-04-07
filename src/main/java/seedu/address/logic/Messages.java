@@ -36,24 +36,17 @@ public class Messages {
 
     /**
      * Formats the {@code person} for generic display to the user.
-     * Uses the legacy person-level attendance and participation fields.
      */
     public static String format(Person person) {
-
         final StringBuilder builder = new StringBuilder();
         builder.append(person.getName())
-                .append("; Attendance: ")
-                .append(person.getAttendance())
-                .append("; Phone: ")
+                .append("\nPhone: ")
                 .append(person.getPhone())
-                .append("; Email: ")
-                .append(person.getEmail())
-                .append("; Matric Number: ")
+                .append("\nMatric Number: ")
                 .append(person.getMatricNumber())
-                .append("; Participation: ") // TODO: Remove. This is legacy from pre-Session class.
-                .append(person.getParticipation())
-                .append("; Tags: ");
-        return getString(person, builder);
+                .append("\nEmail: ")
+                .append(person.getEmail());
+        return appendTagsAndGroups(builder, person);
     }
 
     /**
@@ -62,23 +55,20 @@ public class Messages {
     public static String format(Person person, GroupName groupName, LocalDate date) {
         final StringBuilder builder = new StringBuilder();
         builder.append(person.getName())
-                .append("; Attendance: ")
-                .append(person.getAttendance(groupName, date))
-                .append("; Phone: ")
-                .append(person.getPhone())
-                .append("; Email: ")
-                .append(person.getEmail())
-                .append("; Matric Number: ")
+                .append("\nMatric Number: ")
                 .append(person.getMatricNumber())
-                .append("; Participation: ")
-                .append(person.getParticipation(groupName, date))
-                .append("; Tags: ");
-        return getString(person, builder);
+                .append("\nAttendance: ")
+                .append(person.getAttendance(groupName, date))
+                .append("\nParticipation: ")
+                .append(person.getParticipation(groupName, date));
+        return builder.toString();
     }
 
-    private static String getString(Person person, StringBuilder builder) {
+    private static String appendTagsAndGroups(StringBuilder builder, Person person) {
+        builder.append("\nTags: ");
         person.getTags().forEach(builder::append);
-        builder.append("; Groups: ");
+
+        builder.append("\nGroups: ");
         builder.append(person.getGroups().stream()
                 .sorted(Comparator.comparing(groupName -> groupName.value, String.CASE_INSENSITIVE_ORDER))
                 .map(groupName -> groupName.value)
