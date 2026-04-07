@@ -27,7 +27,7 @@ public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
     private static final double COMMANDBOX_STARTUP_HEIGHT_PX = 45.0;
-    private static final double RESULTDISPLAY_STARTUP_HEIGHT_PX = 160.0;
+    private static final double RESULTDISPLAY_STARTUP_HEIGHT_PX = 170.0;
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
