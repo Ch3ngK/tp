@@ -122,6 +122,20 @@ public class JsonAddressBookStorageTest {
                 .orElseThrow()
                 .getAttendance(new GroupName("CS2103T-T01"), java.time.LocalDate.of(2026, 3, 16))
                 .toString());
+
+        // Verify saved JSON does not contain legacy person-level fields,
+        // while session-level attendance/participation is still present.
+        String savedJson = FileUtil.readFromFile(filePath);
+        int personStart = savedJson.indexOf("\"name\" : \"Session Student\"");
+        int groupSessionsStart = savedJson.indexOf("\"groupSessions\"", personStart);
+        String personHeader = savedJson.substring(personStart, groupSessionsStart);
+
+        assertFalse(personHeader.contains("\"attendance\""));
+        assertFalse(personHeader.contains("\"participation\""));
+
+        assertTrue(savedJson.contains("\"groupSessions\""));
+        assertTrue(savedJson.contains("\"attendance\" : \"PRESENT\""));
+        assertTrue(savedJson.contains("\"participation\" : 5"));
     }
 
     @Test

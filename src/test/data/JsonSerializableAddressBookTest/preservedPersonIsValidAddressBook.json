@@ -12,8 +12,6 @@
       "phone": "94351253",
       "email": "alice@example.com",
       "matricNumber": "A0102034E",
-      "attendance": "UNINITIALISED",
-      "participation": 0,
       "tags": [],
       "groups": [
         "T01"

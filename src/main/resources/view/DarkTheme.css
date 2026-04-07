@@ -32,6 +32,9 @@
 .text-area,
 .text-area .scroll-pane,
 .text-area .scroll-pane .viewport,
+.text-area .scroll-pane > .corner {
+    -fx-background-color: #383838;
+}
 .text-area .content {
     -fx-background-color: transparent;
 }
@@ -95,7 +98,7 @@
 }
 
 .split-pane-divider {
-    -fx-background-color: #4a4a4a;
+    -fx-background-color: transparent;
 }
 
 .split-pane-divider:hover {

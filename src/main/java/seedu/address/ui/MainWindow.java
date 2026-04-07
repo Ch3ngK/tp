@@ -27,7 +27,7 @@ public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
     private static final double COMMANDBOX_STARTUP_HEIGHT_PX = 45.0;
-    private static final double RESULTDISPLAY_STARTUP_HEIGHT_PX = 120.0;
+    private static final double RESULTDISPLAY_STARTUP_HEIGHT_PX = 170.0;
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
@@ -168,8 +168,7 @@ public class MainWindow extends UiPart<Stage> {
         // Make commandBox and resultDisplay not resize when resizing app window:
         SplitPane.setResizableWithParent(commandBoxPlaceholder, false);
         SplitPane.setResizableWithParent(resultDisplayPlaceholder, false);
-        SplitPane.setResizableWithParent(personListPanelPlaceholder, true);
-        // exclude personListPanelPlaceholder so that it absorbs window resizes
+        SplitPane.setResizableWithParent(personListPanelPlaceholder, true); // make it absorb window resizes
 
         // Calculate startup heights of the 2 resizeable placeholders (commandBox, resultDisplay):
         Platform.runLater(() -> {
