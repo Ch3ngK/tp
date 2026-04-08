@@ -135,7 +135,7 @@ Format: `add n/NAME p/PHONE e/EMAIL m/MATRIC_NUMBER [t/TAG]…​`
 * Name cannot contain symbols like `;` and `<>`.
 * Name can only be up to 300 characters long.
 * Email must be in the format local-part@domain.
-* Matriculation number must start with `A` followed by 7 digits and end with a valid checksum letter.
+* Matric number must start with `A` followed by 7 digits and end with a valid checksum letter.
 
 <box type="tip">
 
@@ -196,7 +196,7 @@ Format: `find [n/NAME]... [p/PHONE]... [e/EMAIL]... [m/MATRIC_NUMBER]... [t/TAG]
 
 Examples:
 * `find n/john` returns people with the names `john` and `John Doe`
-* `find n/john p/987 e/example.com m/123 t/friend` returns people with a name containing `john`, a phone number containing `987`, an email containing `example.com`, a matriculation number containing `123` or a tag containing `friend`
+* `find n/john p/987 e/example.com m/123 t/friend` returns people with a name containing `john`, a phone number containing `987`, an email containing `example.com`, a matric number containing `123` or a tag containing `friend`
 * `find n/alex n/david` returns the people `Alex Yeoh`, `David Li`<br>
   ![result for 'find alex david'](images/findAlexDavidResult.png)
 
@@ -260,7 +260,7 @@ Format: `listgroups`
 
 ### Add student to group : `addtogroup`
 
-Adds one or more students to a group. Students can be identified either by matriculation number or index expression.
+Adds one or more students to a group. Students can be identified either by matric number or index expression.
 
 Format: 
 * `addtogroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]`
@@ -273,12 +273,12 @@ For index expressions, TAA supports forms like:
 * i/1,3-5 
 
 Examples:
-*  `addtogroup g/T01 m/A1234567X m/A2345678L` Adds students with matriculation number `A1234567X` and `A2345678L` to group `T01`.
+*  `addtogroup g/T01 m/A1234567X m/A2345678L` Adds students with matric number `A1234567X` and `A2345678L` to group `T01`.
 *  `addtogroup g/Project Team i/1,3,5,7` Adds students with the index 1, 3, 5, 7 from the list in the current view to group `Project Team`.
 
 ### Remove student from group : `removefromgroup`
 
-Removes one or more students from a group. Students can be identified either by matriculation number or index expression. This only removes the student’s membership from the group, not the student from the TAA.
+Removes one or more students from a group. Students can be identified either by matric number or index expression. This only removes the student’s membership from the group, not the student from the TAA.
 
 Format:
 * `removefromgroup g/GROUP_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER]`
@@ -291,7 +291,7 @@ For index expressions, TAA supports forms like:
 * i/1,3-5
 
 Examples:
-*  `removefromgroup g/T01 m/A1234567X m/A2345678L` Removes students with matriculation number `A1234567X` and `A2345678L` from group `T01`.
+*  `removefromgroup g/T01 m/A1234567X m/A2345678L` Removes students with matric number `A1234567X` and `A2345678L` from group `T01`.
 *  `removefromgroup g/Project Team i/1,3,5,7` Removes students with the index 1, 3, 5, 7 from the list in the current view from group `Project Team`.
 
 ### Rename group : `renamegroup`
@@ -498,7 +498,7 @@ Note:
 * Grading again overwrites the old grade
 
 Examples:
-*  `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17` Assigns a grade of 17 for the assignment `Quiz 1` to the students with matriculation number A1234567X and A2345678L for the group in current view.
+*  `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17` Assigns a grade of 17 for the assignment `Quiz 1` to the students with matric number A1234567X and A2345678L for the group in current view.
 
 ## Managing sessions
 
@@ -765,7 +765,7 @@ If your changes to the save file makes its format invalid, TAA will not load you
     * Have each domain label start and end with alphanumeric characters
     * Have each domain label consist of alphanumeric characters, separated only by hyphens, if any.
   * Examples: `example@gmail.com`, `e1111111@u.nus.edu.sg`, `jack_neo@u.nus.edu.sg`
-* **Matriculation number:** Must be a valid NUS matriculation number, starting with `A`, followed by 7 digits, and end with a letter.
+* **Matric number:** Must be a valid NUS matric number, starting with `A`, followed by 7 digits, and end with a letter.
   * Examples:`A0123456J`, `A0308440M`, `A0308676R`
 * **Tags:** Must only contain alphanumeric characters and cannot contain spaces.
   * Examples:`groupB`, `exchangeStudent`, `bestFriends` 
@@ -872,12 +872,12 @@ Once these contacts are valid, TAA will automatically load these contacts on the
     }
   ],
   "loadWarnings": [
-    "Skipped invalid contact 'John':\n- The matriculation number checksum letter is incorrect. For the given digits, it should be 'X'."
+    "Skipped invalid contact 'John':\n- The matric number checksum letter is incorrect. For the given digits, it should be 'X'."
   ]
 }
 ```
 
-The `loadWarnings` tell us that `John` has an invalid matriculation number checksum and that it should be `X`. We can fix this by editing the matriculation number from `A1234567Y` to `A1234567X`. <br>
+The `loadWarnings` tell us that `John` has an invalid matric number checksum and that it should be `X`. We can fix this by editing the matric number from `A1234567Y` to `A1234567X`. <br>
 Rerun TAA and `John` will now be loaded into the contact list!
 
 </panel>
@@ -964,13 +964,13 @@ Rerun TAA and group `T02` will exist. `John` will also be loaded into the contac
 
 <panel id="faq-duplicate" header="What is considered a duplicate contact?" type="seamless" expanded>
 
-TAA considers 2 contacts to be duplicates if they share the same matriculation number (case-insensitive).
+TAA considers 2 contacts to be duplicates if they share the same matric number (case-insensitive).
 
 This means that:
-- Two contacts with the same name but different matriculation numbers **are not** duplicates and can both exist. 
-- Two contacts with different names but the same matriculation number **are** duplicates.
+- Two contacts with the same name but different matric numbers **are not** duplicates and can both exist. 
+- Two contacts with different names but the same matric number **are** duplicates.
 
-If you try to `add` a contact whose matriculation number already exists, or `edit` a contact such that its matriculation number would match an existing contact, TAA will reject it and not make any changes to the app.
+If you try to `add` a contact whose matric number already exists, or `edit` a contact such that its matric number would match an existing contact, TAA will reject it and not make any changes to the app.
 
 </panel>
 
@@ -996,24 +996,24 @@ You can remove all tags from a contact by running `edit i/INDEX t/`, without spe
 You should refer to this section to find out more about some common errors faced when manually editing the save file.
 
 #### Troubleshooting manual editing of contacts
-| Problem                                                              | Error shown                                                                                                                      | How to fix                                                                                                                                        |
-|:---------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Invalid or blank name                                                | `Name cannot be blank, must be at most 300 characters long and characters like semicolons and <> are invalid.`                   | Ensure that `Name` follows the constraints given in the error message. <br>You can also refer to [this FAQ](#faq-add_edit_valid_formats).         |
-| Invalid or blank phone                                               | `Phone numbers should not be blank, should only contain numbers, and should be at least 3 digits long`                           | Ensure that `Phone` follows the constraints given in the error message. <br>You can also refer to [this FAQ](#faq-add_edit_valid_formats).        |
-| Invalid or blank matriculation number                                | `Matriculation number should not be blank and should start with 'A', followed by 7 digits and end with a valid checksum letter.` | Ensure that `matricNumber` follows the constraints given in the error message. <br>You can also refer to [this FAQ](#faq-add_edit_valid_formats). |
-| Invalid matriculation number number checksum                         | `The matriculation number checksum letter is incorrect. For the given digits, it should be 'X'.`                                 | Change the last character of the `matricNumber` (checksum) to the correct one as given in the error message.                                      |
-| Duplicate contact                                                    | `Skipped duplicate contact: NAME (Matric: AXXXXXXXA)`                                                                            | Delete the duplicate from `"preservedSkippedPersons": [ ]`, or change their matriculation number to a unique one not currently in TAA.            |
-| Contact references a group that does not exist yet                   | `Contact references group 'Y' which does not exist yet.`                                                                         | Ensure that the group exists in `"groups": [ ]` of the save file. <br> This is not the same `"groups": [ ]` as the one found in `"persons": [ ]`. |                                                                                                                                                   |
-| Contact has grades for a group they are not part of                   | `Contact has grades for group 'X' but is not a member of it`                                                                     | Add the respective group into `"groups": [ ]` for that contact under `"persons": [ ]`.                                                            |
-| Contact has grades for an assignment that does not exist in the group | `Contact has a grade for assignment 'X' in group 'Y', but that assignment does not exist`                                        | Add the assignment into `"groups": [ ]`.<br> This is not the same `"groups": [ ]` as the one found in `"persons": [ ]`.                           |
-| Contact has grades for an assignment that exceeds the max marks       | `Grade A for assignment 'X' in group 'Y' exceeds max marks of B`                                                                | Ensure that grade is below max marks for the assignment.                                                                                          |
-| Contact has session for a group they are not a part of                | `Contact has sessions for group 'X' but is not a member of it`                                                                   | Ensure that contact has matching groups in `"groups": [ ]` and `"groupSessions": { }` in `"persons": [ ]`.                                        |
+| Error shown                                                                                                                                                                                   | How to fix                                                                                                                                        |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Name cannot be blank, must be at most 300 characters long and characters like semicolons and <> are invalid.`                                                                                | Ensure that `Name` follows the constraints given in the error message. <br>You can also refer to [this FAQ](#faq-add_edit_valid_formats).         |
+| `Phone numbers should not be blank, should only contain numbers, and should be at least 3 digits long`                                                                                        | Ensure that `Phone` follows the constraints given in the error message. <br>You can also refer to [this FAQ](#faq-add_edit_valid_formats).        |
+| `Matric number should not be blank and should start with 'A', followed by 7 digits and end with a valid checksum letter.`                                                                     | Ensure that `matricNumber` follows the constraints given in the error message. <br>You can also refer to [this FAQ](#faq-add_edit_valid_formats). |
+| `The matric number checksum letter is incorrect. For the given digits, it should be 'X'.`                                                                                                     | Change the last character of the `matricNumber` (checksum) to the correct one as given in the error message.                                      |
+| `Skipped duplicate contact: NAME (Matric: AXXXXXXXA)`                                                                                                                                         | Delete the duplicate from `"preservedSkippedPersons": [ ]`, or change their matric number to a unique one not currently in TAA.                   |
+| `Contact references group 'Y' which does not exist yet.`                                                                                                                                      | Ensure that the group exists in `"groups": [ ]` of the save file. <br> This is not the same `"groups": [ ]` as the one found in `"persons": [ ]`. |                                                                                                                                                   |
+| `Contact has grades for group 'X' but is not a member of it`                                                                                                                                  | Add the respective group into `"groups": [ ]` for that contact under `"persons": [ ]`.                                                            |
+| `Contact has a grade for assignment 'X' in group 'Y', but that assignment does not exist`                                                                                                     | Add the assignment into `"groups": [ ]`.<br> This is not the same `"groups": [ ]` as the one found in `"persons": [ ]`.                           |
+| `Grade A for assignment 'X' in group 'Y' exceeds max marks of B`                                                                                                                              | Ensure that grade is below max marks for the assignment.                                                                                          |
+| `Contact has sessions for group 'X' but is not a member of it`                                                                                                                                | Ensure that contact has matching groups in `"groups": [ ]` and `"groupSessions": { }` in `"persons": [ ]`.                                        |
 
 ### Troubleshooting manual editing of groups
-| Problem                               | Error shown                                                                                                                                           | How to fix                                                                                                                     |
-|:--------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| Invalid or blank group name           | `Group names should only contain letters, numbers, spaces, hyphens, and underscores, and it should not be blank`                                      | Ensure that the group name follows the constraints given in the error message.                                                 |
-| Duplicate group name                  | `Skipped duplicate group: 'X'`                                                                                                                        | Delete the group by deleting `{ "name": "X", "assignments": [ ] }` from `"preservedSkippedGroups": [ ]` , or rename the group. |
-| Invalid or blank assignment name      | `Assignment names should only contain alphanumeric characters and spaces, and should not be blank`                                                    | Ensure that the assignment name follows the constraints given in the error message.                                            |
-| Assignment has non-positive max marks | `Max marks should be a positive integer`                                                                                                              | Ensure that max marks is a positive integer.                                                                                   |
+| Error shown                                                                                                                                           | How to fix                                                                                                                     |
+|:------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+| `Group names should only contain letters, numbers, spaces, hyphens, and underscores, and it should not be blank`                                      | Ensure that the group name follows the constraints given in the error message.                                                 |
+| `Skipped duplicate group: 'X'`                                                                                                                        | Delete the group by deleting `{ "name": "X", "assignments": [ ] }` from `"preservedSkippedGroups": [ ]` , or rename the group. |
+| `Assignment names should only contain alphanumeric characters and spaces, and should not be blank`                                                    | Ensure that the assignment name follows the constraints given in the error message.                                            |
+| `Max marks should be a positive integer`                                                                                                              | Ensure that max marks is a positive integer (max marks is till 2147483647 inclusive).                                          |
 
