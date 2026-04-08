@@ -461,7 +461,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 
         Steps 1b1-1b2 are repeated till all fields are correct.
        
-        Use case ends resumes from step 1.
+        Use case resumes from step 1.
 
 * 1c. TAA detects a duplicate matriculation number in existing contacts.
 
@@ -494,7 +494,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
     * 3a1. TAA rejects the command.
     * 3a2. User re-enters command with a valid index.
 
-      Use case resumes at step 3.
+        Use case resumes at step 3.
 
 **Use case: UC3 - Edit a contact**
 
@@ -514,7 +514,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
     * 3a1. TAA rejects the command.
     * 3a2. User re-enters command with a valid index.
 
-      Use case resumes at step 3.
+        Use case resumes at step 3.
 
 * 3b. No fields to edit are provided.
 
@@ -656,6 +656,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 **Use case: UC8 - Create a session for a group**  
 
 **MSS**
+
 1. User switches to a group.
 2. TAA shows the students in that group.
 3. User requests to create a session for a specific date.
@@ -684,6 +685,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 **Use case: UC9 - View attendance overview for a group**
 
 **MSS**
+
 1. User requests to switch to a tutorial group.
 2. TAA switches to the specified group view.
 3. User requests to view attendance for the group.
@@ -715,14 +717,14 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 
 Preconditions: A group is currently active.
 
-MSS
+**MSS**
 
 1. User requests to export the current attendance and participation view, optionally specifying a file path.
 2. TAA writes the data to the specified file (or a default filename) and shows a confirmation message with the path.
 
    Use case ends.
 
-Extensions
+**Extensions**
 
 * 1a. No group is currently active.
 
@@ -735,6 +737,7 @@ Extensions
     * 1b1. TAA shows an error message.
 
         Use case ends.
+
 ---
 
 ### Non-Functional Requirements
@@ -759,7 +762,7 @@ Extensions
 * **Submission Status**: The state of a student’s assignment (e.g., Submitted, Late, Missing, Graded).
 * **Command**: A user-issued instruction in TAA to perform a specific action (e.g., add, edit, delete, mark).
 
---------------------------------------------------------------------------------------------------------------------
+---
 
 <div style="page-break-after: always;"></div>
 
