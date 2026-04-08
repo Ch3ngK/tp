@@ -24,7 +24,7 @@ Refer to the guide [_Setting up and getting started_](SettingUp.md).
 
 --------------------------------------------------------------------------------------------------------------------
 
-
+<div style="page-break-after: always;"></div>
 
 ## **Design**
 
@@ -51,7 +51,7 @@ The bulk of the app's work is done by the following four components:
 
 [**`Commons`**](#common-classes) represents a collection of classes used by multiple other components.
 
-
+<div style="page-break-after: always;"></div>
 
 **How the architecture components interact with each other**
 
@@ -70,7 +70,7 @@ For example, the `Logic` component defines its API in the `Logic.java` interface
 
 The sections below give more details of each component.
 
-
+<div style="page-break-after: always;"></div>
 
 ### UI component
 
@@ -89,7 +89,7 @@ The `UI` component,
 * keeps a reference to the `Logic` component, because the `UI` relies on the `Logic` to execute commands.
 * depends on some classes in the `Model` component, as it displays `Person` object residing in the `Model`.
 
-
+<div style="page-break-after: always;"></div>
 
 ### Logic component
 
@@ -125,7 +125,7 @@ How the parsing works:
 * When called upon to parse a user command, the `AddressBookParser` class creates an `XYZCommandParser` (`XYZ` is a placeholder for the specific command name e.g., `AddCommandParser`) which uses the other classes shown above to parse the user command and create a `XYZCommand` object (e.g., `AddCommand`) which the `AddressBookParser` returns back as a `Command` object.
 * All `XYZCommandParser` classes (e.g., `AddCommandParser`, `DeleteCommandParser`, ...) inherit from the `Parser` interface so that they can be treated similarly where possible e.g, during testing.
 
-
+<div style="page-break-after: always;"></div>
 
 ### Model component
 **API** : [`Model.java`](https://github.com/AY2526S2-CS2103T-F14-1/tp/blob/master/src/main/java/seedu/address/model/Model.java)
@@ -141,7 +141,7 @@ How the parsing works:
 
 </div>
 
-
+<div style="page-break-after: always;"></div>
 
 The `Model` component,
 
@@ -161,7 +161,7 @@ The `Model` component,
 
 </box>
 
-
+<div style="page-break-after: always;"></div>
 
 ### Storage component
 
@@ -197,7 +197,7 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 --------------------------------------------------------------------------------------------------------------------
 
-
+<div style="page-break-after: always;"></div>
 
 ## **Implementation**
 
@@ -306,7 +306,7 @@ The `redo` command does the opposite — it calls `Model#redoAddressBook()`,
 
 </box>
 
-
+<div style="page-break-after: always;"></div>
 
 Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
 
@@ -335,7 +335,7 @@ The following activity diagram summarizes what happens when a user executes a ne
 
 --------------------------------------------------------------------------------------------------------------------
 
-
+<div style="page-break-after: always;"></div>
 
 ## **Documentation, logging, testing, configuration, dev-ops**
 
@@ -429,7 +429,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 
 ---
 
-
+<div style="page-break-after: always;"></div>
 
 ### Use cases
 
@@ -761,7 +761,7 @@ Extensions
 
 --------------------------------------------------------------------------------------------------------------------
 
-
+<div style="page-break-after: always;"></div>
 
 ## **Appendix: Instructions for manual testing**
 
