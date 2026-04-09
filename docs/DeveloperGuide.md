@@ -1372,11 +1372,11 @@ Back up the file before each test if you intend to continue using the existing d
 
 1. Prerequisites: Ensure the contact's other fields are valid, otherwise the matric number error will be reported first (from [Contact with an invalid matric number](#contact-with-an-invalid-matric-number)).
 
-1. Edit a contact's grade for an assignment to a value greater than the assignment's `maxMarks`.
+2. Edit a contact's grade for an assignment to a value greater than the assignment's `maxMarks`.
 
 <p></p>
 
-2. Launch TAA.
+3. Launch TAA.
     * Expected: 
       * That contact is skipped. 
       * A load warning is displayed. 
