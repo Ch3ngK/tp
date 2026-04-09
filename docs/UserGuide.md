@@ -582,6 +582,33 @@ Examples:
 * `exportview`
 * `exportview f/exports/t01-view.csv`
 
+### CSV file format
+
+Each row represents one student.
+
+The columns are arranged as follows:
+
+- The first column is `Student`.
+- The remaining columns are grouped by date.
+- For each date, there are two columns:
+  - `<date> Attendance`
+  - `<date> Participation`
+
+Example:
+
+| Student     | 2026-04-01 Attendance | 2026-04-01 Participation |
+|-------------|------------------------|---------------------------|
+| John Doe    | PRESENT                | 0                         |
+| Philip Cap  | PRESENT                | 0                         |
+| Brendan Tan | ABSENT                 | 0                         |
+
+### Notes
+
+The exported CSV file contains the students currently shown in the view.
+If you export again to the same file path, the existing file will be overwritten.
+If you want to keep an older export, save it to a different location or rename the file before exporting again.
+
+
 ### Exiting the program : `exit`
 
 Exits the program.

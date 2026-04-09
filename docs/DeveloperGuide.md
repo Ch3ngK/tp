@@ -589,7 +589,7 @@ The term `contacts` and `students` are used interchangeably in user stories and 
     * 3b1. TAA rejects the command.
     * 3b2. User re-enters command with the missing fields.
 
-      Use case resumes at step 3.
+        Use case resumes at step 3.
   
 * 3c. An edited field value is invalid.
 
@@ -795,13 +795,11 @@ Preconditions: A group is currently active.
 **Extensions**
 
 * 1a. No group is currently active.
-
     * 1a1. TAA shows an error message.
 
         Use case ends.
 
 * 1b. The file cannot be written (e.g., invalid path or insufficient permissions).
-
     * 1b1. TAA shows an error message.
 
         Use case ends.
@@ -838,7 +836,7 @@ Preconditions: A group is currently active.
 
 Given below are instructions to test the app manually.
 
-<box type="info" seamless>
+<box type="info">
 
 **Note:** These instructions only provide a starting point for testers to work on;
 testers are expected to do more *exploratory* testing.
@@ -848,45 +846,606 @@ testers are expected to do more *exploratory* testing.
 ### Launch and shutdown
 
 1. Initial launch
+   * Download the latest `TAA.jar` file and copy into an empty folder
+   * Open your terminal, navigate to the folder and launch TAA using `java -jar TAA.jar`.
+        * Expected: Shows the GUI with a set of sample contacts.
 
-   1. Download the jar file and copy into an empty folder
+<p></p>
 
-   1. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
+2. Saving window preferences
+   * Resize the window as desired. Move the window to a different location. Close the window.
+   * Re-launch the app by double-clicking the jar file.
+        * Expected: The most recent window size and location is retained.
 
-1. Saving window preferences
+### Adding a contact
 
-   1. Resize the window to an optimum size. Move the window to a different location. Close the window.
+1. Test case: `add`
+    * Expected: `Invalid command format!...` error message.
 
-   1. Re-launch the app by double-clicking the jar file.<br>
-       Expected: The most recent window size and location is retained.
+<p></p>
 
-1. _{ more test cases …​ }_
+2. Test case: `add n/John`
+    * Expected: `Invalid command format!...` error message.
 
-### Deleting a person
+<p></p>
 
-1. Deleting a person while all persons are being shown
+3. Test case: `add n/John p/98764321 e/john@gmail.com m/A1234567X t/exchange`
+   * Prerequisites: No contact with matric number `A1234567X` exists.
+   * Expected: John is added into TAA.
 
-   1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
+<p></p>
+  
+4. Test case: `add n/John p/98764321 e/john@gmail.com m/A1234567Y t/exchange`
+    * Expected: `The matric number checksum letter is incorrect. For the given digits, it should be 'X'.` error message.
 
-   1. Test case: `delete 1`<br>
-      Expected: First contact is deleted from the list. Details of the deleted contact shown in the status message. Timestamp in the status bar is updated.
+<p></p>
 
-   1. Test case: `delete 0`<br>
-      Expected: No person is deleted. Error details shown in the status message. Status bar remains the same.
+5. Test case: `add n/John p/98764321 e/john@gmail.com m/A1234567X t/exchange`
+   * Prerequisite: A contact with matric number `A1234567X` already exists.
+   * Expected: `A person with the same matric number already exists.` error message.
 
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
-      Expected: Similar to previous.
+### Editing a contact
 
-1. _{ more test cases …​ }_
+1. Prerequisites: At least one contact is visible in the list.
 
-### Saving data
+<p></p>
 
-1. Dealing with missing/corrupted data files
+2. Test case: `edit i/1 p/91234567 e/newemail@example.com`
+    * Expected: The first contact's phone and email are updated to `91234567` and `newemail@example.com`, respectively.
 
-   1. _{explain how to simulate a missing/corrupted file, and the expected behavior}_
+<p></p>
 
-1. _{ more test cases …​ }_
+3. Test case: `edit i/1 t/`
+    * Expected: All tags are removed from the first contact.
 
+<p></p>
+
+4. Test case: `edit i/999 p/91234567`
+   * Prerequisites: No contact with index `999` exists.
+   * Expected: `The person index provided is invalid` error message.
+
+<p></p>
+
+5. Test case: `edit i/1`
+    * Expected: `At least one field to edit must be provided.` error message.
+
+<p></p>
+
+6. Test case: `edit i/1 m/A1234567X`
+   * Prerequisite: First contact has matric number `A1234567X`.
+   * Expected: `A person with the same matric number already exists.` error message.
+
+### Deleting a contact
+
+1. Prerequisites: At least one contact is visible in the list.
+
+<p> </p>
+
+2. Test case: `delete`
+    * Expected: `Invalid command format!...` error message.      
+
+<p> </p>
+
+3. Test case: `delete i/1`
+    * Expected: The first contact is removed from the list. 
+
+<p> </p>
+
+4. Test case: `delete i/0`
+    * Expected: `Invalid command format!...` error message.
+
+<p> </p>
+
+5. Test case: `find n/Alex`, then `delete i/1`
+    * Prerequisites: Only 1 contact named `Alex` exists, and he is index 1 after running `find n/Alex` 
+    * Expected: The contact `Alex` is deleted. Running `list` afterward confirms they are no longer present.
+
+### Finding a contact
+
+1. Prerequisites: A contact named `Alex Yeoh` with matric number `A0102035A` and another contact named `Bernice` exists with matric number `A0294810A` exists.
+
+<p></p>
+
+2. Test case: `find`
+    * Expected: `Invalid command format!...` error message.
+
+<p></p>
+
+3. Test case: `find n/Alex`
+    * Expected: Contact named `Alex Yeoh` is displayed.
+ 
+<p></p>
+
+4. Test case: `find m/A010`
+    * Expected: Contact named `Alex Yeoh` is listed.
+
+<p></p>
+
+5. Test case: `find n/Alex m/A0294810A`
+    * Expected: `Bernice` appears as index 1, and `Alex Yeoh` appears as index 2.
+
+### Creating a group
+
+1. Test case: `creategroup g/T09`
+    * Expected: Group `T09` is created.
+
+<p></p>
+
+2. Test case: `creategroup g/T09`
+    * Prerequisite: Group `T09` already exists from the previous test case.
+    * Expected: `This group already exists.` error message.
+
+### Listing groups
+
+1. Test case: `listgroups`
+    * Expected: All groups are listed in the result display.
+
+### Switching between groups
+
+1. Prerequisites: Groups `2026-S1-T01` and `2026-S1-T02` exist from sample data.
+
+<p></p>
+
+2. Test case: `switchgroup g/2026-S1-T01`
+    * Expected: The view is filtered to show only contacts in `2026-S1-T01`. The status bar updates to show `2026-S1-T01`.
+
+<p></p>
+
+3. Test case: `switchgroup all`
+    * Expected: All contacts are shown. The status bar updates to show `All Students`.
+
+<p></p>
+
+4. Test case: `switchgroup g/T99`
+    * Expected: `This group does not exist.` error message.
+
+### Adding a contact to a group
+
+1. Prerequisites: Group `T09` exists. Sample data is loaded. 
+
+<p></p>
+
+2. Test case: `addtogroup g/T09 m/A0102035A`
+    * Expected: `Alex Yeoh` is added to group `T09`. The result display shows a success message.
+
+<p></p>
+
+3. Test case: `addtogroup g/T09 i/2,3`
+    * Expected: The 2nd and 3rd contacts in the current view are added to group `T09`.
+
+<p></p>
+
+4. Test case: `addtogroup g/T09 m/A0102035A`
+    * Prerequisite: `Alex Yeoh` is already in `T09` from the previous test case.
+    * Expected: `Already in T09: Alex Yeoh.` error message.
+
+### Removing a student from a group
+
+1. Prerequisite: `Alex Yeoh` is in group `T09`.
+
+<p></p>
+
+2. Test case: `removefromgroup g/T09 m/A0102035A`
+    * Expected: `Removed Alex Yeoh from T09.` Contact will still exist in TAA, but is not in the group `T09`.
+
+<p></p>
+
+3. Test case: `removefromgroup g/T09 m/A0102035A`
+    * Prerequisite: `Alex Yeoh` is no longer in `T09` from the previous test case.
+    * Expected: `Not in T09: Alex Yeoh.` error message.
+
+### Renaming a group
+
+1. Prerequisite: Group `T09` exists. Sample data is loaded.
+
+<p></p>
+
+2. Test case: `renamegroup g/T09 new/T09-Renamed`
+    * Expected: `Renamed group T09 to T09-Renamed`.
+
+<p></p>
+
+3. Test case: `renamegroup g/T09-Renamed new/2026-S1-T01`
+    * Prerequisite: Group `2026-S1-T01` already exists from sample data.
+    * Expected: `Another group with that name already exists.` error message.
+
+### Deleting a group
+
+1. Prerequisite: Group `T09-Renamed` exists.
+
+<p></p>
+
+2. Test case: `deletegroup g/T09-Renamed`
+    * Expected: `Deleted group: T09-Renamed`. Contacts that were in the group still remain in TAA.
+
+<p></p>
+
+3. Test case: `deletegroup g/T99`
+    * Expected: `This group does not exist.` error message.
+
+### Adding a session
+
+1. Prerequisites: Switch to calendar view using `view g/2026-S1-T01`. No session on `2026-04-10` exists.
+
+<p></p>
+
+2. Test case: `addsession d/2026-04-10`
+    * Expected: A session on `2026-04-10` is created for all students in `2026-S1-T01`.
+
+<p></p>
+
+3. Test case: `addsession d/2026-04-17 n/make-up`
+    * Expected: A session on `2026-04-17` is created with the note `make-up`.
+    * Note: You may need to run `view d/2026-04-17` to see the created note.
+
+<p></p>
+
+4. Test case: `addsession d/2026-04-10`
+    * Prerequisite: Session on `2026-04-10` already exists from the previous test case.
+    * Expected: `Session 2026-04-10 already exists for all students in group 2026-S1-T01.` error message.
+
+<p></p>
+
+5. Test case: `addsession d/2026-13-01`
+    * Expected: `Invalid month: 13. Month must be between 01 and 12.` error message.
+
+### Editing a session
+
+1. Prerequisite: Session on `2026-04-10` exists in `2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `editsession d/2026-04-10 nd/2026-04-11`
+    * Expected: `Updated session 2026-04-10 -> 2026-04-11 in group 2026-S1-T01.`
+
+<p></p>
+
+3. Test case: `editsession d/2026-04-11 nn/tutorial`
+    * Expected: `Updated session 2026-04-11 (note "tutorial") in group 2026-S1-T01.`
+
+<p></p>
+
+4. Test case: `editsession d/2026-04-11 nn/`
+    * Expected: `Updated session 2026-04-11 (cleared note) in group 2026-s1-t01.`.
+
+<p></p>
+
+5. Test case: `editsession d/2026-04-11`
+    * Expected: `Invalid command format!...` error message.
+
+<p></p>
+
+6. Test case: `editsession d/2026-04-11 nd/2026-04-17`
+    * Prerequisite: Sessions exist on both `2026-04-11` and `2026-04-17`.
+    * Expected: `Cannot move session to 2026-04-17 because that date already exists in group 2026-S1-T01.`
+
+### Deleting a session
+
+1. Prerequisite: Session on `2026-04-11` exists in `2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `deletesession d/2026-04-11`
+    * Expected: `This will delete session 2026-04-11 from group 2026-S1-T01 for every student. Run the same command with "confirm" to proceed.`.
+    * Note: No session is deleted yet.
+
+<p></p>
+
+3. Test case: `deletesession confirm d/2026-04-11`
+    * Expected: `Deleted session 2026-04-11 from group 2026-S1-T01 and removed its attendance and participation records.`.
+
+<p></p>
+
+4. Test case: `deletesession confirm d/2026-04-17`
+    * Prerequisite: Session on `2026-04-17` exists.
+    * Expected: Similar expected output as Test Case 3.
+    * Note: The session is deleted immediately without a separate confirmation step.
+
+<p></p>
+
+5. Test case: `deletesession confirm d/2026-12-31`
+    * Expected: `No session on 2026-12-31 was found in group 2026-S1-T01.` error message.
+
+### Marking attendance
+
+1. Prerequisites: Switch to calendar view using `view g/2026-S1-T01`. A session on `2026-04-10` exists.
+
+<p></p>
+
+2. Test case: `mark i/1 d/2026-04-10`
+    * Expected: The first contact in the view is marked `PRESENT` for `2026-04-10`.
+
+<p></p>
+
+3. Test case: `unmark i/1 d/2026-04-10`
+    * Expected: The first contact is marked `ABSENT` for `2026-04-10`.
+
+<p></p>
+
+4. Test case: `mark i/1 d/2026-04-10` (outside group view)
+    * Prerequisite: Run `switchgroup all` first.
+    * Expected: `Mark attendance from a group view only. Use switchgroup g/GROUP_NAME first.` error message.
+
+<p></p>
+
+5. Test case: `mark i/1 d/2020-01-01`
+    * Prerequisite: Switch back to `2026-S1-T01` using `view g/2026-S1-T01`. No session exists on `2020-01-01`.
+    * Expected: A session for `2020-01-01` is automatically created and first contact is marked as present.
+
+<p></p>
+
+6. Test case: `mark i/999 d/2026-04-10`
+    * Prerequisite: No contact with index `999` exists.
+    * Expected: `The person index provided is invalid`.
+
+### Assigning participation
+
+1. Prerequisites: Switch to calendar view using `view g/2026-S1-T01`. A session on `2026-04-10` exists.
+
+<p></p>
+
+2. Test case: `part i/1 d/2026-04-10 pv/4`
+    * Expected: A participation score of `4` is recorded for the first student on `2026-04-10`.
+
+<p></p>
+
+3. Test case: `part i/1 d/2026-04-10 pv/6`
+    * Expected: `Invalid command format!...` error message.
+
+<p></p>
+
+4. Test case: `part i/1 d/2026-04-10 pv/abc`
+    * Expected: `Invalid command format!...` error message.
+
+### Viewing attendance and participation
+
+1. Prerequisites: Switch to `2026-S1-T01` using `switchgroup g/2026-S1-T01`. At least one session with attendance data exists.
+
+<p></p>
+
+2. Test case: `view`
+    * Expected: A calendar-style overview displays all students and their attendance and participation across all sessions.
+
+<p></p>
+
+3. Test case: `view d/2026-04-10`
+    * Expected: The column for `2026-04-10` is highlighted in the overview.
+
+<p></p>
+
+4. Test case: `view absent d/2026-04-10`
+    * Expected: Only students marked `ABSENT` on `2026-04-10` are shown.
+
+<p></p>
+
+5. Test case: `view from/2026-04-01 to/2026-04-30`
+    * Expected: Only session columns within April 2026 are shown.
+
+<p></p>
+
+6. Test case: `view from/2026-04-30 to/2026-04-01`
+    * Expected: `from/ date cannot be after to/ date.` error message.
+
+<p></p>
+
+7. Test case: `view d/2026-04-10`, then `mark i/2`, then `part i/2 pv/3`
+    * Expected: Each shorthand command applies to `2026-04-10` without needing to re-specify the date. The view updates after each command.
+
+### Creating an assignment
+
+1. Prerequisites: Switch to `2026-S1-T01` using `switchgroup g/2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `createassignment a/Quiz 1 d/2026-05-01 mm/20`
+    * Expected: `Created assignment Quiz 1 in 2026-S1-T01.`.
+
+<p></p>
+
+3. Test case: `createa a/Quiz 2 d/2026-05-08 mm/10`
+    * Expected: `Created assignment Quiz 2 in 2026-S1-T01.`.
+    * Note: `createa` is a shorthand that behaves like `createassignment`.
+
+<p></p>
+
+4. Test case: `createassignment a/Quiz 1 d/2026-06-01 mm/30`
+    * Prerequisite: `Quiz 1` already exists from the Test Case 2.
+    * Expected: `An assignment with that name already exists in the current group.` error message.
+
+<p></p>
+
+5. Test case: `createassignment a/Quiz 3 d/2026-05-15 mm/10` (outside group view)
+    * Prerequisite: Run `switchgroup all` first.
+    * Expected: `Assignment commands can only be used when viewing a specific group.` error message.
+
+### Listing assignments
+
+1. Prerequisite: Switch to `2026-S1-T01` using `switchgroup g/2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `lista`
+    * Expected: All assignments for `2026-S1-T01` are shown, including their due dates, max marks, and graded counts.
+
+### Editing an assignment
+
+1. Prerequisite: `Quiz 1` exists in `2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `editassignment a/Quiz 1 na/Midterm d/2026-05-10 mm/25`
+    * Expected: `Edited assignment Midterm in 2026-S1-T01.`.
+
+<p></p>
+
+3. Test case: `editassignment a/NonExistent na/New d/2026-06-01 mm/10`
+    * Expected: `This assignment does not exist in the current group.` error message.
+
+### Grading an assignment
+
+1. Prerequisites: `Quiz 2` (max marks `10`) exists in `2026-S1-T01`. At least 3 students are in the group.
+
+<p></p>
+
+2. Test case: `gradea a/Quiz 2 i/1 gr/8`
+    * Expected: The first student receives a grade of `8` for `Quiz 2`.
+
+<p></p>
+
+3. Test case: `gradea a/Quiz 2 i/1-3 gr/7`
+   * Expected: Students at indices 1, 2, and 3 all receive a grade of `7` for `Quiz 2`.
+
+<p></p>
+
+4. Test case: `gradea a/Quiz 2 m/A0102035A gr/10`
+    * Expected: Contact with matric number `A0102035A` receives a grade of `10` for `Quiz 2`.
+    * Note: If sample data is used, `A0102035A` refers to `Alex Yeoh`.
+
+<p></p>
+
+5. Test case: `gradea a/Quiz 2 i/1 gr/100`
+    * Expected: `Grade must be between 0 and 10 (the assignment's max marks) inclusive.` error message.
+
+<p></p>
+
+6. Test case: `gradea a/Quiz 2 i/1 gr/-1`
+    * Expected: `Grade should be a non-negative integer.` error message.
+
+### Deleting an assignment
+
+1. Prerequisite: `Quiz 2` exists in `2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `deleteassignment a/Quiz 2`
+    * Expected: `Deleted assignment Quiz 2 from 2026-S1-T01.`
+    * Note: All contact grades for this assignment are also removed.
+
+<p></p>
+
+3. Test case: `deletea a/NonExistent`
+    * Expected: `This assignment does not exist in the current group.` error message.
+
+### Export view
+
+1. Prerequisites: Switch to `2026-S1-T01` using `switchgroup g/2026-S1-T01`.
+
+<p></p>
+
+2. Test case: `exportview`
+    * Expected: A CSV file is created at `[JAR file location]/view-export.csv`, containing contacts in group `2026-S1-T01`.
+
+<p></p>
+
+3. Test case: `exportview f/exports/t01-apr.csv`
+    * Expected: The file is written to `exports/t01-apr.csv` relative to the JAR file location.
+
+<p></p>
+
+4. Test case: `exportview` (outside group view)
+    * Prerequisite: Run `switchgroup all` first.
+    * Expected: `No group selected. Switch to a group before exporting the view` error message.
+
+### Viewing help
+
+1. Test case: `help`
+    * Expected: A help window opens (or is brought to focus if minimized) with a link to the User Guide.
+
+#### Clearing all entries
+
+1. Test case: `clear`
+    * Expected: All contacts and groups are removed.
+
+<p></p>
+
+2. Test case: `clear someExtraText`
+    * Expected: All contacts and groups are removed. Extraneous parameters are ignored.
+
+### Exiting the program
+
+1. Test case: `exit`
+    * Expected: The application closes.
+
+### Saving and reloading data
+
+1. Add a contact: `add n/Test User p/81111111 e/test@example.com m/A0308002Y`.
+
+<p></p>
+
+2. Close the app with `exit`.
+
+<p></p>
+
+3. Re-launch TAA using `java -jar TAA.jar`.
+    * Expected: The contact `Test User` is still present.
+
+### Handling corrupted or edge-case save files
+
+<box type="info">
+
+The following tests require direct editing of `TAA_savefile.json` in the `data` folder.<br>
+Back up the file before each test if you intend to continue using the existing data in your save file.
+
+</box>
+
+#### Blank save file
+
+1. Delete all contents in `TAA_savefile.json`.
+
+<p></p>
+
+2. Launch TAA with `java -jar TAA.jar`.
+    * Expected: Sample data is loaded. The app starts normally.
+
+### Malformed JSON
+
+1. Replace the contents of `TAA_savefile.json` with invalid JSON (e.g., `{ "persons": [`).
+
+<p></p>
+
+2. Launch TAA.
+    * Expected: TAA starts with an empty address book and displays a warning. All save operations are blocked for this session to prevent overwriting the original file.
+
+### Contact referencing a non-existent group
+
+1. In `TAA_savefile.json`, add a contact whose `groups` array references a group name not present in the `groups` array.
+   * Alternatively, edit an existing `groups` array inside a person of sample data to reference a group that does not exist.
+   * Example: Edit `2026-S1-T01` for `Alex Yeoh` to `2026-S1-T15`.
+
+<p></p>
+
+2. Launch TAA.
+    * Expected: 
+      * That contact is skipped and not loaded.
+      * TAA starts with the remaining valid entries. 
+      * A load warning is displayed on startup. 
+      * The skipped entry is preserved in `preservedSkippedPersons` in the save file.
+
+### Contact with an invalid matric number
+
+1. Manually edit a contact's `matricNumber` field to an invalid value (example: `A0000000Z`).
+
+<p></p>
+
+2. Launch TAA.
+    * Expected: 
+      * That contact is skipped. 
+      * A load warning is displayed. 
+      * The remaining contacts load normally.
+
+### Contact with an assignment grade exceeding max marks
+
+1. Prerequisites: Ensure the contact's other fields are valid, otherwise the matric number error will be reported first (from [Contact with an invalid matric number](#contact-with-an-invalid-matric-number)).
+
+2. Edit a contact's grade for an assignment to a value greater than the assignment's `maxMarks`.
+
+<p></p>
+
+3. Launch TAA.
+    * Expected: 
+      * That contact is skipped. 
+      * A load warning is displayed. 
+      * Other contacts load normally.
 
 ## Appendix: Effort
 
@@ -908,13 +1467,6 @@ Overall, our team successfully transformed a generic contact-management applicat
 
 ## Appendix: Planned Enhancements
 
-1. Add undo/redo support for data-changing commands.
-2. Improve the attendance and participation UI further for better readability across long academic timelines.
-3. Support importing and exporting data in more convenient formats such as CSV.
-4. Add recurring-session support for tutorial groups so weekly schedules can be created more efficiently.
-5. Improve accessibility through additional colour themes and colour-blind-friendly display options.
-6. Add more powerful search and filtering, such as combined filters for group, attendance, and assignment progress.
-7. Provide command shortcuts or aliases for frequently used workflows.
-8. Expand support for per-student notes and reminders.
-
 Team size: 5
+
+1. Improve session and assignment grade error reporting during save file loading: Currently, when a manually edited contact has multiple invalid session or assignment grade fields, only the first error among them is reported, requiring multiple fix-and-relaunch cycles to fully correct the entry. We plan to accumulate and report all such errors together in a single warning message, consistent with how basic field errors (name, phone, email, matric number, tags) are already reported together.
