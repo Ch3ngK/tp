@@ -190,6 +190,11 @@ public class ViewCommand extends Command {
     }
 
     private boolean sessionExistsForGroup(Model model, GroupName groupName, LocalDate date) {
+        if (model.findGroupByName(groupName)
+                .flatMap(group -> group.getSession(date))
+                .isPresent()) {
+            return true;
+        }
         return model.getAddressBook().getPersonList().stream()
                 .filter(person -> person.hasGroup(groupName))
                 .map(person -> person.getGroupSessions().get(groupName))

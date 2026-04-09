@@ -12,8 +12,11 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
+import seedu.address.model.person.Attendance;
 import seedu.address.model.person.MatricNumber;
+import seedu.address.model.person.Participation;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.Session;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddToGroupCommandTest {
@@ -92,5 +95,32 @@ public class AddToGroupCommandTest {
         AddToGroupCommand command = AddToGroupCommand.forIndexes(T01, java.util.List.of(Index.fromOneBased(2)));
 
         assertCommandFailure(command, model, MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+    }
+
+    @Test
+    public void execute_inheritsExistingGroupSessions() {
+        Model model = new ModelManager();
+        Group seededGroup = new Group(T01).withUpdatedSession(new Session(
+                java.time.LocalDate.of(2026, 3, 16),
+                new Attendance(Attendance.Status.UNINITIALISED),
+                new Participation(0),
+                "tutorial"));
+        model.addGroup(seededGroup);
+
+        Person alice = new PersonBuilder().withName("Alice")
+                .withMatricNumber("A1234567X")
+                .withEmail("alice@example.com")
+                .withPhone("91234567")
+                .build();
+        model.addPerson(alice);
+
+        AddToGroupCommand command = AddToGroupCommand.forIndexes(T01, java.util.List.of(Index.fromOneBased(1)));
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        Person updatedAlice = new Person(alice, java.util.Set.of(T01))
+                .withUpdatedSession(T01, seededGroup.getSession(java.time.LocalDate.of(2026, 3, 16)).orElseThrow());
+        expectedModel.setPerson(alice, updatedAlice);
+
+        assertCommandSuccess(command, model, "Added Alice to T01.", expectedModel);
     }
 }

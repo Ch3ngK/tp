@@ -54,7 +54,7 @@ public class CreateAssignmentCommand extends ClassScopedAssignmentCommand {
 
         List<Assignment> updatedAssignments = new ArrayList<>(activeGroup.getAssignments());
         updatedAssignments.add(new Assignment(assignmentName, dueDate, maxMarks));
-        Group updatedGroup = new Group(activeGroup.getGroupName(), updatedAssignments);
+        Group updatedGroup = activeGroup.withAssignments(updatedAssignments);
         model.setGroup(activeGroup, updatedGroup);
         return new CommandResult(String.format(MESSAGE_SUCCESS, assignmentName.value,
                 activeGroup.getGroupName().value));

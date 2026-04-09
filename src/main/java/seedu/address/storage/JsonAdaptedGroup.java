@@ -10,6 +10,7 @@ import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
+import seedu.address.model.person.Session;
 
 /**
  * Jackson-friendly version of {@link Group}.
@@ -21,19 +22,25 @@ class JsonAdaptedGroup {
 
     private final String name;
     private final List<JsonAdaptedAssignment> assignments = new ArrayList<>();
+    private final List<JsonAdaptedSession> sessions = new ArrayList<>();
 
     @JsonCreator
     public JsonAdaptedGroup(@JsonProperty("name") String name,
-                            @JsonProperty("assignments") List<JsonAdaptedAssignment> assignments) {
+                            @JsonProperty("assignments") List<JsonAdaptedAssignment> assignments,
+                            @JsonProperty("sessions") List<JsonAdaptedSession> sessions) {
         this.name = name;
         if (assignments != null) {
             this.assignments.addAll(assignments);
+        }
+        if (sessions != null) {
+            this.sessions.addAll(sessions);
         }
     }
 
     public JsonAdaptedGroup(Group source) {
         name = source.getGroupName().value;
         assignments.addAll(source.getAssignments().stream().map(JsonAdaptedAssignment::new).toList());
+        sessions.addAll(source.getSessions().stream().map(JsonAdaptedSession::new).toList());
     }
 
     public Group toModelType() throws IllegalValueException {
@@ -49,7 +56,11 @@ class JsonAdaptedGroup {
         for (JsonAdaptedAssignment assignment : assignments) {
             modelAssignments.add(assignment.toModelType());
         }
-        return new Group(new GroupName(name), modelAssignments);
+        List<Session> modelSessions = new ArrayList<>();
+        for (JsonAdaptedSession session : sessions) {
+            modelSessions.add(session.toModelType());
+        }
+        return new Group(new GroupName(name), modelAssignments, modelSessions);
     }
 }
 // @@author

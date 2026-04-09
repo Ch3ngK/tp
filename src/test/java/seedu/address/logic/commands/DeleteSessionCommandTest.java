@@ -56,12 +56,18 @@ public class DeleteSessionCommandTest {
         model.addGroup(new Group(T01));
         model.switchToGroupView(T01);
         model.setActiveSessionDate(SESSION_DATE);
+        Group group = model.findGroupByName(T01).orElseThrow();
+        model.setGroup(group, group.withUpdatedSession(new seedu.address.model.person.Session(SESSION_DATE,
+                new seedu.address.model.person.Attendance("PRESENT"),
+                new seedu.address.model.person.Participation(1))));
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", SESSION_DATE.toString(), "PRESENT", 1).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.switchToGroupView(T01);
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withoutSession(SESSION_DATE));
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         expectedModel.setPerson(person, person.withoutSession(T01, SESSION_DATE));
         expectedModel.clearActiveSessionDate();
@@ -113,5 +119,24 @@ public class DeleteSessionCommandTest {
         String expected = DeleteSessionCommand.class.getCanonicalName()
                 + "{sessionDate=" + SESSION_DATE + ", groupName=Optional[" + T01 + "]}";
         assertEquals(expected, command.toString());
+    }
+
+    @Test
+    public void execute_deletesGroupLevelSessionWithoutStudents() {
+        Model model = new ModelManager();
+        Group group = new Group(T01).withUpdatedSession(new seedu.address.model.person.Session(SESSION_DATE,
+                new seedu.address.model.person.Attendance("UNINITIALISED"),
+                new seedu.address.model.person.Participation(0)));
+        model.addGroup(group);
+        model.switchToGroupView(T01);
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.switchToGroupView(T01);
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withoutSession(SESSION_DATE));
+
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
+        assertCommandSuccess(command, model,
+                String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
     }
 }

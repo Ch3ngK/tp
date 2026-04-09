@@ -29,12 +29,21 @@ public class EditSessionCommandTest {
         model.addGroup(new Group(T01));
         model.switchToGroupView(T01);
         model.setActiveSessionDate(ORIGINAL_DATE);
+        Group group = model.findGroupByName(T01).orElseThrow();
+        model.setGroup(group, group.withUpdatedSession(new seedu.address.model.person.Session(ORIGINAL_DATE,
+                new seedu.address.model.person.Attendance("PRESENT"),
+                new seedu.address.model.person.Participation(2))));
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", ORIGINAL_DATE.toString(), "PRESENT", 2).build());
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.switchToGroupView(T01);
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withoutSession(ORIGINAL_DATE)
+                .withUpdatedSession(new seedu.address.model.person.Session(NEW_DATE,
+                        new seedu.address.model.person.Attendance("PRESENT"),
+                        new seedu.address.model.person.Participation(2))));
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         var updatedPerson = person.withoutSession(T01, ORIGINAL_DATE)
                 .withUpdatedSession(T01, new seedu.address.model.person.Session(NEW_DATE,
@@ -66,8 +75,17 @@ public class EditSessionCommandTest {
         model.addPerson(new PersonBuilder().withName("Alice").withMatricNumber("A1234567X")
                 .withEmail("alice@example.com").withPhone("91234567")
                 .withSession("T01", ORIGINAL_DATE.toString(), "PRESENT", 2).build());
+        Group group = model.findGroupByName(T01).orElseThrow();
+        model.setGroup(group, group.withUpdatedSession(new seedu.address.model.person.Session(ORIGINAL_DATE,
+                new seedu.address.model.person.Attendance("PRESENT"),
+                new seedu.address.model.person.Participation(2))));
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withoutSession(ORIGINAL_DATE)
+                .withUpdatedSession(new seedu.address.model.person.Session(NEW_DATE,
+                        new seedu.address.model.person.Attendance("PRESENT"),
+                        new seedu.address.model.person.Participation(2))));
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         var updatedPerson = person.withoutSession(T01, ORIGINAL_DATE)
                 .withUpdatedSession(T01, new seedu.address.model.person.Session(NEW_DATE,
@@ -88,5 +106,30 @@ public class EditSessionCommandTest {
                 + "{originalDate=" + ORIGINAL_DATE + ", newDate=Optional[" + NEW_DATE
                 + "], newNote=Optional.empty, groupName=Optional[" + T01 + "]}";
         assertEquals(expected, command.toString());
+    }
+
+    @Test
+    public void execute_movesGroupLevelSessionWithoutStudents() {
+        Model model = new ModelManager();
+        Group group = new Group(T01).withUpdatedSession(new seedu.address.model.person.Session(ORIGINAL_DATE,
+                new seedu.address.model.person.Attendance("UNINITIALISED"),
+                new seedu.address.model.person.Participation(0),
+                "tutorial"));
+        model.addGroup(group);
+        model.switchToGroupView(T01);
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.switchToGroupView(T01);
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withoutSession(ORIGINAL_DATE)
+                .withUpdatedSession(new seedu.address.model.person.Session(NEW_DATE,
+                        new seedu.address.model.person.Attendance("UNINITIALISED"),
+                        new seedu.address.model.person.Participation(0),
+                        "tutorial")));
+
+        EditSessionCommand command = new EditSessionCommand(ORIGINAL_DATE, NEW_DATE);
+        assertCommandSuccess(command, model,
+                String.format(EditSessionCommand.MESSAGE_SUCCESS, ORIGINAL_DATE + " -> " + NEW_DATE, T01),
+                expectedModel);
     }
 }

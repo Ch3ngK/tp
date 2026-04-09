@@ -6,6 +6,7 @@ import java.time.format.TextStyle;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -55,6 +56,7 @@ public class PersonListPanel extends UiPart<Region> {
     private static final double MATRIX_CELL_HEIGHT = 64;
     private static final double STUDENT_HEADER_HEIGHT = YEAR_HEADER_HEIGHT + MATRIX_GRID_GAP + MATRIX_CELL_HEIGHT;
     private final ObservableList<Person> allPersons;
+    private final ObservableList<Group> groups;
     private final CommandBox.CommandExecutor commandExecutor;
     private final ReadOnlyObjectProperty<LocalDate> visibleSessionRangeStart;
     private final ReadOnlyObjectProperty<LocalDate> visibleSessionRangeEnd;
@@ -110,6 +112,7 @@ public class PersonListPanel extends UiPart<Region> {
                            CommandBox.CommandExecutor commandExecutor) {
         super(FXML);
         this.allPersons = allPersons;
+        this.groups = groups;
         this.commandExecutor = commandExecutor;
         this.visibleSessionRangeStart = visibleSessionRangeStart;
         this.visibleSessionRangeEnd = visibleSessionRangeEnd;
@@ -227,12 +230,19 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private List<LocalDate> getSessionDates(GroupName groupName) {
-        return allPersons.stream()
+        java.util.stream.Stream<Session> groupSessions = groups.stream()
+                .filter(group -> group.getGroupName().equals(groupName))
+                .findFirst()
+                .map(Group::getSessions)
+                .orElse(List.of())
+                .stream();
+        java.util.stream.Stream<Session> personSessions = allPersons.stream()
                 .filter(person -> person.hasGroup(groupName))
                 .flatMap(person -> person.getGroupSessions()
                         .getOrDefault(groupName, new SessionList())
                         .getSessions()
-                        .stream())
+                        .stream());
+        return java.util.stream.Stream.concat(groupSessions, personSessions)
                 .map(Session::getDate)
                 .filter(date -> currentVisibleRangeStart == null || !date.isBefore(currentVisibleRangeStart))
                 .filter(date -> currentVisibleRangeEnd == null || !date.isAfter(currentVisibleRangeEnd))
@@ -527,6 +537,15 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     private String getSessionNote(GroupName groupName, LocalDate sessionDate) {
+        Optional<String> groupNote = groups.stream()
+                .filter(group -> group.getGroupName().equals(groupName))
+                .findFirst()
+                .flatMap(group -> group.getSession(sessionDate))
+                .map(Session::getNote)
+                .filter(note -> !note.isBlank());
+        if (groupNote.isPresent()) {
+            return groupNote.get();
+        }
         return allPersons.stream()
                 .filter(person -> person.hasGroup(groupName))
                 .map(person -> person.getSessionNote(groupName, sessionDate))

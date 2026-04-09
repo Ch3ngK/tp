@@ -56,7 +56,7 @@ public class RenameGroupCommand extends Command {
             model.setPerson(person, updatedPerson);
         }
 
-        model.setGroup(target, new Group(newName, java.util.List.copyOf(target.getAssignments())));
+        model.setGroup(target, target.withName(newName));
         return new CommandResult(String.format(MESSAGE_SUCCESS, targetName.value, newName.value));
     }
 

@@ -13,6 +13,7 @@ import java.util.Optional;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Person;
@@ -95,12 +96,17 @@ public class ExportViewCommand extends Command {
     private List<LocalDate> getSessionDates(List<Person> persons, GroupName groupName, Model model) {
         Optional<LocalDate> rangeStart = model.getVisibleSessionRangeStart();
         Optional<LocalDate> rangeEnd = model.getVisibleSessionRangeEnd();
-        return persons.stream()
+        java.util.stream.Stream<Session> groupSessions = model.findGroupByName(groupName)
+                .map(Group::getSessions)
+                .orElse(List.of())
+                .stream();
+        java.util.stream.Stream<Session> personSessions = persons.stream()
                 .filter(person -> person.hasGroup(groupName))
                 .flatMap(person -> person.getGroupSessions()
                         .getOrDefault(groupName, new SessionList())
                         .getSessions()
-                        .stream())
+                        .stream());
+        return java.util.stream.Stream.concat(groupSessions, personSessions)
                 .map(Session::getDate)
                 .filter(date -> rangeStart.isEmpty() || !date.isBefore(rangeStart.get()))
                 .filter(date -> rangeEnd.isEmpty() || !date.isAfter(rangeEnd.get()))

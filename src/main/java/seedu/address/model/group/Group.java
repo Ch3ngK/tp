@@ -10,6 +10,8 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.assignment.Assignment;
 import seedu.address.model.assignment.AssignmentName;
 import seedu.address.model.assignment.UniqueAssignmentList;
+import seedu.address.model.person.Session;
+import seedu.address.model.person.SessionList;
 
 /**
  * Group represents a real-world Group, such as Tutorial Group, Lab Group, and similar.
@@ -20,6 +22,7 @@ import seedu.address.model.assignment.UniqueAssignmentList;
 public class Group {
     private final GroupName groupName;
     private final UniqueAssignmentList assignments;
+    private final SessionList sessions;
 
     /**
      * Creates a {@code Group} with the given name.
@@ -27,18 +30,27 @@ public class Group {
      * @param groupName Name of the group.
      */
     public Group(GroupName groupName) {
-        this(groupName, List.of());
+        this(groupName, List.of(), List.of());
     }
 
     /**
      * Creates a {@code Group} with the given name and assignments.
      */
     public Group(GroupName groupName, List<Assignment> assignments) {
+        this(groupName, assignments, List.of());
+    }
+
+    /**
+     * Creates a {@code Group} with the given name, assignments, and sessions.
+     */
+    public Group(GroupName groupName, List<Assignment> assignments, List<Session> sessions) {
         requireNonNull(groupName);
         requireNonNull(assignments);
+        requireNonNull(sessions);
         this.groupName = groupName;
         this.assignments = new UniqueAssignmentList();
         this.assignments.setAssignments(assignments);
+        this.sessions = new SessionList(sessions);
     }
 
     public GroupName getGroupName() {
@@ -50,6 +62,68 @@ public class Group {
      */
     public ObservableList<Assignment> getAssignments() {
         return assignments.asUnmodifiableObservableList();
+    }
+
+    /**
+     * Returns an unmodifiable view of the sessions belonging to this group.
+     */
+    public List<Session> getSessions() {
+        return sessions.getSessions();
+    }
+
+    /**
+     * Returns the session with the given date if present.
+     */
+    public Optional<Session> getSession(java.time.LocalDate date) {
+        requireNonNull(date);
+        return sessions.getSession(date);
+    }
+
+    /**
+     * Returns a copy of this group with the given assignments.
+     */
+    public Group withAssignments(List<Assignment> updatedAssignments) {
+        requireNonNull(updatedAssignments);
+        return new Group(groupName, updatedAssignments, sessions.getSessions());
+    }
+
+    /**
+     * Returns a copy of this group with the given session added or overwritten.
+     */
+    public Group withUpdatedSession(Session session) {
+        requireNonNull(session);
+        SessionList updatedSessions = new SessionList(sessions.getSessions());
+        updatedSessions.addSession(session);
+        return new Group(
+                groupName,
+                List.copyOf(assignments.asUnmodifiableObservableList()),
+                updatedSessions.getSessions());
+    }
+
+    /**
+     * Returns a copy of this group without the session for the given date.
+     */
+    public Group withoutSession(java.time.LocalDate date) {
+        requireNonNull(date);
+        SessionList updatedSessions = new SessionList(sessions.getSessions());
+        if (!updatedSessions.removeSession(date)) {
+            return this;
+        }
+        return new Group(
+                groupName,
+                List.copyOf(assignments.asUnmodifiableObservableList()),
+                updatedSessions.getSessions());
+    }
+
+    /**
+     * Returns a copy of this group with a different name.
+     */
+    public Group withName(GroupName newGroupName) {
+        requireNonNull(newGroupName);
+        return new Group(
+                newGroupName,
+                List.copyOf(assignments.asUnmodifiableObservableList()),
+                sessions.getSessions());
     }
 
     /**
@@ -92,12 +166,13 @@ public class Group {
 
         Group otherGroup = (Group) other;
         return groupName.equals(otherGroup.groupName)
-                && assignments.equals(otherGroup.assignments);
+                && assignments.equals(otherGroup.assignments)
+                && sessions.equals(otherGroup.sessions);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(groupName, assignments);
+        return java.util.Objects.hash(groupName, assignments, sessions);
     }
 
     @Override
@@ -105,6 +180,7 @@ public class Group {
         return new ToStringBuilder(this)
                 .add("groupName", groupName)
                 .add("assignments", assignments)
+                .add("sessions", sessions)
                 .toString();
     }
 

@@ -12,6 +12,7 @@ import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
 import seedu.address.model.person.MatricNumber;
 import seedu.address.model.person.Person;
@@ -64,6 +65,8 @@ public class AddToGroupCommand extends GroupMembershipCommand {
 
         List<Person> targetPersons = resolveTargetPersons(model);
         logger.fine("Resolved " + targetPersons.size() + " student(s) for add-to-group.");
+        Group targetGroup = model.findGroupByName(groupName)
+                .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
 
         List<String> addedStudents = new ArrayList<>();
         List<String> alreadyMembers = new ArrayList<>();
@@ -80,6 +83,9 @@ public class AddToGroupCommand extends GroupMembershipCommand {
             HashSet<GroupName> updatedGroups = new HashSet<>(person.getGroups());
             updatedGroups.add(groupName);
             Person updatedPerson = new Person(person, updatedGroups);
+            for (var session : targetGroup.getSessions()) {
+                updatedPerson = updatedPerson.withUpdatedSession(groupName, session);
+            }
             model.setPerson(person, updatedPerson);
             addedStudents.add(person.getName().fullName); // TODO: Improve Law of Demeter
         }

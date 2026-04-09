@@ -9,6 +9,7 @@ import java.util.Optional;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
@@ -78,8 +79,15 @@ public class EditSessionCommand extends Command {
 
         GroupName targetGroup = groupName.or(() -> originalActiveGroup)
                 .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
+        Group group = model.findGroupByName(targetGroup)
+                .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
         LocalDate targetDate = newDate.orElse(originalDate);
-        boolean foundOriginal = false;
+        Optional<Session> originalGroupSession = group.getSession(originalDate);
+        boolean foundOriginal = originalGroupSession.isPresent();
+        if (!targetDate.equals(originalDate) && group.getSession(targetDate).isPresent()) {
+            throw new CommandException(String.format(
+                    MESSAGE_TARGET_SESSION_ALREADY_EXISTS, targetDate, targetGroup));
+        }
         for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
             if (!person.hasGroup(targetGroup)) {
                 continue;
@@ -103,6 +111,28 @@ public class EditSessionCommand extends Command {
         if (!foundOriginal) {
             throw new CommandException(String.format(MESSAGE_SESSION_NOT_FOUND, originalDate, targetGroup));
         }
+
+        Optional<Session> fallbackPersonSession = List.copyOf(model.getAddressBook().getPersonList())
+                .stream()
+                .filter(person -> person.hasGroup(targetGroup))
+                .map(person -> Optional.ofNullable(person.getGroupSessions().get(targetGroup))
+                        .flatMap(sessionList -> sessionList.getSession(originalDate)))
+                .flatMap(Optional::stream)
+                .findFirst();
+        Session sourceGroupSession;
+        if (originalGroupSession.isPresent()) {
+            sourceGroupSession = originalGroupSession.get();
+        } else {
+            sourceGroupSession = fallbackPersonSession
+                    .orElseThrow(() -> new CommandException(
+                            String.format(MESSAGE_SESSION_NOT_FOUND, originalDate, targetGroup)));
+        }
+        Session updatedGroupSession = new Session(
+                targetDate,
+                sourceGroupSession.getAttendance(),
+                sourceGroupSession.getParticipation(),
+                newNote.orElse(sourceGroupSession.getNote()));
+        model.setGroup(group, group.withoutSession(originalDate).withUpdatedSession(updatedGroupSession));
 
         for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
             if (!person.hasGroup(targetGroup)) {

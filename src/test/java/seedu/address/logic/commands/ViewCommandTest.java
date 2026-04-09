@@ -212,6 +212,27 @@ public class ViewCommandTest {
     }
 
     @Test
+    public void execute_groupLevelSessionWithoutStudents_succeeds() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01, List.of(), List.of(
+                new seedu.address.model.person.Session(SESSION_DATE,
+                        new Attendance("UNINITIALISED"),
+                        new seedu.address.model.person.Participation(0),
+                        "tutorial"))));
+        model.switchToGroupView(T01);
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.switchToGroupView(T01);
+        expectedModel.setActiveSessionDate(SESSION_DATE);
+        expectedModel.setAttendanceViewActive(true);
+        expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
+
+        ViewCommand command = new ViewCommand(T01, SESSION_DATE);
+        assertCommandSuccess(command, model,
+                String.format(ViewCommand.MESSAGE_VIEW_SUCCESS, 0, T01, SESSION_DATE), expectedModel);
+    }
+
+    @Test
     public void execute_refocusDate_preservesExistingVisibleRange() {
         Model model = new ModelManager();
         model.addGroup(new Group(T01));

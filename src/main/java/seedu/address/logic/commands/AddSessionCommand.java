@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Attendance;
 import seedu.address.model.person.Participation;
@@ -34,8 +35,6 @@ public class AddSessionCommand extends Command {
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
     public static final String MESSAGE_NO_ACTIVE_GROUP =
             "No group selected. Enter a group first or provide g/GROUP_NAME.";
-    public static final String MESSAGE_NO_STUDENTS_IN_GROUP =
-            "Group %1$s has no students yet. Add students to the group before creating a session.";
     public static final String MESSAGE_SESSION_ALREADY_EXISTS =
             "Session %1$s already exists for all students in group %2$s.";
 
@@ -82,6 +81,12 @@ public class AddSessionCommand extends Command {
 
         GroupName targetGroup = model.getActiveGroupName()
                 .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
+        Group group = model.findGroupByName(targetGroup)
+                .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
+        Session defaultSession = new Session(sessionDate,
+                new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), note);
+
+        boolean groupSessionExists = group.getSession(sessionDate).isPresent();
         int createdCount = 0;
         int existingCount = 0;
         int studentsInGroup = 0;
@@ -98,20 +103,15 @@ public class AddSessionCommand extends Command {
                 continue;
             }
 
-            Session defaultSession = new Session(sessionDate,
-                    new Attendance(Attendance.Status.UNINITIALISED), new Participation(0), note);
             model.setPerson(person, person.withUpdatedSession(targetGroup, defaultSession));
             createdCount++;
         }
 
-        if (studentsInGroup == 0) {
-            throw new CommandException(String.format(MESSAGE_NO_STUDENTS_IN_GROUP, targetGroup));
-        }
-
-        if (createdCount == 0) {
+        if (groupSessionExists || (studentsInGroup > 0 && createdCount == 0)) {
             throw new CommandException(String.format(MESSAGE_SESSION_ALREADY_EXISTS, sessionDate, targetGroup));
         }
 
+        model.setGroup(group, group.withUpdatedSession(defaultSession));
         model.setActiveSessionDate(sessionDate);
         if (existingCount > 0) {
             return new CommandResult(String.format(

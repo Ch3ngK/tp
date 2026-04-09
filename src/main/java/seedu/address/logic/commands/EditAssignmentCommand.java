@@ -68,7 +68,7 @@ public class EditAssignmentCommand extends ClassScopedAssignmentCommand {
         List<Assignment> updatedAssignments = new ArrayList<>(activeGroup.getAssignments());
         int index = updatedAssignments.indexOf(assignmentToEdit);
         updatedAssignments.set(index, editedAssignment);
-        Group updatedGroup = new Group(activeGroup.getGroupName(), updatedAssignments);
+        Group updatedGroup = activeGroup.withAssignments(updatedAssignments);
         model.setGroup(activeGroup, updatedGroup);
 
         if (!targetAssignmentName.equals(editedAssignment.getAssignmentName())) {

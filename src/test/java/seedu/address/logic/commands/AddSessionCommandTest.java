@@ -34,6 +34,11 @@ public class AddSessionCommandTest {
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.switchToGroupView(T01);
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withUpdatedSession(
+                new seedu.address.model.person.Session(SESSION_DATE,
+                        new Attendance(Attendance.Status.UNINITIALISED),
+                        new seedu.address.model.person.Participation(0))));
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         expectedModel.setPerson(person, person.withUpdatedSession(T01,
                 new seedu.address.model.person.Session(SESSION_DATE,
@@ -72,14 +77,24 @@ public class AddSessionCommandTest {
     }
 
     @Test
-    public void execute_groupHasNoStudents_throwsHelpfulCommandException() {
+    public void execute_groupHasNoStudents_createsGroupLevelSession() throws Exception {
         Model model = new ModelManager();
         model.addGroup(new Group(T01));
         model.switchToGroupView(T01);
 
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.switchToGroupView(T01);
+        Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
+        expectedModel.setGroup(originalGroup, originalGroup.withUpdatedSession(
+                new seedu.address.model.person.Session(SESSION_DATE,
+                        new Attendance(Attendance.Status.UNINITIALISED),
+                        new seedu.address.model.person.Participation(0))));
+        expectedModel.setActiveSessionDate(SESSION_DATE);
+
         AddSessionCommand command = new AddSessionCommand(SESSION_DATE);
-        String expectedMessage = String.format(AddSessionCommand.MESSAGE_NO_STUDENTS_IN_GROUP, T01);
-        assertThrows(CommandException.class, expectedMessage, () -> command.execute(model));
+        assertCommandSuccess(command, model,
+                String.format(AddSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01, 0), expectedModel);
+        assertTrue(model.findGroupByName(T01).orElseThrow().getSession(SESSION_DATE).isPresent());
     }
 
     @Test
@@ -116,5 +131,19 @@ public class AddSessionCommandTest {
                 .getGroupSessions().get(T01).getSession(SESSION_DATE).isPresent());
         assertTrue(model.findPersonByMatricNumber(new MatricNumber("A1234568W")).orElseThrow()
                 .getGroupSessions().get(T01).getSession(SESSION_DATE).isPresent());
+    }
+
+    @Test
+    public void execute_groupLevelSessionAlreadyExists_throwsCommandException() {
+        Model model = new ModelManager();
+        Group originalGroup = new Group(T01).withUpdatedSession(new seedu.address.model.person.Session(SESSION_DATE,
+                new Attendance(Attendance.Status.UNINITIALISED),
+                new seedu.address.model.person.Participation(0)));
+        model.addGroup(originalGroup);
+        model.switchToGroupView(T01);
+
+        AddSessionCommand command = new AddSessionCommand(SESSION_DATE);
+        String expectedMessage = String.format(AddSessionCommand.MESSAGE_SESSION_ALREADY_EXISTS, SESSION_DATE, T01);
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(model));
     }
 }

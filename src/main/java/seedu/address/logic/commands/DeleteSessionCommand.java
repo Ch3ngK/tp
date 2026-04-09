@@ -9,6 +9,7 @@ import java.util.Optional;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.group.Group;
 import seedu.address.model.group.GroupName;
 import seedu.address.model.person.Person;
 
@@ -74,11 +75,15 @@ public class DeleteSessionCommand extends Command {
 
         GroupName targetGroup = model.getActiveGroupName()
                 .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
+        Group group = model.findGroupByName(targetGroup)
+                .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
 
         if (!confirmed) {
             return new CommandResult(String.format(MESSAGE_CONFIRMATION, sessionDate, targetGroup));
         }
 
+        Group updatedGroup = group.withoutSession(sessionDate);
+        boolean sessionRemovedFromGroup = !updatedGroup.equals(group);
         int removedCount = 0;
         for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
             if (!person.hasGroup(targetGroup)) {
@@ -91,8 +96,12 @@ public class DeleteSessionCommand extends Command {
             }
         }
 
-        if (removedCount == 0) {
+        if (!sessionRemovedFromGroup && removedCount == 0) {
             throw new CommandException(String.format(MESSAGE_SESSION_NOT_FOUND, sessionDate, targetGroup));
+        }
+
+        if (sessionRemovedFromGroup) {
+            model.setGroup(group, updatedGroup);
         }
 
         if (model.getActiveSessionDate().filter(sessionDate::equals).isPresent()) {

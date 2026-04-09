@@ -47,7 +47,7 @@ public class DeleteAssignmentCommand extends ClassScopedAssignmentCommand {
 
         List<Assignment> updatedAssignments = new ArrayList<>(activeGroup.getAssignments());
         updatedAssignments.remove(assignmentToDelete);
-        Group updatedGroup = new Group(activeGroup.getGroupName(), updatedAssignments);
+        Group updatedGroup = activeGroup.withAssignments(updatedAssignments);
         model.setGroup(activeGroup, updatedGroup);
 
         for (Person person : List.copyOf(model.getAddressBook().getPersonList())) {
