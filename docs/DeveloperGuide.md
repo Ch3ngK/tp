@@ -242,6 +242,73 @@ The table below shows one matric number that produces each of the 13 possible ch
 |   `A0308001B`   | 0,3,0,8,0,1  |    12     |   12   | B            |
 
 
+### Command Tab Completion Feature
+
+The **command tab completion** feature provides real-time command suggestions and contextual parameter help as the user types, with the ability to accept suggestions via the TAB key.
+
+#### How It Works
+
+The feature leverages three key components:
+
+1. **CommandRegistry** - A centralized registry containing all available commands and their parameters help-string
+2. **CommandBox (UI)** - The input component that listens to user input and manages suggestion display
+3. **Ghost Text Label** - A visual overlay showing faded suggestions for intuitive completion
+
+The architecture works as follows:
+
+-> <puml src="diagrams/CommandTabCompletionSequenceDiagram.puml" alt="Command Tab Completion Feature" width="700px"/> <-
+
+#### Detailed Flow
+
+**Step 1: Initialization**
+- When `CommandBox` is created, it extracts all command words from `CommandRegistry.COMMAND_ATTRIBUTES` and creates a sorted list of `COMMAND_SUGGESTIONS`
+
+**Step 2: User Types**
+- As the user types in the `TextArea`, a text change listener triggers two updates:
+    - `updateGhostText()`: Finds and displays matching command suggestions as faded text
+    - `updateContextualHelp()`: Shows command parameters in the result display panel
+
+**Step 3: Ghost Text Generation**
+- The `findSuggestion()` method performs a prefix match against `COMMAND_SUGGESTIONS`
+- The first matching command (e.g., typing "a" returns "add") is displayed in the `ghostTextLabel` with semi-transparent styling
+- The suggestion is cleared if the input contains spaces or multiple words
+
+**Step 4: TAB Key Completion**
+- When the user presses TAB, the current ghost text suggestion is inserted into the command box
+- A space is automatically appended, positioning the cursor for parameter entry
+- The ghost text is cleared
+
+**Step 5: Contextual Help**
+- The `updateContextualHelp()` method extracts the command word and looks up its parameters in `CommandRegistry`
+- Parameters (e.g., "NAME p/PHONE e/EMAIL") are displayed in the result display area
+- When the user clears the command or switches commands, the previously displayed text is restored
+
+#### Class Diagram
+
+-> <puml src="diagrams/CommandTabCompletionClassDiagram.puml" alt="Command Tab Completion Class Structure" width="600px"/> <-
+
+#### Design Considerations
+
+**Aspect: Where to store command metadata**
+
+* **Option 1 (current choice):** Use a centralized `CommandRegistry` with a static `COMMAND_ATTRIBUTES` map
+    * Pros: Easy to maintain; single source of truth; decoupled from UI
+    * Cons: Requires manual registration of each command (risk of developer error); slight overhead from map lookups
+
+* **Option 2:** Store parameters within each Command class
+    * Pros: Commands are self-documenting; no central registry needed
+    * Cons: Harder to aggregate suggestions for UI; requires reflection to access static fields
+
+**Aspect: Suggestion matching algorithm**
+
+* **Option 1 (current choice):** Simple prefix matching (linear search through sorted list)
+    * Pros: Predictable; easy to understand; fast for small command sets (< 50 commands)
+    * Cons: Not fuzzy; doesn't handle typos
+
+* **Option 2:** Fuzzy matching with edit distance
+    * Pros: More forgiving; better user experience for typos
+    * Cons: More complex; slower for large command sets; may suggest unintended commands
+
 ### \[Proposed\] Undo/redo feature
 
 #### Proposed Implementation

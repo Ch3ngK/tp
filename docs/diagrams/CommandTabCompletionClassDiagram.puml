@@ -1,0 +1,46 @@
+@startuml
+!include style.puml
+skinparam arrowThickness 1.1
+skinparam arrowColor UI_COLOR_T4
+skinparam classBackgroundColor UI_COLOR
+
+package UI <<Rectangle>> {
+Class CommandBox {
+  -commandTextArea: TextArea
+  -ghostTextLabel: Label
+  -COMMAND_SUGGESTIONS: List<String>
+  -activeCommandWord: String
+  -savedResultText: String
+  -resultDisplayGetter: Supplier<String>
+  -resultDisplaySetter: Consumer<String>
+  --
+  -initialize(): void
+  -updateGhostText(input: String): void
+  -findSuggestion(input: String): String {static}
+  -clearGhostText(): void
+  -updateContextualHelp(input: String): void
+  -extractCommandWord(input: String): String {static}
+}
+}
+
+package Logic <<Rectangle>> {
+    Class CommandRegistry {
+      {static} COMMAND_ATTRIBUTES: Map<String, String>
+    }
+
+    class XYZCommand {
+      {static} COMMAND_WORD: String
+      {static} COMMAND_PARAMETERS: String
+    }
+}
+
+CommandBox --> "reads from\n\n" CommandRegistry
+CommandBox -> "\n\nuses suggestions from" COMMAND_SUGGESTIONS
+CommandRegistry -down> XYZCommand
+
+note bottom on link
+  Map entries initialized from each Command's
+  COMMAND_WORD and COMMAND_PARAMETERS
+end note
+
+@enduml

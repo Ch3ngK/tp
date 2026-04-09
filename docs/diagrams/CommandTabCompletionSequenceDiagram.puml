@@ -1,0 +1,79 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+skinparam defaultFontSize 14
+
+box UI UI_COLOR_T1
+participant ":CommandBox" as CommandBox UI_COLOR
+participant ":ghostTextLabel" as GhostLabel UI_COLOR
+participant ":commandTextArea" as TextArea UI_COLOR
+end box
+
+box Logic LOGIC_COLOR_T1
+participant ":CommandRegistry" as Registry LOGIC_COLOR
+end box
+
+[-> TextArea : User types "a"
+activate TextArea
+
+TextArea -> CommandBox : textProperty() listener\ntriggers
+activate CommandBox
+
+CommandBox -> CommandBox : updateGhostText("a")
+activate CommandBox
+
+CommandBox -> CommandBox : findSuggestion("a", COMMAND_SUGGESTIONS)
+activate CommandBox
+
+CommandBox -> Registry : lookup matching commands (from COMMAND_SUGGESTIONS)
+activate Registry
+
+Registry --> CommandBox : returns sorted list containing "add", "addsession", ...
+deactivate Registry
+
+CommandBox --> CommandBox : returns "add"\n(first match)
+deactivate CommandBox
+
+CommandBox -> GhostLabel : setText("add")
+CommandBox -> GhostLabel : setVisible(true)
+
+deactivate CommandBox
+
+CommandBox -> CommandBox : \n updateContextualHelp("a")
+activate CommandBox
+
+CommandBox -> Registry : COMMAND_ATTRIBUTES.get("add")
+activate Registry
+
+Registry --> CommandBox : "n/NAME p/PHONE e/EMAIL"
+deactivate Registry
+
+CommandBox -> CommandBox : resultDisplaySetter.accept(\n"add NAME p/PHONE e/EMAIL")
+deactivate CommandBox
+
+deactivate CommandBox
+
+note right of TextArea : Ghost text "add" displayed\nwith 50% transparency
+
+[-> TextArea : User presses TAB
+activate TextArea
+
+TextArea -> CommandBox : TAB key event handler
+activate CommandBox
+
+CommandBox -> GhostLabel : getText()
+activate GhostLabel
+
+GhostLabel --> CommandBox : "add"
+deactivate GhostLabel
+
+CommandBox -> TextArea : setText("add ")
+CommandBox -> TextArea : positionCaret(4)
+CommandBox -> GhostLabel : clearGhostText()
+
+deactivate CommandBox
+
+note right of TextArea : "add " inserted\nGhost text cleared
+
+deactivate TextArea
+@enduml
