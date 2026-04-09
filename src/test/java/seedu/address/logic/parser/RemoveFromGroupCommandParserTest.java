@@ -62,8 +62,32 @@ public class RemoveFromGroupCommandParserTest {
     }
 
     @Test
-    public void parse_missingGroupPrefix_failure() {
-        assertParseFailure(parser, " i/1",
+    public void parse_missingGroupPrefixWithIndexes_success() throws Exception {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        model.addPerson(new PersonBuilder().withName("Alice")
+                .withMatricNumber("A1234567X")
+                .withEmail("alice@example.com")
+                .withPhone("91234567")
+                .withGroups("T01")
+                .build());
+        model.switchToGroupView(T01);
+
+        RemoveFromGroupCommand command = parser.parse(" i/1");
+        CommandResult result = command.execute(model);
+
+        assertEquals(new CommandResult("Removed Alice from T01."), result);
+    }
+
+    @Test
+    public void parse_missingTargets_failure() {
+        assertParseFailure(parser, " g/T01",
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, RemoveFromGroupCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parse_preamble_failure() {
+        assertParseFailure(parser, " abc g/T01 i/1",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, RemoveFromGroupCommand.MESSAGE_USAGE));
     }
 }

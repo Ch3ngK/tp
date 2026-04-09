@@ -6,7 +6,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_INDEXES;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_MATRIC_NUMBER;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.RemoveFromGroupCommand;
@@ -24,13 +23,16 @@ public class RemoveFromGroupCommandParser implements Parser<RemoveFromGroupComma
     public RemoveFromGroupCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap =
                 ArgumentTokenizer.tokenize(args, PREFIX_GROUP, PREFIX_MATRIC_NUMBER, PREFIX_INDEXES);
-        if (!arePrefixesPresent(argMultimap, PREFIX_GROUP) || !argMultimap.getPreamble().isEmpty()) {
+        if (!argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
                     RemoveFromGroupCommand.MESSAGE_USAGE));
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_GROUP, PREFIX_INDEXES);
-        GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+        GroupName groupName = null;
+        if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
+            groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
+        }
         boolean hasMatricTargets = !argMultimap.getAllValues(PREFIX_MATRIC_NUMBER).isEmpty();
         boolean hasIndexTargets = argMultimap.getValue(PREFIX_INDEXES).isPresent();
 
@@ -54,10 +56,6 @@ public class RemoveFromGroupCommandParser implements Parser<RemoveFromGroupComma
             matricNumbers.add(ParserUtil.parseMatricNumber(value));
         }
         return matricNumbers;
-    }
-
-    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
     }
 }
 // @@author

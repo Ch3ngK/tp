@@ -86,4 +86,57 @@ public class RemoveFromGroupCommandTest {
 
         assertCommandFailure(command, model, RemoveFromGroupCommand.MESSAGE_GROUP_NOT_FOUND);
     }
+
+    @Test
+    public void execute_withoutGroupNameInActiveGroupView_success() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        Person alice = new PersonBuilder().withName("Alice")
+                .withMatricNumber("A1234567X")
+                .withEmail("alice@example.com")
+                .withPhone("91234567")
+                .withGroups("T01")
+                .build();
+        model.addPerson(alice);
+        model.switchToGroupView(T01);
+
+        RemoveFromGroupCommand command = RemoveFromGroupCommand.forIndexes(null,
+                java.util.List.of(Index.fromOneBased(1)));
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.switchToGroupView(T01);
+        expectedModel.setPerson(alice, alice.withoutGroupData(T01));
+
+        assertCommandSuccess(command, model, "Removed Alice from T01.", expectedModel);
+    }
+
+    @Test
+    public void execute_withoutGroupNameOutsideGroupView_failure() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        model.addPerson(new PersonBuilder().withName("Alice")
+                .withMatricNumber("A1234567X")
+                .withEmail("alice@example.com")
+                .withPhone("91234567")
+                .withGroups("T01")
+                .build());
+
+        RemoveFromGroupCommand command = RemoveFromGroupCommand.forIndexes(null,
+                java.util.List.of(Index.fromOneBased(1)));
+
+        assertCommandFailure(command, model, RemoveFromGroupCommand.MESSAGE_REQUIRES_GROUP_NAME_OR_ACTIVE_GROUP);
+    }
+
+    @Test
+    public void execute_noTargets_returnsNoStudentsRemovedMessage() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+
+        RemoveFromGroupCommand command = RemoveFromGroupCommand.forIndexes(T01, List.of());
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+
+        assertCommandSuccess(command, model,
+                "No students were removed from T01.", expectedModel);
+    }
 }

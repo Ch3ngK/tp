@@ -27,7 +27,6 @@ abstract class GroupMembershipCommand extends Command {
     protected final List<MatricNumber> targetMatricNumbers;
 
     GroupMembershipCommand(GroupName groupName, List<Index> targetIndexes) {
-        requireNonNull(groupName);
         requireNonNull(targetIndexes);
         this.groupName = groupName;
         this.targetIndexes = List.copyOf(targetIndexes);
@@ -36,7 +35,6 @@ abstract class GroupMembershipCommand extends Command {
 
     GroupMembershipCommand(GroupName groupName, List<MatricNumber> targetMatricNumbers,
                            boolean ignored) {
-        requireNonNull(groupName);
         requireNonNull(targetMatricNumbers);
         this.groupName = groupName;
         this.targetIndexes = List.of();
