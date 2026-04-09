@@ -327,7 +327,7 @@ Assigns participation level of a particular date for a tutorial group to contact
 You must be in a group view using `switchgroup g/GROUP_NAME` before using this command.
 </box>
 
-Format: `part i/INDEX d/YYYY-MM-DD pv/PARTICIPATION_VALUE`
+Format: `part i/INDEX_EXPRESSION d/YYYY-MM-DD pv/PARTICIPATION_VALUE`
 
 * The index refers to the index number shown in the list for the current view.
 * The index **must be a positive integer** 1, 2, 3, …​
@@ -645,7 +645,7 @@ You should follow the format below closely to prevent an invalid save file.
   } ]
 }
 ```
-<panel header="Here's an example of how a manually edited `TAA_savefile.json` looks like!" type="seamless">
+<panel header="Here's an example of how a manually edited `TAA_savefile.json` looks like!" type="seamless" expanded>
 
 The example below will load 1 contact, named `John`, belonging to the group `T02` with an assignment named `Assignment 1` where he has scored 100 / 100 marks. <br>
 `John` is present on the session on 2026-04-03, in which he has a participation value of 3.
