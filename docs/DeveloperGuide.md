@@ -1402,6 +1402,4 @@ Overall, our team successfully transformed a generic contact-management applicat
 
 Team size: 5
 
-1. Improve load error reporting for manually edited save files. 
-    * Currently, when a contact in the save file has invalid session or assignment grade fields, only the first error encountered is reported. 
-    * A future enhancement would accumulate and report all errors together, reducing the number of fix-and-relaunch cycles needed to fully correct a manually edited entry.
+1. Improve session and assignment grade error reporting during save file loading: Currently, when a manually edited contact has multiple invalid session or assignment grade fields, only the first error among them is reported, requiring multiple fix-and-relaunch cycles to fully correct the entry. We plan to accumulate and report all such errors together in a single warning message, consistent with how basic field errors (name, phone, email, matriculation number, tags) are already reported together.
