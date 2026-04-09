@@ -4,8 +4,10 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.ToStringBuilder;
@@ -18,22 +20,26 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
 
 /**
- * Marks a person as present using the displayed index.
+ * Marks one or more persons as present using the displayed indexes.
  */
 public class MarkCommand extends Command {
 
     public static final String COMMAND_WORD = "mark";
-    public static final String COMMAND_PARAMETERS = "i/INDEX d/YYYY-MM-DD";
+    public static final String COMMAND_PARAMETERS = "i/INDEX_EXPRESSION d/YYYY-MM-DD";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Marks the person identified by the index number in the displayed person list as PRESENT.\n"
+            + ": Marks the persons identified by the index expression in the displayed person list as PRESENT.\n"
             + "Parameters: " + COMMAND_PARAMETERS + "\n"
             + "Examples:\n"
             + COMMAND_WORD + " i/1 d/2026-03-14\n"
+            + COMMAND_WORD + " i/1,2,3 d/2026-03-14\n"
+            + COMMAND_WORD + " i/1-3 d/2026-03-14\n"
             + COMMAND_WORD + " i/1 (after 'view d/2026-03-14')";
 
     public static final String MESSAGE_MARK_SUCCESS =
             "Marked Person as PRESENT: %1$s";
+    public static final String MESSAGE_MULTIPLE_MARK_SUCCESS =
+            "Marked Persons as PRESENT: %1$s";
 
     public static final String MESSAGE_NO_ACTIVE_GROUP =
             "No group selected. Enter a group first or provide g/GROUP_NAME.";
@@ -45,21 +51,21 @@ public class MarkCommand extends Command {
     public static final String MESSAGE_GROUP_NOT_FOUND =
             "This group does not exist.";
 
-    private final Index targetIndex;
+    private final List<Index> targetIndexes;
     private final Optional<LocalDate> date;
     private final Optional<GroupName> groupName;
 
     /**
-     * Creates a MarkCommand to mark the person identified by the given {@code Index}
+     * Creates a MarkCommand to mark the persons identified by the given {@code Index} list
      * as present.
      *
-     * @param targetIndex Index of the person in the filtered person list to be marked as present.
+     * @param targetIndexes Indexes of the persons in the filtered person list to be marked as present.
      * @param date Date of the session to mark attendance for.
      * @param groupName Group containing this session.
      */
-    public MarkCommand(Index targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName) {
-        requireAllNonNull(targetIndex, date, groupName);
-        this.targetIndex = targetIndex;
+    public MarkCommand(List<Index> targetIndexes, Optional<LocalDate> date, Optional<GroupName> groupName) {
+        requireAllNonNull(targetIndexes, date, groupName);
+        this.targetIndexes = new ArrayList<>(targetIndexes);
         this.date = date;
         this.groupName = groupName;
     }
@@ -67,10 +73,6 @@ public class MarkCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-
-        if (model.getActiveGroupName().isEmpty()) {
-            throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
-        }
 
         // Step 1: switch group if g/ provided
         if (groupName.isPresent()) {
@@ -87,7 +89,7 @@ public class MarkCommand extends Command {
         Optional<GroupName> activeGroup = model.getActiveGroupName();
 
         if (activeGroup.isEmpty()) {
-            throw new CommandException(MESSAGE_NO_ACTIVE_GROUP);
+            throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
         }
 
         GroupName group = activeGroup.get();
@@ -97,36 +99,41 @@ public class MarkCommand extends Command {
         }
         LocalDate targetDate = resolvedDate.get();
 
-        // Step 3: get person
+        // Step 3: get persons
         List<Person> lastShownList = model.getFilteredPersonList();
+        List<Person> personsToUpdate = new ArrayList<>();
 
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        for (Index targetIndex : targetIndexes) {
+            if (targetIndex.getZeroBased() >= lastShownList.size()) {
+                throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+            }
+            personsToUpdate.add(lastShownList.get(targetIndex.getZeroBased()));
         }
 
-        Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
+        // Step 4 - 7: update each person
+        List<String> updatedPersons = new ArrayList<>();
+        for (Person personToUpdate : personsToUpdate) {
+            Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
 
-        // Step 4: get session
-        Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
+            Session updatedSession = new Session(
+                    targetDate,
+                    new Attendance(Attendance.Status.PRESENT),
+                    currentSession.getParticipation(),
+                    currentSession.getNote()
+            );
 
-        // Step 5: update attendance
-        Session updatedSession = new Session(
-                targetDate,
-                new Attendance(Attendance.Status.PRESENT),
-                currentSession.getParticipation(),
-                currentSession.getNote()
-        );
+            Person updatedPerson = personToUpdate.withUpdatedSession(group, updatedSession);
+            model.setPerson(personToUpdate, updatedPerson);
+            updatedPersons.add(Messages.format(updatedPerson, group, targetDate));
+        }
 
-        // Step 6: update person
-        Person updatedPerson = personToUpdate.withUpdatedSession(group, updatedSession);
-
-        // Step 7: update model
-        model.setPerson(personToUpdate, updatedPerson);
         model.setActiveSessionDate(targetDate);
 
-        return new CommandResult(
-                String.format(MESSAGE_MARK_SUCCESS, Messages.format(updatedPerson, group, targetDate))
-        );
+        String joinedPersons = updatedPersons.stream().collect(Collectors.joining("\n"));
+        if (updatedPersons.size() == 1) {
+            return new CommandResult(String.format(MESSAGE_MARK_SUCCESS, joinedPersons));
+        }
+        return new CommandResult(String.format(MESSAGE_MULTIPLE_MARK_SUCCESS, joinedPersons));
     }
 
     @Override
@@ -139,7 +146,7 @@ public class MarkCommand extends Command {
             return false;
         }
 
-        return targetIndex.equals(otherMarkCommand.targetIndex)
+        return targetIndexes.equals(otherMarkCommand.targetIndexes)
                 && date.equals(otherMarkCommand.date)
                 && groupName.equals(otherMarkCommand.groupName);
     }
@@ -147,7 +154,7 @@ public class MarkCommand extends Command {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("targetIndex", targetIndex)
+                .add("targetIndexes", targetIndexes)
                 .add("date", date)
                 .add("groupName", groupName)
                 .toString();

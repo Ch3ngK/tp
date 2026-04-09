@@ -7,6 +7,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_INDEXES;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PARTICIPATION;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import seedu.address.commons.core.index.Index;
@@ -23,6 +24,7 @@ public class PartCommandParser implements Parser<PartCommand> {
     /**
      * Parses the given {@code String} of arguments in the context of the PartCommand
      * and returns a PartCommand object for execution.
+     *
      * @throws ParseException if the user input does not conform the expected format
      */
     public PartCommand parse(String args) throws ParseException {
@@ -38,7 +40,8 @@ public class PartCommandParser implements Parser<PartCommand> {
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_INDEXES, PREFIX_DATE, PREFIX_GROUP, PREFIX_PARTICIPATION);
 
         try {
-            Index index = ParserUtil.parseIndex(argMultimap.getValue(PREFIX_INDEXES).get());
+            List<Index> indexes = ParserUtil.parseIndexes(argMultimap.getValue(PREFIX_INDEXES).get());
+
             Optional<LocalDate> date = Optional.empty();
             if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
@@ -54,7 +57,7 @@ public class PartCommandParser implements Parser<PartCommand> {
             Participation participation =
                     new Participation(argMultimap.getValue(PREFIX_PARTICIPATION).get());
 
-            return new PartCommand(index, date, groupName, participation);
+            return new PartCommand(indexes, date, groupName, participation);
         } catch (IllegalArgumentException e) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, PartCommand.MESSAGE_USAGE), e);
         } catch (ParseException e) {

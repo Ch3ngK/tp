@@ -5,8 +5,10 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.ToStringBuilder;
@@ -19,24 +21,29 @@ import seedu.address.model.person.Person;
 import seedu.address.model.person.Session;
 
 /**
- * Assigns a participation value to a person identified using the displayed index
+ * Assigns a participation value to one or more persons identified using the displayed indexes
  * for a specified session date in the current or specified group.
  */
 public class PartCommand extends Command {
 
     public static final String COMMAND_WORD = "part";
-    public static final String COMMAND_PARAMETERS = "i/INDEX pv/PARTICIPATION_VALUE d/YYYY-MM-DD"
-                    + " (PARTICIPATION_VALUE must be an integer from 0 to 5)\n";
+    public static final String COMMAND_PARAMETERS = "i/INDEX_EXPRESSION pv/PARTICIPATION_VALUE d/YYYY-MM-DD"
+            + " (PARTICIPATION_VALUE must be an integer from 0 to 5)\n";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Assigns participation to the person identified by the index number in the displayed person list.\n"
+            + ": Assigns participation to the persons identified by the index expression "
+            + "in the displayed person list.\n"
             + "Parameters: " + COMMAND_PARAMETERS + "\n"
             + "Examples:\n"
             + COMMAND_WORD + " i/1 pv/5 d/2026-03-14\n"
+            + COMMAND_WORD + " i/1,2,3 pv/5 d/2026-03-14\n"
+            + COMMAND_WORD + " i/1-3 pv/5 d/2026-03-14\n"
             + COMMAND_WORD + " i/1 pv/5 (after 'view d/2026-03-14')";
 
     public static final String MESSAGE_PARTICIPATION_SUCCESS =
             "Updated participation for Person: %1$s";
+    public static final String MESSAGE_MULTIPLE_PARTICIPATION_SUCCESS =
+            "Updated participation for Persons: %1$s";
 
     public static final String MESSAGE_GROUP_NOT_FOUND =
             "This group does not exist.";
@@ -48,26 +55,26 @@ public class PartCommand extends Command {
     public static final String MESSAGE_NO_ACTIVE_SESSION =
             "No session selected. Provide d/YYYY-MM-DD or run view with d/YYYY-MM-DD first.";
 
-    private final Index targetIndex;
+    private final List<Index> targetIndexes;
     private final Optional<LocalDate> date;
     private final Optional<GroupName> groupName;
     private final Participation participation;
 
     /**
      * Creates a PartCommand to assign the specified {@code Participation}
-     * value to the person identified by the given {@code Index}, for the
+     * value to the persons identified by the given {@code Index} list, for the
      * specified session date and current or specified group.
      *
-     * @param targetIndex Index of the person in the filtered person list whose participation
-     *                    level is to be updated.
+     * @param targetIndexes Indexes of the persons in the filtered person list whose participation
+     *                      levels are to be updated.
      * @param date Date of the session to update participation for.
      * @param groupName Group containing this session, if explicitly provided.
-     * @param participation Participation value to assign to the specified person.
+     * @param participation Participation value to assign to the specified persons.
      */
-    public PartCommand(Index targetIndex, Optional<LocalDate> date, Optional<GroupName> groupName,
+    public PartCommand(List<Index> targetIndexes, Optional<LocalDate> date, Optional<GroupName> groupName,
                        Participation participation) {
-        requireAllNonNull(targetIndex, date, groupName, participation);
-        this.targetIndex = targetIndex;
+        requireAllNonNull(targetIndexes, date, groupName, participation);
+        this.targetIndexes = new ArrayList<>(targetIndexes);
         this.date = date;
         this.groupName = groupName;
         this.participation = participation;
@@ -76,10 +83,6 @@ public class PartCommand extends Command {
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-
-        if (model.getActiveGroupName().isEmpty()) {
-            throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
-        }
 
         // Step 1: switch group if g/ provided
         if (groupName.isPresent()) {
@@ -96,7 +99,7 @@ public class PartCommand extends Command {
         Optional<GroupName> activeGroup = model.getActiveGroupName();
 
         if (activeGroup.isEmpty()) {
-            throw new CommandException(MESSAGE_NO_ACTIVE_GROUP);
+            throw new CommandException(MESSAGE_REQUIRES_GROUP_VIEW);
         }
 
         GroupName group = activeGroup.get();
@@ -106,37 +109,41 @@ public class PartCommand extends Command {
         }
         LocalDate targetDate = resolvedDate.get();
 
-        // Step 3: get person
+        // Step 3: get persons
         List<Person> lastShownList = model.getFilteredPersonList();
+        List<Person> personsToUpdate = new ArrayList<>();
 
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        for (Index targetIndex : targetIndexes) {
+            if (targetIndex.getZeroBased() >= lastShownList.size()) {
+                throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+            }
+            personsToUpdate.add(lastShownList.get(targetIndex.getZeroBased()));
         }
 
-        Person personToUpdate = lastShownList.get(targetIndex.getZeroBased());
+        // Step 4 - 7: update each person
+        List<String> updatedPersons = new ArrayList<>();
+        for (Person personToUpdate : personsToUpdate) {
+            Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
 
-        // Step 4: get session
-        Session currentSession = personToUpdate.getOrCreateSession(group, targetDate);
+            Session updatedSession = new Session(
+                    targetDate,
+                    currentSession.getAttendance(),
+                    participation,
+                    currentSession.getNote()
+            );
 
-        // Step 5: update participation
-        Session updatedSession = new Session(
-                targetDate,
-                currentSession.getAttendance(),
-                participation,
-                currentSession.getNote()
-        );
+            Person updatedPerson = personToUpdate.withUpdatedSession(group, updatedSession);
+            model.setPerson(personToUpdate, updatedPerson);
+            updatedPersons.add(Messages.format(updatedPerson, group, targetDate));
+        }
 
-        // Step 6: update person
-        Person updatedPerson = personToUpdate.withUpdatedSession(group, updatedSession);
-
-        // Step 7: update model
-        model.setPerson(personToUpdate, updatedPerson);
         model.setActiveSessionDate(targetDate);
 
-        return new CommandResult(String.format(
-                MESSAGE_PARTICIPATION_SUCCESS,
-                Messages.format(updatedPerson, group, targetDate))
-        );
+        String joinedPersons = updatedPersons.stream().collect(Collectors.joining("\n"));
+        if (updatedPersons.size() == 1) {
+            return new CommandResult(String.format(MESSAGE_PARTICIPATION_SUCCESS, joinedPersons));
+        }
+        return new CommandResult(String.format(MESSAGE_MULTIPLE_PARTICIPATION_SUCCESS, joinedPersons));
     }
 
     @Override
@@ -149,7 +156,7 @@ public class PartCommand extends Command {
             return false;
         }
 
-        return targetIndex.equals(otherPartCommand.targetIndex)
+        return targetIndexes.equals(otherPartCommand.targetIndexes)
                 && date.equals(otherPartCommand.date)
                 && groupName.equals(otherPartCommand.groupName)
                 && participation.equals(otherPartCommand.participation);
@@ -158,7 +165,7 @@ public class PartCommand extends Command {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("targetIndex", targetIndex)
+                .add("targetIndexes", targetIndexes)
                 .add("date", date)
                 .add("groupName", groupName)
                 .add("participation", participation)

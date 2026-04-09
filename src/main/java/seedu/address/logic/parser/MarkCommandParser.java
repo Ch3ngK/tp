@@ -6,6 +6,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_GROUP;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_INDEXES;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import seedu.address.commons.core.index.Index;
@@ -35,7 +36,8 @@ public class MarkCommandParser implements Parser<MarkCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_INDEXES, PREFIX_DATE, PREFIX_GROUP);
         try {
-            Index index = ParserUtil.parseIndex(argMultimap.getValue(PREFIX_INDEXES).get());
+            List<Index> indexes = ParserUtil.parseIndexes(argMultimap.getValue(PREFIX_INDEXES).get());
+
             Optional<LocalDate> date = Optional.empty();
             if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
                 date = Optional.of(ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get()));
@@ -48,7 +50,7 @@ public class MarkCommandParser implements Parser<MarkCommand> {
                 );
             }
 
-            return new MarkCommand(index, date, groupName);
+            return new MarkCommand(indexes, date, groupName);
         } catch (ParseException e) {
             throw e;
         }
