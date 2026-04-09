@@ -94,7 +94,10 @@ public class Group {
         requireNonNull(session);
         SessionList updatedSessions = new SessionList(sessions.getSessions());
         updatedSessions.addSession(session);
-        return new Group(groupName, List.copyOf(assignments.asUnmodifiableObservableList()), updatedSessions.getSessions());
+        return new Group(
+                groupName,
+                List.copyOf(assignments.asUnmodifiableObservableList()),
+                updatedSessions.getSessions());
     }
 
     /**
@@ -106,7 +109,10 @@ public class Group {
         if (!updatedSessions.removeSession(date)) {
             return this;
         }
-        return new Group(groupName, List.copyOf(assignments.asUnmodifiableObservableList()), updatedSessions.getSessions());
+        return new Group(
+                groupName,
+                List.copyOf(assignments.asUnmodifiableObservableList()),
+                updatedSessions.getSessions());
     }
 
     /**
@@ -114,7 +120,10 @@ public class Group {
      */
     public Group withName(GroupName newGroupName) {
         requireNonNull(newGroupName);
-        return new Group(newGroupName, List.copyOf(assignments.asUnmodifiableObservableList()), sessions.getSessions());
+        return new Group(
+                newGroupName,
+                List.copyOf(assignments.asUnmodifiableObservableList()),
+                sessions.getSessions());
     }
 
     /**

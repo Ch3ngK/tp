@@ -123,8 +123,9 @@ public class EditSessionCommand extends Command {
         if (originalGroupSession.isPresent()) {
             sourceGroupSession = originalGroupSession.get();
         } else {
-            sourceGroupSession = fallbackPersonSession.orElseThrow(
-                    () -> new CommandException(String.format(MESSAGE_SESSION_NOT_FOUND, originalDate, targetGroup)));
+            sourceGroupSession = fallbackPersonSession
+                    .orElseThrow(() -> new CommandException(
+                            String.format(MESSAGE_SESSION_NOT_FOUND, originalDate, targetGroup)));
         }
         Session updatedGroupSession = new Session(
                 targetDate,
