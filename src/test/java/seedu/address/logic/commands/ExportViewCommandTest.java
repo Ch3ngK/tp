@@ -45,4 +45,55 @@ public class ExportViewCommandTest {
             command.execute(model);
         });
     }
+
+    @Test
+    public void execute_withIllegalFileName_throwsCommandException() {
+        Model model = getModelWithActiveGroup();
+        ExportViewCommand command = new ExportViewCommand("bad\u0000name.csv");
+
+        assertThrows(CommandException.class, String.format(
+                ExportViewCommand.MESSAGE_INVALID_FILE_NAME, "bad\\0name.csv", "\\0"), () -> {
+            command.execute(model);
+        });
+    }
+
+    @Test
+    public void execute_withReservedFileName_throwsCommandException() {
+        Model model = getModelWithActiveGroup();
+        ExportViewCommand command = new ExportViewCommand("CON.csv");
+
+        assertThrows(CommandException.class, String.format(
+                ExportViewCommand.MESSAGE_INVALID_FILE_NAME_RESERVED, "CON.csv", "CON"), () -> {
+            command.execute(model);
+        });
+    }
+
+    @Test
+    public void execute_withForwardSlashRootedPath_throwsCommandException() {
+        Model model = getModelWithActiveGroup();
+        ExportViewCommand command = new ExportViewCommand("/T02");
+
+        assertThrows(CommandException.class, String.format(
+                ExportViewCommand.MESSAGE_INVALID_FILE_NAME, "/T02", "'/'"), () -> {
+            command.execute(model);
+        });
+    }
+
+    @Test
+    public void execute_withBackslashRootedPath_throwsCommandException() {
+        Model model = getModelWithActiveGroup();
+        ExportViewCommand command = new ExportViewCommand("\\T02");
+
+        assertThrows(CommandException.class, String.format(
+                ExportViewCommand.MESSAGE_INVALID_FILE_NAME, "\\T02", "'\\'"), () -> {
+            command.execute(model);
+        });
+    }
+
+    private Model getModelWithActiveGroup() {
+        Model model = new ModelManager();
+        model.addGroup(new Group(T01));
+        model.switchToGroupView(T01);
+        return model;
+    }
 }

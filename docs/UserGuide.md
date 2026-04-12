@@ -578,9 +578,16 @@ Format: `exportview [f/FILE_PATH]`
 * Exports the currently displayed rows and the session columns currently visible in `view`.
 * If no file path is provided, TAA will write to `[JAR file location]/view-export.csv`.
 
-Examples:
 * `exportview`
 * `exportview f/exports/t01-view.csv`
+
+<box type="warning">
+
+**IMPORTANT:**
+Avoid illegal filename characters such as `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, and `|` at the start of the export file name.
+<br> TAA will reject file names containing these characters and ask you to choose a different name.
+
+</box>
 
 ### Exiting the program : `exit`
 
