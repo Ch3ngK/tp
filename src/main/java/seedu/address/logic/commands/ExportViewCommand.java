@@ -71,7 +71,7 @@ public class ExportViewCommand extends Command {
         csv.append(System.lineSeparator());
 
         for (Person person : persons) {
-            csv.append(escape(person.getName().fullName));
+            csv.append(escape(formatExportStudentLabel(person)));
             for (LocalDate sessionDate : sessionDates) {
                 Attendance attendance = person.getAttendance(activeGroup, sessionDate);
                 csv.append(',').append(attendance.value);
@@ -113,6 +113,10 @@ public class ExportViewCommand extends Command {
                 .distinct()
                 .sorted()
                 .toList();
+    }
+
+    private String formatExportStudentLabel(Person person) {
+        return person.getName().fullName + " (" + person.getMatricNumber().value + ")";
     }
 
     private String escape(String value) {

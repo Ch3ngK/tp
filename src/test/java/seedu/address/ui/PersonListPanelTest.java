@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
+
+import seedu.address.testutil.PersonBuilder;
 
 public class PersonListPanelTest {
 
@@ -60,5 +61,21 @@ public class PersonListPanelTest {
         assertEquals(colorFor2026FullView, colorFor2026FilteredView);
         assertFalse(colorFor2026FullView.isBlank());
         assertFalse(colorFor2025.isBlank());
+    }
+
+    @Test
+    public void formatMatrixStudentLabel_includesMatricNumberOnNextLine() {
+        String label = PersonListPanel.formatMatrixStudentLabel(
+                new PersonBuilder().withName("Alex Tan").withMatricNumber("A1234567X").build(), 0);
+
+        assertEquals("1. Alex Tan" + System.lineSeparator() + "A1234567X", label);
+    }
+
+    @Test
+    public void formatMatrixStudentLabel_secondRowStillIncludesMatricNumber() {
+        String label = PersonListPanel.formatMatrixStudentLabel(
+                new PersonBuilder().withName("Jamie Lim").withMatricNumber("A1111111M").build(), 1);
+
+        assertEquals("2. Jamie Lim" + System.lineSeparator() + "A1111111M", label);
     }
 }
