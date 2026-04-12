@@ -27,4 +27,11 @@ public class DeleteSessionCommandParserTest {
                 String.format(seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT,
                         DeleteSessionCommand.MESSAGE_USAGE));
     }
+
+    @Test
+    public void parse_confirmPreamble_throwsParseException() {
+        assertParseFailure(parser, " confirm d/2026-03-16",
+                String.format(seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT,
+                        DeleteSessionCommand.MESSAGE_USAGE));
+    }
 }

@@ -40,7 +40,7 @@ public class DeleteSessionCommandTest {
         var person = expectedModel.findPersonByMatricNumber(new MatricNumber("A1234567X")).orElseThrow();
         expectedModel.setPerson(person, person.withoutSession(T01, SESSION_DATE));
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty());
         assertCommandSuccess(command, model,
                 String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
 
@@ -73,7 +73,7 @@ public class DeleteSessionCommandTest {
         expectedModel.clearActiveSessionDate();
         expectedModel.updateFilteredPersonList(seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS);
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty());
         assertCommandSuccess(command, model,
                 String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
         assertTrue(model.getActiveSessionDate().isEmpty());
@@ -85,7 +85,7 @@ public class DeleteSessionCommandTest {
         model.addGroup(new Group(T01));
         model.switchToGroupView(T01);
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty());
         String expectedMessage = String.format(DeleteSessionCommand.MESSAGE_SESSION_NOT_FOUND, SESSION_DATE, T01);
         assertThrows(CommandException.class, expectedMessage, () -> command.execute(model));
     }
@@ -135,7 +135,7 @@ public class DeleteSessionCommandTest {
         Group originalGroup = expectedModel.findGroupByName(T01).orElseThrow();
         expectedModel.setGroup(originalGroup, originalGroup.withoutSession(SESSION_DATE));
 
-        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty(), true);
+        DeleteSessionCommand command = new DeleteSessionCommand(SESSION_DATE, Optional.empty());
         assertCommandSuccess(command, model,
                 String.format(DeleteSessionCommand.MESSAGE_SUCCESS, SESSION_DATE, T01), expectedModel);
     }

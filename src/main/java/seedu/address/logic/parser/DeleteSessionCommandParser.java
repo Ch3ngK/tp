@@ -21,19 +21,17 @@ public class DeleteSessionCommandParser implements Parser<DeleteSessionCommand> 
     public DeleteSessionCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_DATE, PREFIX_GROUP);
         String preamble = argMultimap.getPreamble().trim();
-        if (!arePrefixesPresent(argMultimap, PREFIX_DATE)
-                || !(preamble.isEmpty() || preamble.equalsIgnoreCase("confirm"))) {
+        if (!arePrefixesPresent(argMultimap, PREFIX_DATE) || !preamble.isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteSessionCommand.MESSAGE_USAGE));
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_DATE, PREFIX_GROUP);
         LocalDate sessionDate = ParserUtil.parseSessionDate(argMultimap.getValue(PREFIX_DATE).get());
-        boolean confirmed = preamble.equalsIgnoreCase("confirm");
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
             GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());
-            return new DeleteSessionCommand(sessionDate, Optional.of(groupName), confirmed);
+            return new DeleteSessionCommand(sessionDate, Optional.of(groupName));
         }
-        return new DeleteSessionCommand(sessionDate, Optional.empty(), confirmed);
+        return new DeleteSessionCommand(sessionDate, Optional.empty());
     }
 
     private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {

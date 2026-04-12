@@ -29,9 +29,6 @@ public class DeleteSessionCommand extends Command {
 
     public static final String MESSAGE_SUCCESS =
             "Deleted session %1$s from group %2$s and removed its attendance and participation records.";
-    public static final String MESSAGE_CONFIRMATION =
-            "This will delete session %1$s from group %2$s for every student. Run the same command with "
-                    + "\"confirm\" to proceed.";
     public static final String MESSAGE_GROUP_NOT_FOUND = "This group does not exist.";
     public static final String MESSAGE_NO_ACTIVE_GROUP =
             "No group selected. Enter a group first or provide g/GROUP_NAME.";
@@ -40,25 +37,23 @@ public class DeleteSessionCommand extends Command {
 
     private final LocalDate sessionDate;
     private final Optional<GroupName> groupName;
-    private final boolean confirmed;
 
     public DeleteSessionCommand(LocalDate sessionDate) {
-        this(sessionDate, Optional.empty(), false);
+        this(sessionDate, Optional.empty());
     }
 
     public DeleteSessionCommand(LocalDate sessionDate, GroupName groupName) {
-        this(sessionDate, Optional.of(groupName), false);
+        this(sessionDate, Optional.of(groupName));
     }
 
     /**
-     * Creates a delete-session command with optional group and confirmation state.
+     * Creates a delete-session command with an optional group.
      */
-    public DeleteSessionCommand(LocalDate sessionDate, Optional<GroupName> groupName, boolean confirmed) {
+    public DeleteSessionCommand(LocalDate sessionDate, Optional<GroupName> groupName) {
         requireNonNull(sessionDate);
         requireNonNull(groupName);
         this.sessionDate = sessionDate;
         this.groupName = groupName;
-        this.confirmed = confirmed;
     }
 
     @Override
@@ -77,10 +72,6 @@ public class DeleteSessionCommand extends Command {
                 .orElseThrow(() -> new CommandException(MESSAGE_NO_ACTIVE_GROUP));
         Group group = model.findGroupByName(targetGroup)
                 .orElseThrow(() -> new CommandException(MESSAGE_GROUP_NOT_FOUND));
-
-        if (!confirmed) {
-            return new CommandResult(String.format(MESSAGE_CONFIRMATION, sessionDate, targetGroup));
-        }
 
         Group updatedGroup = group.withoutSession(sessionDate);
         boolean sessionRemovedFromGroup = !updatedGroup.equals(group);
