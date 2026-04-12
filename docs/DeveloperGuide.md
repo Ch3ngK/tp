@@ -511,36 +511,28 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 1. User chooses to add a contact with the required details.
 2. TAA adds the contact.
 
-   Use case ends.
+Use case ends.
 
 **Extensions**
 
 * 1a. TAA detects missing fields.
-
-    * 1a1. TAA rejects the command.
+    * 1a1. TAA rejects the command and shows error message.
     * 1a2. User re-enters the command with the missing fields.
-  
-        Steps 1a1-1a2 are repeated till all fields are present.
-        Use case resumes from step 1.
-
+  <p></p>
+    Use case resumes from step 1.
+  <p></p>
 * 1b. TAA detects errors in fields provided.
-
-    * 1b1. TAA rejects the command.
+    * 1b1. TAA rejects the command and shows error message.
     * 1b2. User re-enters corrected fields.
-
-        Steps 1b1-1b2 are repeated till all fields are correct.
-       
-        Use case resumes from step 1.
-
+    <p></p>
+    Use case resumes from step 1.
+    <p></p>
 * 1c. TAA detects a duplicate matric number in existing contacts.
-
-    * 1c1. TAA rejects the command.
+    * 1c1. TAA rejects the command and shows error message.
     * 1c2. User re-enters the matric number field.
-  
-        Steps 1c1-1c2 are repeated until contact is no longer a duplicate.
-
-        Use case resumes from step 1.
-
+    <p></p>
+    Use case resumes from step 1.
+    <p></p>
 **Use case: UC2 - Delete a contact**
 
 **MSS**
@@ -550,20 +542,19 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 3.  User requests to delete a specific contact by index.
 4.  TAA deletes the contact.
 
-    Use case ends.
+Use case ends.
 
 **Extensions**
 
-* 2a. The list is empty. 
+* 2a. The list is empty.
 
     Use case ends.
 
-* 3a. The given index is invalid.
-
-    * 3a1. TAA rejects the command.
+* 3a. TAA detects an invalid index.
+    * 3a1. TAA rejects the command and shows error message.
     * 3a2. User re-enters command with a valid index.
-
-        Use case resumes at step 3.
+    <p></p>
+    Use case resumes at step 3.
 
 **Use case: UC3 - Edit a contact**
 
@@ -574,66 +565,128 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 3.  User requests to edit a specific contact in the list by index.
 4.  TAA updates the contact.
 
-    Use case ends.
+Use case ends.
 
 **Extensions**
 
-* 3a. The given index is invalid.
+* 2a. The list is empty.
 
-    * 3a1. TAA rejects the command.
+  Use case ends.
+
+* 3a. TAA detects an invalid index.
+    * 3a1. TAA rejects the command and shows error message.
     * 3a2. User re-enters command with a valid index.
-
-        Use case resumes at step 3.
-
-* 3b. No fields to edit are provided.
-
-    * 3b1. TAA rejects the command.
+    <p></p>
+    Use case resumes at step 3.
+    <p></p>
+* 3b. TAA detects no fields to edit.
+    * 3b1. TAA rejects the command and shows error message.
     * 3b2. User re-enters command with the missing fields.
-
-        Use case resumes at step 3.
-  
-* 3c. An edited field value is invalid.
-
-    * 3c1. TAA rejects the command.
+    <p></p>
+    Use case resumes at step 3.
+    <p></p>
+* 3c. TAA detects an edited field is invalid.
+    * 3c1. TAA rejects the command and shows error message.
     * 3c2. User re-enters the command with the corrected fields.
-  
-        Steps 3c1-3c2 are repeated until the fields are valid.
-  
-        Use case resumes at step 3.
-  
-* 3d. The edit would result in a duplicate contact.
-
-    * 3d1. TAA rejects the command. 
+    <p></p>
+    Use case resumes at step 3.
+    <p></p>
+* 3d. TAA detects that the edit would result in a duplicate contact.
+    * 3d1. TAA rejects the command and shows error message. 
     * 3d2. User re-enters command with a different matric number.
+    <p></p>
+    Use case resumes at step 3.
+    <p></p>
 
-        Steps 3d1-3d2 are repeated until the contact is no longer a duplicate.     
+**Use case: UC4 - Create a group**
 
-        Use case resumes at step 3.
+**MSS**
 
-**Use case: UC4 - Switch to a group view**
+1. User requests to create a group with a specified name.
+2. TAA creates the group and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects a duplicate group name.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+
+* 1b. TAA detects an invalid group name.
+    * 1b1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+
+**Use case: UC5 - Delete a group**
+
+**MSS**
+
+1. User requests to delete a group.
+2. TAA deletes the group and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects that the group does not exist.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+
+**Use case: UC6 - Rename a group**
+
+**MSS**
+
+1. User requests to rename a group.
+2. TAA renames the group and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects the group does not exist.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+* 1b. TAA detects a group with the new name exists.
+    * 1b1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+* 1c. TAA detects a group with the new name exists.
+    * 1c1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+
+**Use case: UC7 - Switch to a group view**
 
 **MSS**
 
 1.  User requests to switch to a group view.
 2.  TAA switches the active group view and shows a confirmation message.
 
-    Use case ends.
+Use case ends.
 
 **Extensions**
 
-* 1a. The group view identifier is missing or invalid.
-
-    * 1a1. TAA shows an error message.
-
-        Use case ends.
-
-* 2a. The specified group view does not exist.
-
-    * 2a1. TAA shows an error message.
-
-        Use case ends.
-
-**Use case: UC5 - Record class participation**
+* 1a. TAA detects that the group view identifier is missing or invalid.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+* 1b. TAA detects that the specified group view does not exist.
+    * 2a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case ends.
+    <p></p>
+**Use case: UC8 - Record class participation**
 
 **MSS**
 
@@ -642,23 +695,38 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 3.  User requests to record participation for a specific person on a specified date.
 4.  TAA records the participation and shows a confirmation message.
 
-    Use case ends.
+Use case ends.
 
 **Extensions**
 
-* 3a. The given date is invalid.
+* 2a. The list is empty.
 
-    * 3a1. TAA shows an error message.
+  Use case ends.
 
-        Use case resumes at step 2.
+* 3a. TAA detects an invalid index.
+    * 3a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
 
-* 4a. A participation record already exists for that person on that date.
-
-    * 4a1. TAA shows a message indicating no change was made.
-
-        Use case ends.
-
-**Use case: UC6 - Record assignment submission**
+* 3b. TAA detects that the given date is invalid.
+    * 3b1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
+  
+* 3c. TAA detects an invalid participation score.
+  * 3c1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
+    
+* 3d. TAA detects there is no session for the specified date.
+    * 3d1. TAA creates a session for the date.
+    <p></p>
+    Use case resumes at step 4.
+    <p></p>
+**Use case: UC9 - Grade assignment submission**
 
 **MSS**
 
@@ -667,122 +735,99 @@ The term `contacts` and `students` are used interchangeably in user stories and 
 3.  User requests to record an assignment submission for a specific person.
 4.  TAA records the submission and shows a confirmation message.
 
-    Use case ends.
+Use case ends.
 
 **Extensions**
 
 * 2a. The list is empty.
-
+    
     Use case ends.
+    
+* 3a. TAA detects an invalid index.
+    * 3a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
+  
+* 3b. TAA detects the assignment does not exist.
+    * 3b1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p> 
 
-* 3a. The given index is invalid.
+* 3c. TAA detects missing fields (e.g., missing assignment name or mark).
+    * 3c1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
+  
+* 3d. TAA detects grade exceeds max marks for the assignment.
+    * 3d1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
+**Use case: UC10 - Mark attendance**
 
-    * 3a1. TAA shows an error message.
+UC10 behaves very similarly to !!UC8!!, but does not involve Extension 3c.
 
-        Use case resumes at step 2.
 
-* 3b. The given assignment details are invalid (e.g., missing assignment name or status).
-
-    * 3b1. TAA shows an error message.
-
-        Use case resumes at step 2.
-
-* 4a. A submission record already exists for that assignment for that person.
-
-    * 4a1. TAA shows a message indicating no change was made.
-
-        Use case ends.
-
-**Use case: UC7 - Mark attendance**
+**Use case: UC11 - Create a session for a group**  
 
 **MSS**
 
-1.  User requests to list persons.
-2.  TAA shows a list of persons.
-3.  User requests to mark attendance for a person in the list.
-4.  TAA marks the attendance of that person.
-
-    Use case ends.
-
-**Extensions**
-
-* 2a. The list is empty.
-
-    Use case ends.
-
-* 3a. The given index is invalid.
-
-    * 3a1. TAA shows an error message.
-
-        Use case resumes at step 2.
-
-* 3b. The given tutorial group is invalid.
-
-    * 3a1. TAA shows an error message.
-
-        Use case resumes at step 2.
-
-**Use case: UC8 - Create a session for a group**  
-
-**MSS**
-
-1. User switches to a group.
+1. User requests to switch to a group.
 2. TAA shows the students in that group.
 3. User requests to create a session for a specific date.
 4. TAA creates the session for the group and shows a confirmation message.
 
+Use case ends.
+
 **Extensions**
 
-* 1a. The group does not exist.
-
-    * 1a1. TAA shows an error message.
-
-        Use case ends.
-  
-* 3a. The date is invalid.
-
-    * 3a1. TAA shows an error message.
-    
-      Use case ends.
-
-* 3b. A session already exists on that date.
-
-    * 3b1. TAA shows an error message.
-        
-        Use case ends.
-
-**Use case: UC9 - View attendance overview for a group**
+* 1a. TAA detects that the group does not exist.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+* 3a. TAA detects that the date is invalid.
+    * 3a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 2.
+    <p></p>
+* 3b. TAA detects that a session already exists on that date for all students in the group.
+    * 3b1. TAA rejects the command and shows error message.
+    <p></p>        
+    Use case resumes at step 2.
+    <p></p>
+**Use case: UC12 - View attendance overview for a group**
 
 **MSS**
 
-1. User requests to switch to a tutorial group.
+1. User requests to switch to a group.
 2. TAA switches to the specified group view.
 3. User requests to view attendance for the group.
 4. TAA displays the attendance overview for the students in the group.
 
-   Use case ends.
+Use case ends.
 
 **Extensions**
 
-* 1a. The specified group does not exist.
-
-    * 1a1. TAA shows an error message.
-
-        Use case ends.
-
-* 3a. The group has no students.
-
+* 1a. TAA detects that the group does not exist.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+* 3a. TAA detects the group has no students.
     * 3a1. TAA displays an empty attendance overview.
-
-        Use case ends.
-
-* 3b. The group has students but no recorded sessions.
-
+    <p></p>
+    Use case ends.
+    <p></p>
+* 3b. TAA detects the group has students but no recorded sessions.
     * 3b1. TAA displays the attendance overview without session columns.
-
-        Use case ends.
-
-**Use case: UC10 - Export current view to CSV**
+    <p></p>
+    Use case ends.
+    <p></p>
+**Use case: UC13 - Export current view to CSV**
 
 Preconditions: A group is currently active.
 
@@ -791,19 +836,101 @@ Preconditions: A group is currently active.
 1. User requests to export the current attendance and participation view, optionally specifying a file path.
 2. TAA writes the data to the specified file (or a default filename) and shows a confirmation message with the path.
 
-   Use case ends.
+Use case ends.
 
 **Extensions**
 
-* 1a. No group is currently active.
-    * 1a1. TAA shows an error message.
-
-        Use case ends.
-
+* 1a. TAA detects no group is currently active.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
 * 1b. The file cannot be written (e.g., invalid path or insufficient permissions).
-    * 1b1. TAA shows an error message.
+    * 1b1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
 
-        Use case ends.
+**Use case: UC14 - Create an assignment for a group**
+
+**MSS**
+
+1. User requests to create a new assignment in a group.
+2. TAA creates the assignment and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects an assignment with the same name in the group.
+    * 1a1. TAA rejects the command and shows error message.
+      <p></p>
+      Use case resumes at step 1.
+      <p></p>
+    
+* 1b. TAA detects an invalid assignment name or max marks.
+    * 1b1. TAA rejects the command and shows error message.
+      <p></p>
+      Use case resumes at step 1.
+      <p></p>
+
+**Use case: UC15 - Find contacts**
+
+**MSS**
+
+1. User requests to find a contact by search terms.
+2. TAA displays contacts that match the search terms.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA does not detect search terms.
+    * 1a1. TAA rejects the command and shows error message.
+      <p></p>
+      Use case resumes at step 1.
+      <p></p>
+* 1b. TAA does not find any matching contacts.
+    * 1b1. TAA returns empty list.
+      <p></p>
+      Use case ends.
+      <p></p>
+
+**Use case: UC16 - Edit session**
+
+**MSS**
+
+1. User requests to edit details for a session.
+2. TAA updates session details and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects a session with the same date exists.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+* 1b. TAA does not detect details.
+    * 1b1. TAA rejects the command and shows error message.
+      <p></p>
+      Use case resumes at step 1.
+      <p></p>
+* 1c. TAA does not find a session with the date.
+    * 1c1. TAA rejects the command and shows error message.
+      <p></p>
+      Use case ends.
+      <p></p>
+
+**Use case: UC17 - Edit assignment**
+
+**MSS**
+
+1. User requests to edit an assignment.
+2. TAA updates assignment details and shows a confirmation message.
+
+Use case ends
 
 ---
 
@@ -1102,12 +1229,13 @@ testers are expected to do more *exploratory* testing.
 <p></p>
 
 3. Test case: `editsession d/2026-04-11 nn/tutorial`
+    * Prerequisite: Session date has been edited to `2026-04-11` from Test Case 2.
     * Expected: `Updated session 2026-04-11 (note "tutorial") in group 2026-S1-T01.`
 
 <p></p>
 
 4. Test case: `editsession d/2026-04-11 nn/`
-    * Expected: `Updated session 2026-04-11 (cleared note) in group 2026-s1-t01.`.
+    * Expected: `Updated session 2026-04-11 (cleared note) in group 2026-S1-T01.`.
 
 <p></p>
 
@@ -1127,24 +1255,11 @@ testers are expected to do more *exploratory* testing.
 <p></p>
 
 2. Test case: `deletesession d/2026-04-11`
-    * Expected: `This will delete session 2026-04-11 from group 2026-S1-T01 for every student. Run the same command with "confirm" to proceed.`.
-    * Note: No session is deleted yet.
-
-<p></p>
-
-3. Test case: `deletesession confirm d/2026-04-11`
     * Expected: `Deleted session 2026-04-11 from group 2026-S1-T01 and removed its attendance and participation records.`.
 
 <p></p>
 
-4. Test case: `deletesession confirm d/2026-04-17`
-    * Prerequisite: Session on `2026-04-17` exists.
-    * Expected: Similar expected output as Test Case 3.
-    * Note: The session is deleted immediately without a separate confirmation step.
-
-<p></p>
-
-5. Test case: `deletesession confirm d/2026-12-31`
+3. Test case: `deletesession d/2026-12-31`
     * Expected: `No session on 2026-12-31 was found in group 2026-S1-T01.` error message.
 
 ### Marking attendance
@@ -1339,11 +1454,14 @@ testers are expected to do more *exploratory* testing.
 <p></p>
 
 3. Test case: `exportview f/exports/t01-apr.csv`
-    * Expected: The file is written to `exports/t01-apr.csv` relative to the JAR file location.
+    * Expected: The file is written to `[JAR file location]/exports/t01-apr.csv`.
+
+4. Test case: `exportview f/t:est`
+    * Expected: `The file name 't:est' is invalid because it contains illegal character(s): ':'. Please choose a different file name.` error message.
 
 <p></p>
 
-4. Test case: `exportview` (outside group view)
+5. Test case: `exportview` (outside group view)
     * Prerequisite: Run `switchgroup all` first.
     * Expected: `No group selected. Switch to a group before exporting the view` error message.
 
@@ -1474,4 +1592,8 @@ Overall, our team successfully transformed a generic contact-management applicat
 
 Team size: 5
 
-1. Improve session and assignment grade error reporting during save file loading: Currently, when a manually edited contact has multiple invalid session or assignment grade fields, only the first error among them is reported, requiring multiple fix-and-relaunch cycles to fully correct the entry. We plan to accumulate and report all such errors together in a single warning message, consistent with how basic field errors (name, phone, email, matric number, tags) are already reported together.
+1. **Improve session and assignment grade error reporting during save file loading**: Currently, when a manually edited contact has multiple invalid session or assignment grade fields, only the first error among them is reported, requiring multiple fix-and-relaunch cycles to fully correct the entry. We plan to accumulate and report all such errors together in a single warning message, consistent with how basic field errors (name, phone, email, matric number, tags) are already reported together.
+
+2. **Use a leaner JSON representation for group sessions**:
+   Currently, group sessions are serialized using the same `JsonAdaptedSession` class as person sessions, which includes attendance and participation fields. Group sessions are always reconstructed with UNINITIALISED attendance and 0 participation, so they carry no information.
+   We plan to have a dedicated JsonAdaptedGroupSession class that serializes only the date and note fields, producing a leaner save file and making the data model's intent clearer.
