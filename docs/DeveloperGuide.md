@@ -1706,9 +1706,11 @@ Overall, our team successfully transformed a generic contact-management applicat
 
 Team size: 5
 
-1. **Improve session and assignment grade error reporting during save file loading**: Currently, when a manually edited contact has multiple invalid session or assignment grade fields, only the first error among them is reported, requiring multiple fix-and-relaunch cycles to fully correct the entry. We plan to accumulate and report all such errors together in a single warning message, consistent with how basic field errors (name, phone, email, matric number, tags) are already reported together.
+1. **Improve session and assignment grade error reporting during save file loading**: Currently, when a manually edited entry has multiple invalid session or assignment grade fields, only the first error among them is reported, requiring multiple fix-and-relaunch cycles to fully correct the entry. We plan to accumulate and report all such errors together in a single warning message, consistent with how basic field errors (name, phone, email, matric number, tags) are already reported together.
 
 2. **Use a leaner JSON representation for group sessions**:
-   Currently, group sessions are serialized using the same `JsonAdaptedSession` class as person sessions, which includes attendance and participation fields. Group sessions are always reconstructed with UNINITIALISED attendance and 0 participation, so they carry no information.
+   Currently, group sessions are serialized using the same `JsonAdaptedSession` class as person sessions, which includes attendance and participation fields. Group sessions are always constructed with UNINITIALISED attendance and 0 participation, so they carry no meaningful data.
    We plan to have a dedicated JsonAdaptedGroupSession class that serializes only the date and note fields, producing a leaner save file and making the data model's intent clearer.
 
+3. **Validate person session dates against group sessions on load**:
+   Currently, a person's session records are not cross-checked against the group's session list during loading. A manually edited save file could contain a person with a session date that does not exist in the group's session list, and TAA will load it without warning. A future enhancement would validate person session dates against the group's session list during load, and skip or warn on mismatched entries.
