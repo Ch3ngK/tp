@@ -517,19 +517,16 @@ Use case ends.
 
 * 1a. TAA detects missing fields.
     * 1a1. TAA rejects the command and shows error message.
-    * 1a2. User re-enters the command with the missing fields.
   <p></p>
     Use case resumes from step 1.
   <p></p>
 * 1b. TAA detects errors in fields provided.
     * 1b1. TAA rejects the command and shows error message.
-    * 1b2. User re-enters corrected fields.
     <p></p>
     Use case resumes from step 1.
     <p></p>
 * 1c. TAA detects a duplicate matric number in existing contacts.
     * 1c1. TAA rejects the command and shows error message.
-    * 1c2. User re-enters the matric number field.
     <p></p>
     Use case resumes from step 1.
     <p></p>
@@ -552,9 +549,8 @@ Use case ends.
 
 * 3a. TAA detects an invalid index.
     * 3a1. TAA rejects the command and shows error message.
-    * 3a2. User re-enters command with a valid index.
     <p></p>
-    Use case resumes at step 3.
+    Use case resumes at step 2.
 
 **Use case: UC3 - Edit a contact**
 
@@ -575,27 +571,23 @@ Use case ends.
 
 * 3a. TAA detects an invalid index.
     * 3a1. TAA rejects the command and shows error message.
-    * 3a2. User re-enters command with a valid index.
     <p></p>
-    Use case resumes at step 3.
+    Use case resumes at step 2.
     <p></p>
 * 3b. TAA detects no fields to edit.
     * 3b1. TAA rejects the command and shows error message.
-    * 3b2. User re-enters command with the missing fields.
     <p></p>
-    Use case resumes at step 3.
+    Use case resumes at step 2.
     <p></p>
 * 3c. TAA detects an edited field is invalid.
     * 3c1. TAA rejects the command and shows error message.
-    * 3c2. User re-enters the command with the corrected fields.
     <p></p>
-    Use case resumes at step 3.
+    Use case resumes at step 2.
     <p></p>
 * 3d. TAA detects that the edit would result in a duplicate contact.
-    * 3d1. TAA rejects the command and shows error message. 
-    * 3d2. User re-enters command with a different matric number.
+    * 3d1. TAA rejects the command and shows error message.
     <p></p>
-    Use case resumes at step 3.
+    Use case resumes at step 2.
     <p></p>
 
 **Use case: UC4 - Create a group**
@@ -635,7 +627,7 @@ Use case ends.
 * 1a. TAA detects that the group does not exist.
     * 1a1. TAA rejects the command and shows error message.
     <p></p>
-    Use case resumes at step 1.
+    Use case ends.
     <p></p>
 
 **Use case: UC6 - Rename a group**
@@ -652,7 +644,7 @@ Use case ends.
 * 1a. TAA detects the group does not exist.
     * 1a1. TAA rejects the command and shows error message.
     <p></p>
-    Use case resumes at step 1.
+    Use case ends.
     <p></p>
 * 1b. TAA detects a group with the new name exists.
     * 1b1. TAA rejects the command and shows error message.
@@ -660,7 +652,51 @@ Use case ends.
     Use case resumes at step 1.
     <p></p>
 
-**Use case: UC7 - Switch to a group view**
+**Use case: UC7 - Add student to group**
+
+**MSS**
+
+1. User requests to add a student to a group.
+2. TAA adds the student to the group and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects that the group does not exist.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case ends.
+    <p></p>
+
+* 1b. TAA detects the given index is invalid.
+    * 1b1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case resumes at step 1.
+    <p></p>
+
+* 1c. TAA detects that the student is already in the group.
+    * 1c1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case ends.
+    <p></p>
+
+**Use case: UC8 - Remove student from group**
+
+**Preconditions**: Student is added into group by !!UC7 - Add student to group!!.
+
+**MSS**
+
+1. User requests to remove a student from a group.
+2. TAA removes the student and shows confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+Extensions are similar to Extensions 1a. and 1b. of !!UC7 - Add student to group!!.
+
+**Use case: UC9 - Switch to a group view**
 
 **MSS**
 
@@ -671,7 +707,7 @@ Use case ends.
 
 **Extensions**
 
-* 1a. TAA detects that the group view identifier is missing.
+* 1a. TAA detects that the group field is missing.
     * 1a1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 1.
@@ -681,7 +717,9 @@ Use case ends.
     <p></p>
     Use case ends.
     <p></p>
-**Use case: UC8 - Record class participation**
+**Use case: UC10 - Record class participation**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
 
 **MSS**
 
@@ -721,7 +759,9 @@ Use case ends.
     <p></p>
     Use case resumes at step 4.
     <p></p>
-**Use case: UC9 - Grade an assignment submission**
+**Use case: UC11 - Grade an assignment submission**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
 
 **MSS**
 
@@ -761,12 +801,26 @@ Use case ends.
     <p></p>
     Use case resumes at step 2.
     <p></p>
-**Use case: UC10 - Mark attendance**
+**Use case: UC12 - Mark attendance**
 
-UC10 behaves very similarly to !!UC8 - Record class participation!!, but does not involve Extension 3c.
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
 
+**MSS**
 
-**Use case: UC11 - Create a session for a group**  
+1. User requests to mark attendance for a date.
+2. TAA marks attendance and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+Extensions for UC12 behave very similarly to !!UC10 - Record class participation!!, but does not involve Extension 3c.
+
+**Use case: UC13 - Unmark attendance**
+
+UC13 behaves similarly to !!UC12 - Mark attendance!!.
+
+**Use case: UC14 - Create a session for a group**  
 
 **MSS**
 
@@ -780,49 +834,74 @@ Use case ends.
 * 1a. TAA detects that the group does not exist.
     * 1a1. TAA rejects the command and shows error message.
     <p></p>
+    Use case ends.
+    <p></p>
+* 1b. TAA detects that the date is invalid.
+    * 1b1. TAA rejects the command and shows error message.
+    <p></p>
     Use case resumes at step 1.
     <p></p>
-* 3a. TAA detects that the date is invalid.
-    * 3a1. TAA rejects the command and shows error message.
-    <p></p>
-    Use case resumes at step 2.
-    <p></p>
-* 3b. TAA detects that a session already exists on that date for all students in the group.
-    * 3b1. TAA rejects the command and shows error message.
+* 1c. TAA detects that a session already exists on that date for all students in the group.
+    * 1c1. TAA rejects the command and shows error message.
     <p></p>        
-    Use case resumes at step 2.
+    Use case resumes at step 1.
     <p></p>
-**Use case: UC12 - View attendance overview for a group**
+
+**Use case: UC15 - Delete session**
 
 **MSS**
 
-1. User requests to switch to a group.
-2. TAA switches to the specified group view.
-3. User requests to view attendance for the group.
-4. TAA displays the attendance overview for the students in the group.
+1. User requests to delete a session for a group.
+2. TAA deletes the session and shows a confirmation message.
 
 Use case ends.
 
 **Extensions**
 
-* 1a. TAA detects that the group does not exist.
+* 1a. TAA detects the group does not exist.
     * 1a1. TAA rejects the command and shows error message.
+    <p></p>        
+    Use case ends.
     <p></p>
+
+* 1b. TAA detects the session date is invalid.
+  * 1b1. TAA rejects the command and shows error message.
+    <p></p>        
     Use case resumes at step 1.
     <p></p>
-* 3a. TAA detects the group has no students.
-    * 3a1. TAA displays an empty attendance overview.
-    <p></p>
+    
+* 1c. TAA detects no session exists.
+    * 1c1. TAA rejects the command and shows error message.
+    <p></p>        
     Use case ends.
     <p></p>
-* 3b. TAA detects the group has students but no recorded sessions.
-    * 3b1. TAA displays the attendance overview without session columns.
-    <p></p>
-    Use case ends.
-    <p></p>
-**Use case: UC13 - Export current view**
 
-Preconditions: A group is currently active.
+**Use case: UC16 - View attendance overview for a group**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
+
+**MSS**
+
+1. User requests to view attendance for the group.
+2. TAA displays the attendance overview for the students in the group.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects the group has no students.
+    * 1a1. TAA displays an empty attendance overview.
+    <p></p>
+    Use case ends.
+    <p></p>
+* 1b. TAA detects the group has students but no recorded sessions.
+    * 1b1. TAA displays the attendance overview without session columns.
+    <p></p>
+    Use case ends.
+    <p></p>
+**Use case: UC17 - Export current view**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
 
 **MSS**
 
@@ -833,18 +912,15 @@ Use case ends.
 
 **Extensions**
 
-* 1a. TAA detects no group is currently active.
+* 1a. The file cannot be written (e.g., invalid path or insufficient permissions).
     * 1a1. TAA rejects the command and shows error message.
     <p></p>
     Use case ends.
     <p></p>
-* 1b. The file cannot be written (e.g., invalid path or insufficient permissions).
-    * 1b1. TAA rejects the command and shows error message.
-    <p></p>
-    Use case ends.
-    <p></p>
 
-**Use case: UC14 - Create an assignment for a group**
+**Use case: UC18 - Create an assignment for a group**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
 
 **MSS**
 
@@ -867,7 +943,7 @@ Use case ends.
     Use case resumes at step 1.
     <p></p>
 
-**Use case: UC15 - Find contacts**
+**Use case: UC19 - Find contacts**
 
 **MSS**
 
@@ -884,12 +960,12 @@ Use case ends.
     Use case resumes at step 1.
     <p></p>
 * 1b. TAA does not find any matching contacts.
-    * 1b1. TAA returns empty list.
+    * 1b1. TAA shows no matching contacts.
     <p></p>
     Use case ends.
     <p></p>
 
-**Use case: UC16 - Edit session**
+**Use case: UC20 - Edit session**
 
 **MSS**
 
@@ -916,7 +992,9 @@ Use case ends.
     Use case ends.
     <p></p>
 
-**Use case: UC17 - Edit assignment**
+**Use case: UC21 - Edit assignment**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
 
 **MSS**
 
@@ -930,7 +1008,7 @@ Use case ends.
 * 1a. TAA detects that the assignment does not exist in the group.
     * 1a1. TAA rejects the command and shows error message.
     <p></p>
-    Use case resumes at !!UC14 - Create an assignment for a group!!.
+    Use case ends.
     <p></p>
 
 * 1b. TAA does not detect fields to edit.
@@ -943,6 +1021,25 @@ Use case ends.
     * 1c1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 1.
+    <p></p>
+
+**Use case: UC22 - Delete assignment**
+
+**Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
+
+**MSS**
+
+1. User requests to delete an assignment.
+2. TAA deletes the assignment and shows a confirmation message.
+
+Use case ends.
+
+**Extensions**
+
+* 1a. TAA detects that the assignment does not exist in the group.
+    * 1a1. TAA rejects the command and shows error message.
+    <p></p>
+    Use case ends.
     <p></p>
 
 ---
