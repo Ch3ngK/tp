@@ -118,6 +118,8 @@ How the `Logic` component works:
    Note that although this is shown as a single step in the diagram above (for simplicity), in the code it can take several interactions (between the command object and the `Model`) to achieve.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned back from `Logic`.
 
+<div style="page-break-after: always;"></div>
+
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
 -> <puml src="diagrams/ParserClasses.puml" width="600px"/> <-
@@ -186,6 +188,8 @@ How the load works:
 * Skipped entries are preserved back into the data file on the next save, so no data is permanently lost. Warnings generated during this process are retrieved via `StorageManager#getLastLoadWarnings()` and displayed to the user on startup.
 * Previously skipped entries are re-attempted on every subsequent load. If the underlying issue has been resolved (e.g., a missing group was manually added back to the file), the entry will be successfully loaded on the next launch.
 * If the data file is blank or empty, the app loads sample data instead. If the file contains malformed JSON, the app starts with an empty address book and blocks all saves for that session to prevent overwriting the original file.
+
+<div style="page-break-after: always;"></div>
 
 The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
@@ -344,6 +348,8 @@ Step 3. The user executes `add n/David …​` to add a new person. The `add` co
 
 </box>
 
+<div style="page-break-after: always;"></div>
+
 Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoAddressBook()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous address book state, and restores the address book to that state.
 
 -> <puml src="diagrams/UndoRedoState3.puml" alt="UndoRedoState3" width="400px"/> <-
@@ -376,6 +382,8 @@ The `redo` command does the opposite — it calls `Model#redoAddressBook()`,
 **Note:** If the `currentStatePointer` is at index `addressBookStateList.size() - 1`, pointing to the latest address book state, then there are no undone AddressBook states to restore. The `redo` command uses `Model#canRedoAddressBook()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
 
 </box>
+
+<div style="page-break-after: always;"></div>
 
 Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
 
@@ -530,6 +538,7 @@ Use case ends.
     <p></p>
     Use case resumes from step 1.
     <p></p>
+
 **Use case: UC2 - Delete a contact**
 
 **MSS**
@@ -544,13 +553,16 @@ Use case ends.
 **Extensions**
 
 * 2a. The list is empty.
-
+    <p></p>
     Use case ends.
-
+    <p></p>
 * 3a. TAA detects an invalid index.
     * 3a1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
+    <p></p>
+
+<div style="page-break-after: always;"></div>
 
 **Use case: UC3 - Edit a contact**
 
@@ -566,9 +578,9 @@ Use case ends.
 **Extensions**
 
 * 2a. The list is empty.
-
-  Use case ends.
-
+    <p></p>
+    Use case ends.
+    <p></p>
 * 3a. TAA detects an invalid index.
     * 3a1. TAA rejects the command and shows error message.
     <p></p>
@@ -606,12 +618,13 @@ Use case ends.
     <p></p>
     Use case resumes at step 1.
     <p></p>
-
 * 1b. TAA detects an invalid group name.
     * 1b1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 1.
     <p></p>
+
+<div style="page-break-after: always;"></div>
 
 **Use case: UC5 - Delete a group**
 
@@ -668,13 +681,11 @@ Use case ends.
     <p></p>
     Use case ends.
     <p></p>
-
 * 1b. TAA detects the given index is invalid.
     * 1b1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 1.
     <p></p>
-
 * 1c. TAA detects that the student is already in the group.
     * 1c1. TAA rejects the command and shows error message.
     <p></p>
@@ -733,27 +744,24 @@ Use case ends.
 **Extensions**
 
 * 2a. The list is empty.
-
-  Use case ends.
-
+    <p></p>
+    Use case ends.
+    <p></p>
 * 3a. TAA detects an invalid index.
     * 3a1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
     <p></p>
-
 * 3b. TAA detects that the given date is invalid.
     * 3b1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
     <p></p>
-  
 * 3c. TAA detects an invalid participation score.
-  * 3c1. TAA rejects the command and shows error message.
+    * 3c1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
     <p></p>
-    
 * 3d. TAA detects there is no session for the specified date.
     * 3d1. TAA creates a session for the date.
     <p></p>
@@ -775,32 +783,32 @@ Use case ends.
 **Extensions**
 
 * 2a. The list is empty.
-    
+    <p></p>
     Use case ends.
-    
+    <p></p>
 * 3a. TAA detects an invalid index.
     * 3a1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
     <p></p>
-  
 * 3b. TAA detects the assignment does not exist.
     * 3b1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
-    <p></p> 
-
+    <p></p>
 * 3c. TAA detects missing fields (e.g., missing assignment name or mark).
     * 3c1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
     <p></p>
-  
 * 3d. TAA detects grade exceeds max marks for the assignment.
     * 3d1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 2.
     <p></p>
+
+<div style="page-break-after: always;"></div>
+
 **Use case: UC12 - Mark attendance**
 
 **Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
@@ -863,13 +871,11 @@ Use case ends.
     <p></p>        
     Use case ends.
     <p></p>
-
 * 1b. TAA detects the session date is invalid.
-  * 1b1. TAA rejects the command and shows error message.
+    * 1b1. TAA rejects the command and shows error message.
     <p></p>        
     Use case resumes at step 1.
     <p></p>
-    
 * 1c. TAA detects no session exists.
     * 1c1. TAA rejects the command and shows error message.
     <p></p>        
@@ -992,6 +998,8 @@ Use case ends.
     Use case ends.
     <p></p>
 
+<div style="page-break-after: always;"></div>
+
 **Use case: UC21 - Edit assignment**
 
 **Preconditions**: User is in a group view by !!UC9 - Switch to a group view!!.
@@ -1010,13 +1018,11 @@ Use case ends.
     <p></p>
     Use case ends.
     <p></p>
-
 * 1b. TAA does not detect fields to edit.
     * 1b1. TAA rejects the command and shows error message.
     <p></p>
     Use case resumes at step 1.
     <p></p>
-
 * 1c. TAA detects the new max marks is lower than an existing grade record for that assignment.
     * 1c1. TAA rejects the command and shows error message.
     <p></p>
@@ -1044,6 +1050,8 @@ Use case ends.
 
 ---
 
+<div style="page-break-after: always;"></div>
+
 ### Non-Functional Requirements
 
 1. The app shall run on Windows, macOS, and Linux, with Java 17 without requiring external dependencies not bundled in the packaged app.
@@ -1058,12 +1066,11 @@ Use case ends.
 
 ### Glossary
 
-* **Mainstream OS**: Windows, Linux, Unix, MacOS
+* **Mainstream OS**: Windows, Linux, macOS
 * **Teaching Assistant**: A course staff member responsible for conducting tutorials, grading assignments, and supporting students.
 * **Tutorial Group**: A subgroup of students assigned to a specific TA for tutorials or lab sessions.
 * **Attendance Status**: The recorded presence or absence of a student for a tutorial session.
-* **Participation Score**: A qualitative or quantitative measure of a student's engagement during tutorials.
-* **Submission Status**: The state of a student’s assignment (e.g., Submitted, Late, Missing, Graded).
+* **Participation Score**: A qualitative or quantitative measure of a student's engagement during tutorials, rated as an integer from 0 to 5.
 * **Command**: A user-issued instruction in TAA to perform a specific action (e.g., add, edit, delete, mark).
 
 ---
@@ -1607,6 +1614,8 @@ testers are expected to do more *exploratory* testing.
 
 3. Re-launch TAA using `java -jar TAA.jar`.
     * Expected: The contact `Test User` is still present.
+
+<div style="page-break-after: always;"></div>
 
 ### Handling corrupted or edge-case save files
 
