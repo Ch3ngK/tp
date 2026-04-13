@@ -27,12 +27,12 @@ import seedu.address.model.person.SessionList;
 public class ExportViewCommand extends Command {
 
     public static final String COMMAND_WORD = "exportview";
-    public static final String COMMAND_PARAMETERS = "[f/FILE_PATH]";
+    public static final String COMMAND_PARAMETERS = "[f/FILE_NAME.csv]";
 
     public static final String DEFAULT_FILE_NAME = "view-export.csv";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Exports the current view to a CSV file.\n"
+            + ": Exports the current view to a CSV-formatted file.\n"
             + "Parameters: " + COMMAND_PARAMETERS + "\n"
             + "Examples:\n"
             + COMMAND_WORD + " f/exports/t01-view.csv (will overwrite existing file with same name)\n"
