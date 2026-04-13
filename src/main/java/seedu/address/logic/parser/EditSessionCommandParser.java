@@ -31,12 +31,12 @@ public class EditSessionCommandParser implements Parser<EditSessionCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_DATE, PREFIX_NEW_DATE, PREFIX_NEW_NOTE, PREFIX_GROUP);
         String dateValue = argMultimap.getValue(PREFIX_DATE).get();
-        ParserUtil.rejectDateTrailingTokens(dateValue, EditSessionCommand.MESSAGE_USAGE);
+        ParserUtil.rejectDateExtraTokens(dateValue, EditSessionCommand.MESSAGE_USAGE);
         LocalDate originalDate = ParserUtil.parseSessionDate(dateValue);
         Optional<LocalDate> newDate = Optional.empty();
         if (argMultimap.getValue(PREFIX_NEW_DATE).isPresent()) {
             String newDateValue = argMultimap.getValue(PREFIX_NEW_DATE).get();
-            ParserUtil.rejectDateTrailingTokens(newDateValue, EditSessionCommand.MESSAGE_USAGE);
+            ParserUtil.rejectDateExtraTokens(newDateValue, EditSessionCommand.MESSAGE_USAGE);
             newDate = Optional.of(ParserUtil.parseSessionDate(newDateValue));
         }
         Optional<String> newNote = argMultimap.getValue(PREFIX_NEW_NOTE).map(String::trim);

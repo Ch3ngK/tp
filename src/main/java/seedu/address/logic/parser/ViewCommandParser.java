@@ -43,19 +43,19 @@ public class ViewCommandParser implements Parser<ViewCommand> {
         LocalDate sessionDate = null;
         if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
             String dateValue = argMultimap.getValue(PREFIX_DATE).get();
-            ParserUtil.rejectDateTrailingTokens(dateValue, ViewCommand.MESSAGE_USAGE);
+            ParserUtil.rejectDateExtraTokens(dateValue, ViewCommand.MESSAGE_USAGE);
             sessionDate = ParserUtil.parseSessionDate(dateValue);
         }
         Optional<LocalDate> rangeStartDate = Optional.empty();
         if (argMultimap.getValue(PREFIX_FROM_DATE).isPresent()) {
             String fromDateValue = argMultimap.getValue(PREFIX_FROM_DATE).get();
-            ParserUtil.rejectDateTrailingTokens(fromDateValue, ViewCommand.MESSAGE_USAGE);
+            ParserUtil.rejectDateExtraTokens(fromDateValue, ViewCommand.MESSAGE_USAGE);
             rangeStartDate = Optional.of(ParserUtil.parseSessionDate(fromDateValue));
         }
         Optional<LocalDate> rangeEndDate = Optional.empty();
         if (argMultimap.getValue(PREFIX_TO_DATE).isPresent()) {
             String toDateValue = argMultimap.getValue(PREFIX_TO_DATE).get();
-            ParserUtil.rejectDateTrailingTokens(toDateValue, ViewCommand.MESSAGE_USAGE);
+            ParserUtil.rejectDateExtraTokens(toDateValue, ViewCommand.MESSAGE_USAGE);
             rangeEndDate = Optional.of(ParserUtil.parseSessionDate(toDateValue));
         }
         if (rangeStartDate.isPresent() && rangeEndDate.isPresent()

@@ -27,7 +27,7 @@ public class DeleteSessionCommandParser implements Parser<DeleteSessionCommand> 
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_DATE, PREFIX_GROUP);
         String dateValue = argMultimap.getValue(PREFIX_DATE).get();
-        ParserUtil.rejectDateTrailingTokens(dateValue, DeleteSessionCommand.MESSAGE_USAGE);
+        ParserUtil.rejectDateExtraTokens(dateValue, DeleteSessionCommand.MESSAGE_USAGE);
         LocalDate sessionDate = ParserUtil.parseSessionDate(dateValue);
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
             GroupName groupName = ParserUtil.parseGroupName(argMultimap.getValue(PREFIX_GROUP).get());

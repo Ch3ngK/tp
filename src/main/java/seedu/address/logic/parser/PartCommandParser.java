@@ -45,7 +45,7 @@ public class PartCommandParser implements Parser<PartCommand> {
             Optional<LocalDate> date = Optional.empty();
             if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
                 String dateValue = argMultimap.getValue(PREFIX_DATE).get();
-                ParserUtil.rejectDateTrailingTokens(dateValue, PartCommand.MESSAGE_USAGE);
+                ParserUtil.rejectDateExtraTokens(dateValue, PartCommand.MESSAGE_USAGE);
                 date = Optional.of(ParserUtil.parseSessionDate(dateValue));
             }
 

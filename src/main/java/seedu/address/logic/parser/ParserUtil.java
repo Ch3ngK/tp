@@ -294,7 +294,7 @@ public class ParserUtil {
      * @param commandUsage Usage message of command, used for error message.
      * @throws ParseException If date string has a space after trimming.
      */
-    public static void rejectDateTrailingTokens(String value, String commandUsage) throws ParseException {
+    public static void rejectDateExtraTokens(String value, String commandUsage) throws ParseException {
         if (value.trim().contains(" ")) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, commandUsage));
         }

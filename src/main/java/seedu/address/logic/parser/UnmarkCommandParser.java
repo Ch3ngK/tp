@@ -42,7 +42,7 @@ public class UnmarkCommandParser implements Parser<UnmarkCommand> {
             Optional<LocalDate> date = Optional.empty();
             if (argMultimap.getValue(PREFIX_DATE).isPresent()) {
                 String dateValue = argMultimap.getValue(PREFIX_DATE).get();
-                ParserUtil.rejectDateTrailingTokens(dateValue, UnmarkCommand.MESSAGE_USAGE);
+                ParserUtil.rejectDateExtraTokens(dateValue, UnmarkCommand.MESSAGE_USAGE);
                 date = Optional.of(ParserUtil.parseSessionDate(dateValue));
             }
 

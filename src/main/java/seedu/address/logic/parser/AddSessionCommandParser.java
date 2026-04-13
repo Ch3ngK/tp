@@ -26,7 +26,7 @@ public class AddSessionCommandParser implements Parser<AddSessionCommand> {
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_DATE, PREFIX_GROUP, PREFIX_NOTE);
         String dateValue = argMultimap.getValue(PREFIX_DATE).get();
-        ParserUtil.rejectDateTrailingTokens(dateValue, AddSessionCommand.MESSAGE_USAGE);
+        ParserUtil.rejectDateExtraTokens(dateValue, AddSessionCommand.MESSAGE_USAGE);
         LocalDate sessionDate = ParserUtil.parseSessionDate(dateValue);
         String note = argMultimap.getValue(PREFIX_NOTE).map(String::trim).orElse("");
         if (argMultimap.getValue(PREFIX_GROUP).isPresent()) {
