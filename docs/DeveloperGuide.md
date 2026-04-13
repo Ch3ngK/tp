@@ -1716,3 +1716,4 @@ Team size: 5
 2. **Use a leaner JSON representation for group sessions**:
    Currently, group sessions are serialized using the same `JsonAdaptedSession` class as person sessions, which includes attendance and participation fields. Group sessions are always reconstructed with UNINITIALISED attendance and 0 participation, so they carry no information.
    We plan to have a dedicated JsonAdaptedGroupSession class that serializes only the date and note fields, producing a leaner save file and making the data model's intent clearer.
+
