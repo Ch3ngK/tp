@@ -79,8 +79,6 @@ java -jar TAA.jar
 
 </panel>
 
-<div style="page-break-after: always;"></div>
-
 You should see TAA launch:
 <p></p>
 <img src="images/Ui.png" alt="Ui" width="850">
@@ -521,7 +519,7 @@ Examples:
 * `find n/john p/987 e/example.com m/123 t/scholar` returns students with a name containing `john`, a phone number containing `987`, an email containing `example.com`, a matric number containing `123` or a tag containing `scholar`
 * `find n/alex n/david` returns the students `Alex Yeoh`, `David Li`<br>
   
-  <img src="images/findAlexDavidResult.png" alt="result for 'find alex david'" width="700">
+  <img src="images/findAlexDavidResult.png" alt="result for 'find alex david'" width="800">
 
 ---
 
@@ -659,9 +657,9 @@ Examples:
 *  `switchgroup g/T01` Switches current group to `T01`
 *  `switchgroup all` Switches out of the current group (i.e. No Group Selected)
 
-<div style="page-break-after: always;"></div>
-
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Feature: Managing Attendance and Participation
 
@@ -735,9 +733,13 @@ You must mark absences manually with the `unmark` command.
 
 ---
 
+<div style="page-break-after: always;"></div>
+
 ### See overview of attendance and participation: `view`
 
 Shows the attendance and participation overview for the current group. <br>
+
+<img src="images/ViewUi.png" alt="Ui" width="800">
 
 Format: `view [STATUS] [d/YYYY-MM-DD] [from/YYYY-MM-DD] [to/YYYY-MM-DD] [g/GROUP_NAME] `
 
@@ -765,7 +767,7 @@ Examples:
 
 <box type="tip" light>
 
-**Tip:**
+**Tips:**
 
 By default (no `STATUS` specified in command), the overview will show:
 * Attendance status as `[ ] Absent`, `[X] Present`, `[-] Uninitialised`.
