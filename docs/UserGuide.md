@@ -44,7 +44,7 @@ Spend less time organizing data and more time focusing on what matters most: **t
 
 <br>
 
-3. Move `TAA.jar` into a new folder used to contain the app's data. We recommend naming this folder "TAA App Folder" and putting it in your Downloads folder.
+3. Move `TAA.jar` into a new folder used to contain the app's data. We recommend naming this folder "TAA" and putting it in your Downloads folder.
 
 <br>
 
@@ -53,12 +53,12 @@ Spend less time organizing data and more time focusing on what matters most: **t
 <panel header="**Windows**" type=seamless expanded>
 
 1. Launch the **Command Prompt** app.
-2. Navigate to the folder for "TAA App Folder" using the `cd` (change directory) command. <br>
-For example, if you put `TAA.jar` in a folder named **TAA App Folder** in your **Downloads** folder, type the following and press enter:
+2. Navigate to the folder containing the TAA.jar file using the `cd` (change directory) command. <br>
+For example, if you put `TAA.jar` in a folder named **TAA** in your **Downloads** folder, type the following and press enter:
 ```
 cd "%USERPROFILE%\Downloads\TAA"
 ```
-3. Launch the app. Type the following and press enter:
+3. Launch the TAA app by typing the following and pressing enter:
 ```
 java -jar TAA.jar
 ```
@@ -67,12 +67,12 @@ java -jar TAA.jar
 <panel header="**macOS** or **Linux**" type=seamless expanded>
 
 1. Launch the **Terminal** app.
-2. Navigate to the folder for "TAA App Folder" using the `cd` (change directory) command. <br>
-   For example, if you put `TAA.jar` in a folder named **TAA App Folder** in your **Downloads** folder, type the following and press enter:
+2. Navigate to the folder containing the TAA.jar file using the `cd` (change directory) command. <br>
+For example, if you put `TAA.jar` in a folder named **TAA** in your **Downloads** folder, type the following and press enter:
 ```
-cd "~/Downloads/TAA"
+cd ~/Downloads/"TAA"
 ```
-3. Launch the app. Type the following and press enter:
+3. Launch the TAA app by typing the following and pressing enter:
 ```
 java -jar TAA.jar
 ```
