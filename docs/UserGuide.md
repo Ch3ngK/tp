@@ -1334,20 +1334,9 @@ Once these students are valid, TAA will automatically load these students on the
     "email" : "example@gmail.com",
     "matricNumber" : "A1234567Y",
     "tags" : [ ],
-    "groups" : [ "T02" ],
-    "groupSessions" : {
-      "T02" : [ {
-        "date" : "2026-04-03",
-        "attendance" : "PRESENT",
-        "participation" : 3,
-        "note" : ""
-      } ]
-    },
-    "assignmentGrades" : {
-      "T02" : {
-        "Assignment 1" : 100
-      }
-    }
+    "groups" : [ ],
+    "groupSessions" : { },
+    "assignmentGrades" : { }
   } ],
   "loadWarnings": [
     "Skipped invalid contact 'John':\n- The matric number checksum letter is incorrect.",
