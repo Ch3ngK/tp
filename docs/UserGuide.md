@@ -163,7 +163,7 @@ Many commands use `i/INDEX` or `i/INDEX_EXPRESSION`.
 
 ## Recommended Workflows
 
-Instead of memorising commands, you can follow these common workflows.
+Here are some common workflows that TAA supports.
 
 ### Adding and organizing students
 
@@ -782,9 +782,9 @@ You can optionally narrow the visible session columns with a date range:
 
 </box>
 
-<div style="page-break-after: always;"></div>
-
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Feature: Managing Assignments
 
@@ -865,8 +865,6 @@ Notes:
 Examples:
 *  `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17` Assigns a grade of 17 for the assignment `Quiz 1` to the students with matric number A1234567X and A2345678L for the current group.
 
-<div style="page-break-after: always;"></div>
-
 ---
 
 ### Deleting an assignment: `deleteassignment` (`deletea`)
@@ -880,6 +878,8 @@ Examples:
 *  `deleteassignment a/Quiz 1` Deletes the assignment `Quiz 1` for all students in the current group .
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Feature: Managing Sessions
 
@@ -934,9 +934,9 @@ Examples:
 * `deletesession d/2026-03-16`
 * `deletesession d/2026-03-16 g/T01`
 
-<div style="page-break-after: always;"></div>
-
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Utility commands
 
@@ -948,6 +948,14 @@ Format: `help`
 
 <img src="images/helpMessage.png" alt="help message" width="700">
 <p></p>
+
+---
+
+### Clearing all entries: `clear`
+
+Clears all entries from TAA. This includes all students, groups, assignments and sessions.
+
+Format: `clear`
 
 ---
 
@@ -1016,23 +1024,15 @@ Example:
 
 ---
 
-### Clearing all entries: `clear`
-
-Clears all entries from TAA. This includes all students, groups, assignments and sessions.
-
-Format: `clear`
-
----
-
 ### Exiting the program: `exit`
 
 Exits the program.
 
 Format: `exit`
 
-<div style="page-break-after: always;"></div>
-
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Managing your data and save file
 
@@ -1311,7 +1311,10 @@ You can read the `loadWarnings` as a reference to fix your save file.
 
 <panel id="faq-invalid_persons" header="What happens if my manually edited students are invalid?" type="seamless" expanded>
 
-You will see an error message telling you how many students are invalid once TAA starts running. 
+You will see an error message telling you how many students are invalid once TAA starts running.
+
+You can fix the invalid student details by editing them in the `preservedSkippedPersons` section of the save file.<br>
+Once these students are valid, TAA will automatically load these students on the next run and clear the `loadWarnings`.
 
 <box type="warning" light>
 
@@ -1320,11 +1323,6 @@ Please close TAA before fixing the student details, or your changes will be lost
 You can also refer to `loadWarnings` in the save file to see the errors for each student.
 
 </box>
-
-You can fix the invalid student details by editing them in the `preservedSkippedPersons` section of the save file.<br>
-Once these students are valid, TAA will automatically load these students on the next run and clear the `loadWarnings`.
-
-<div style="page-break-after: always;"></div>
 
 <panel header="Here's an example of how `preservedSkippedPersons` looks like if you run TAA with an invalid student!" type="seamless" expanded>
 
@@ -1353,8 +1351,6 @@ Rerun TAA and `John` will now be loaded into the contact list!
 </panel>
 
 </panel>
-
-<div style="page-break-after: always;"></div>
 
 <panel id="faq-invalid_groups" header="What happens if my manually edited groups are invalid?" type="seamless" expanded>
 
@@ -1467,6 +1463,8 @@ You should refer to this section to find out more about some common errors faced
 | Contact has a grade for assignment `X` in group `Y`, but that assignment does not exist                                                     | Add the assignment into `"groups": [ ]`.<br> This is not the same `"groups": [ ]` as the one found in `"persons": [ ]`.                                          |
 | Grade `A` for assignment `X` in group `Y` exceeds max marks of `B`                                                                          | Ensure that grade is below max marks for the assignment.                                                                                                         |
 | Contact has sessions for group `X` but is not a member of it                                                                                | Ensure that student has matching groups in `"groups": [ ]` and `"groupSessions": { }` in `"persons": [ ]`.                                                       |
+
+<div style="page-break-after: always;"></div>
 
 ### Troubleshooting manual editing of groups
 | Error shown                                                                                                 | How to fix                                                                                                                                                      |
