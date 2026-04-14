@@ -1,6 +1,6 @@
 coverage:
   ignore:
-    - "tp/src/main/java/seedu/address/ui"
+    - "tp/src/main/java/seedu/address/ui/**/*" # Recursively ignore the ui folder
     - "tp/src/main/java/seedu/address/Main.java"
     - "tp/src/main/java/seedu/address/MainApp.java"
   status:
