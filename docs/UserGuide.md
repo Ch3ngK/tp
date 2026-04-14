@@ -839,18 +839,6 @@ Examples:
 
 ---
 
-### Deleting an assignment: `deleteassignment` (`deletea`)
-
-Deletes an assignment for the students in the current group.
-
-Format:
-* `deleteassignment a/ASSIGNMENT_NAME`
-
-Examples:
-*  `deleteassignment a/Quiz 1` Deletes the assignment `Quiz 1` for all students in the current group .
-
----
-
 ### Listing all assignments: `listassignments` (`lista`)
 
 Shows a list of all assignments for the current group.
@@ -868,7 +856,7 @@ Format:
 * `gradeassignment a/ASSIGNMENT_NAME i/INDEX_EXPRESSION gr/GRADE`
 * `gradeassignment a/ASSIGNMENT_NAME m/MATRIC_NUMBER [m/MATRIC_NUMBER] gr/GRADE`
 
-Notes: 
+Notes:
 * `GRADE` is a number between 0 and max marks.
 * Grading again overwrites the old grade.
 
@@ -876,6 +864,18 @@ Examples:
 *  `gradeassignment a/Quiz 1 m/A1234567X m/A2345678L gr/17` Assigns a grade of 17 for the assignment `Quiz 1` to the students with matric number A1234567X and A2345678L for the current group.
 
 <div style="page-break-after: always;"></div>
+
+---
+
+### Deleting an assignment: `deleteassignment` (`deletea`)
+
+Deletes an assignment for the students in the current group.
+
+Format:
+* `deleteassignment a/ASSIGNMENT_NAME`
+
+Examples:
+*  `deleteassignment a/Quiz 1` Deletes the assignment `Quiz 1` for all students in the current group .
 
 ---
 
