@@ -122,8 +122,6 @@ How the `Logic` component works:
    Note that although this is shown as a single step in the diagram above (for simplicity), in the code it can take several interactions (between the command object and the `Model`) to achieve.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned back from `Logic`.
 
-<div style="page-break-after: always;"></div>
-
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
 -> <puml src="diagrams/ParserClasses.puml" width="600px"/> <-
@@ -199,6 +197,8 @@ The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
 * inherits from both `AddressBookStorage` and `UserPrefStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
+
+---
 
 ### Common classes
 
@@ -1527,12 +1527,12 @@ testers are expected to do more *exploratory* testing.
 <p></p>
 
 5. Test case: `gradea a/Quiz 2 i/1 gr/100`
-    * Expected: `Grade should be a non-negative number with at most 3 decimal places.` error message
+    * Expected: `Grade must be between 0 and 10 (the assignment's max marks) inclusive` error message
 
 <p></p>
 
 6. Test case: `gradea a/Quiz 2 i/1 gr/-1`
-    * Expected: `Grade should be a non-negative integer.` error message.
+    * Expected: `Grade should be a non-negative number with at most 3 decimal places.` error message.
 
 ### Deleting an assignment
 
@@ -1709,4 +1709,3 @@ Team size: 5
 
 3. **Validate person session dates against group sessions on load**:
    Currently, a person's session records are not cross-checked against the group's session list during loading. A manually edited save file could contain a person with a session date that does not exist in the group's session list, and TAA will load it without warning. `view` and `exportview` will still show all sessions (union of group's and student's sessions), but the group's session list in JSON does not capture the full picture of what sessions will be shown. Additionally, this inconsistency can cause `addsession` to treat an existing person-level session as newly created, resulting in a misleading partial-success message. A future enhancement would validate person session dates against the group's session list during load, and skip person-level session entries whose dates do not exist in the group's session list, reporting them as load warnings.
-
